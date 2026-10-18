@@ -173,6 +173,9 @@ body.locked .app{display:none}
 #gate form{margin:0}#gate input{text-align:center}
 .keep{flex-basis:100%;display:flex;gap:8px;align-items:center;justify-content:center;font-size:14px;color:var(--mute);cursor:pointer}
 .keep input{flex:none;width:18px;height:18px;accent-color:var(--pri)}
+.gswap{margin-top:16px;font-size:14px;font-weight:700;color:#14532d;background:#dcfce7;border-radius:999px;padding:9px 20px}
+.gswap:hover{filter:brightness(.96)}
+[data-theme=dark] .gswap{background:#14532d;color:#bbf7d0}
 .gerr{min-height:1.6em;margin:12px 0 0;font-size:14px;color:#c0392b}
 @media(max-width:1200px){.home{grid-template-columns:1fr}.quick{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:899px){
@@ -244,7 +247,11 @@ body.locked .app{display:none}
 <div id="gate"><div class="gold"><div class="in">
 <div class="gtext">班級登入</div>
 <h2 class="gt" id="gtitle"></h2>
-<form id="lf" hidden><input id="no" type="number" inputmode="numeric" min="1" max="99" placeholder="座號" required aria-label="座號"><input id="pw" type="password" placeholder="密碼" required autocomplete="current-password" aria-label="密碼"><label class="keep"><input type="checkbox" id="keep" checked>保持登入(這台裝置)</label><button class="btn" style="flex-basis:100%">登入</button></form>
+<div id="gforms" hidden>
+<form id="lf"><input id="no" type="number" inputmode="numeric" min="1" max="99" placeholder="座號" required aria-label="座號"><input id="pw" type="password" placeholder="密碼" required autocomplete="current-password" aria-label="密碼"><label class="keep"><input type="checkbox" id="keep" checked>保持登入(這台裝置)</label><button class="btn" style="flex-basis:100%">登入</button></form>
+<form id="tl" hidden><input id="tu" type="text" placeholder="教師帳號" required autocomplete="username" autocapitalize="none" spellcheck="false" aria-label="教師帳號"><input id="tpw" type="password" placeholder="密碼" required autocomplete="current-password" aria-label="密碼"><label class="keep"><input type="checkbox" id="tkeep" checked>保持登入(這台裝置)</label><button class="btn" style="flex-basis:100%">🐛 登入</button></form>
+<button type="button" class="gswap" id="gswap">🐛 毛毛蟲專用登入</button>
+</div>
 <p class="gerr" id="gerr">載入中…</p>
 </div></div></div>
 
@@ -448,7 +455,7 @@ else{
   const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bad=()=>{};
   let unsubs=[],last=0,staff={name:'管理員',role:'管理員',key:'admin'};
   const stop=()=>{unsubs.forEach(f=>f());unsubs=[]};
-  const lock=msg=>{stop();me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#lf').hidden=false};
+  const lock=msg=>{stop();me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#gforms').hidden=false};
   const start=()=>{
     document.body.classList.remove('locked');
     ['ann','evt','hw','photos','msg'].forEach(k=>unsubs.push(onSnapshot(collection(db,k),s=>{D[k]=s.docs.map(d=>({id:d.id,...d.data()}));render()},bad)));
@@ -465,7 +472,7 @@ else{
       const s=await getDoc(doc(db,'students',u.uid));me=s.exists()?s.data():null;
       if(!me){await getDoc(doc(db,'meta','site'));staff={name:'管理員',role:'管理員',key:'admin'};try{const t=await getDoc(doc(db,'teachers',u.uid));if(t.exists())staff={name:t.data().name,role:'老師',key:'teacher'}}catch(x){}}
       stop();start();
-    }catch(e){if(e&&e.code==='permission-denied'){await signOut(auth);lock('此帳號已停用或沒有權限')}else{stop();document.body.classList.add('locked');$('#lf').hidden=true;$('#gerr').textContent='連線不穩,請重新整理頁面(登入狀態還在)'}}
+    }catch(e){if(e&&e.code==='permission-denied'){await signOut(auth);lock('此帳號已停用或沒有權限')}else{stop();document.body.classList.add('locked');$('#gforms').hidden=true;$('#gerr').textContent='連線不穩,請重新整理頁面(登入狀態還在)'}}
   });
   $('#lf').onsubmit=async e=>{e.preventDefault();$('#gerr').textContent='';
     const no=String(parseInt($('#no').value,10));
@@ -474,6 +481,17 @@ else{
       await signInWithEmailAndPassword(auth,m.data().email,$('#pw').value);$('#pw').value='';try{localStorage.setItem('cls-no',no)}catch(x){}}
     catch(err){$('#gerr').textContent='座號或密碼錯誤'}};
   try{$('#no').value=localStorage.getItem('cls-no')||''}catch(e){}
+  /* 毛毛蟲專用登入(老師) */
+  let tmode=false;
+  const gmode=t=>{tmode=t;$('#lf').hidden=t;$('#tl').hidden=!t;$('#gswap').textContent=t?'← 回到學生登入':'🐛 毛毛蟲專用登入';$('#gerr').textContent='';setTimeout(()=>$(t?'#tu':'#no').focus({preventScroll:true}),0)};
+  $('#gswap').onclick=()=>gmode(!tmode);
+  try{$('#tu').value=localStorage.getItem('cls-tu')||''}catch(e){}
+  $('#tl').onsubmit=async e=>{e.preventDefault();$('#gerr').textContent='';
+    const v=$('#tu').value.trim();
+    try{let email=v;if(!v.includes('@')){const m=await getDoc(doc(db,'login','t_'+v.toLowerCase()));if(!m.exists())throw 0;email=m.data().email}
+      await setPersistence(auth,$('#tkeep').checked?browserLocalPersistence:browserSessionPersistence);
+      await signInWithEmailAndPassword(auth,email,$('#tpw').value);$('#tpw').value='';try{localStorage.setItem('cls-tu',v)}catch(x){}}
+    catch(err){$('#gerr').textContent='帳號或密碼錯誤'}};
   $('#out').onclick=()=>{$('#umenu').hidden=true;signOut(auth)};
   const send=async e=>{e.preventDefault();
     if(Date.now()-last<1500)return;
