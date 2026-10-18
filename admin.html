@@ -57,6 +57,39 @@ td input{width:100%;text-align:center;border:0;background:transparent;padding:10
 .av2{flex:none;width:34px;height:34px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:900;font-size:13px}
 details{margin:0 0 14px}summary{cursor:pointer;color:var(--mute);font-size:14px;margin-bottom:10px}
 #made{white-space:pre-line}
+main,.top>div{max-width:1120px}
+.shell{display:grid;grid-template-columns:230px 1fr;gap:22px;align-items:start}
+.snav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 74px);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.snav h4{margin:14px 10px 4px;font-size:12px;color:var(--mute);letter-spacing:.14em;font-weight:700}
+.snav h4:first-child{margin-top:4px}
+.snav button{display:flex;justify-content:space-between;align-items:center;width:100%;text-align:left;background:none;border-radius:10px;padding:10px 12px;font-weight:700}
+.snav button:hover{background:var(--hover)}
+.snav button[aria-selected=true]{background:linear-gradient(100deg,#d4af37,#f6e27a);color:#2a2000}
+.snav .b{font-size:12px;background:var(--chip);border-radius:999px;padding:0 9px;color:var(--mute);min-width:22px;text-align:center}
+.snav .b:empty{display:none}
+.snav button[aria-selected=true] .b{background:rgba(0,0,0,.14);color:#2a2000}
+.content{min-width:0}
+.pane{display:none}
+.pane.on{display:block}
+.panel.pane{background:none;border:0;padding:0;margin:0}
+.pane>h2{font-size:28px;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 18px;font-size:14px}
+.cell{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:14px}
+.cell form{margin:0}
+.cell>input{width:100%;flex:none;margin-bottom:14px}
+.cell>input:last-child{margin-bottom:0}
+.cell ul{padding:0}
+.ch{margin:0 0 14px;font-size:14px;font-weight:900;display:flex;align-items:center;gap:8px}
+.ch::before{content:"";width:4px;height:14px;border-radius:2px;background:linear-gradient(#d4af37,#f6e27a)}
+.fl{display:block;font-size:13px;font-weight:700;color:var(--mute);margin:0 0 6px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
+.tile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;min-height:132px;transition:transform .15s,border-color .15s}
+.tile:hover{transform:translateY(-3px);border-color:#d4af37;background:var(--card)}
+.tile .tl{font-weight:700;color:var(--mute);font-size:14px}
+.tile b{font-size:34px;line-height:1.2;font-weight:900;overflow-wrap:anywhere}
+.tile small{display:block;color:var(--mute)}
+.tile i{margin-top:auto;font-style:normal;font-size:13px;font-weight:700;color:var(--gt)}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.snav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:9;flex-direction:row;overflow-x:auto;scrollbar-width:none;border-radius:14px;padding:8px}.snav h4{display:none}.snav button{width:auto;white-space:nowrap;gap:8px;padding:8px 14px}}
 </style>
 </head>
 <body>
@@ -69,32 +102,57 @@ details{margin:0 0 14px}summary{cursor:pointer;color:var(--mute);font-size:14px;
 <main>
 <div class="panel" id="login"><h2>管理員登入</h2><form id="lf"><input id="em" type="text" placeholder="Email 或教師帳號" required autocomplete="username" aria-label="Email 或教師帳號"><input id="pw" type="password" placeholder="密碼" required autocomplete="current-password" aria-label="密碼"><button class="pri">登入</button></form><p class="err" id="err"></p><p class="hint" id="cfgnote" hidden>尚未設定 Firebase:請打開 admin.html,把設定貼到 FIREBASE_CONFIG。</p></div>
 <div id="app" hidden>
-<p class="hint"><b>怎麼用:</b>先在「學生帳號」建立座號、名稱、密碼,同學用座號加密碼登入班級網頁。「教師帳號」只有你(擁有者)看得到,老師可用帳號加密碼登入這個後台,權限和你一樣,只是不能管理教師帳號。你的 <b>UID</b> 要貼進 Firestore 規則。</p>
+<div class="shell">
+<aside class="snav" id="snav" aria-label="後台分類">
+<h4>總覽</h4>
+<button data-pane="home" aria-selected="true">首頁總覽</button>
+<h4>內容管理</h4>
+<button data-pane="ann" aria-selected="false">公告<span class="b" id="b-ann"></span></button>
+<button data-pane="evt" aria-selected="false">行事曆<span class="b" id="b-evt"></span></button>
+<button data-pane="hw" aria-selected="false">作業<span class="b" id="b-hw"></span></button>
+<button data-pane="sched" aria-selected="false">課表與時間</button>
+<button data-pane="photos" aria-selected="false">相簿<span class="b" id="b-photos"></span></button>
+<button data-pane="msg" aria-selected="false">留言<span class="b" id="b-msg"></span></button>
+<h4>帳號</h4>
+<button data-pane="students" aria-selected="false">學生帳號<span class="b" id="b-students"></span></button>
+<button data-pane="teachers" id="nt" aria-selected="false" hidden>教師帳號<span class="b" id="b-teachers"></span></button>
+<h4>設定</h4>
+<button data-pane="site" aria-selected="false">基本設定</button>
+</aside>
+<div class="content">
 
-<div class="panel"><h2>基本設定</h2>
-<div class="row"><input id="title" placeholder="班級名稱" maxlength="20" aria-label="班級名稱"></div>
-<div class="row"><input id="tag" placeholder="一句話介紹" maxlength="80" aria-label="一句話介紹"></div></div>
+<div class="panel pane on" id="p-home"><h2>總覽</h2><p class="sub">點任何一格,進入對應的管理區。</p>
+<div class="tiles" id="tiles"></div>
+<p class="hint" style="margin-top:18px"><b>怎麼用:</b>先在「學生帳號」建立座號、名稱、密碼,同學用座號加密碼登入班級網頁。「教師帳號」只有你(擁有者)看得到,老師可用帳號加密碼登入這個後台,權限和你一樣,只是不能管理教師帳號。</p></div>
 
-<div class="panel" id="tpanel" hidden><h2>教師帳號 <em id="ct">教師可管理所有內容與學生帳號</em></h2>
-<form id="tf"><input name="user" placeholder="登入帳號(英數字)" required pattern="[A-Za-z0-9_]{2,16}" maxlength="16" aria-label="登入帳號"><input name="name" placeholder="老師名稱" required maxlength="12" aria-label="老師名稱"><input name="pw" id="tpw" placeholder="密碼(至少 6 碼)" required minlength="6" maxlength="30" aria-label="密碼"><button type="button" id="trnd">隨機密碼</button><button class="pri">建立教師帳號</button></form>
-<div class="hint" id="tmade" hidden></div>
-<ul id="lt"></ul></div>
-
-<div class="panel"><h2>學生帳號 <em id="cs"></em></h2>
-<form id="sf"><input name="no" type="number" min="1" max="99" placeholder="座號" required style="flex:0 1 90px" aria-label="座號"><input name="name" placeholder="名稱" required maxlength="12" aria-label="名稱"><input name="pw" id="spw" placeholder="密碼(至少 6 碼)" required minlength="6" maxlength="30" aria-label="密碼"><button type="button" id="rnd">隨機密碼</button><button class="pri">建立帳號</button></form>
-<details><summary>一次貼上整班(每行:座號,名稱,密碼)</summary><textarea id="bulk" placeholder="1,王小明,abc123&#10;2,李小華,xyz789"></textarea><button class="pri" id="bulkgo" type="button">批次建立</button></details>
-<div class="hint" id="made" hidden></div>
-<ul id="ls"></ul></div>
+<div class="panel pane" id="p-site"><h2>基本設定</h2><p class="sub">班級名稱與一句話介紹,會顯示在班級網頁首頁。</p>
+<div class="cell"><label class="fl" for="title">班級名稱</label><input id="title" placeholder="班級名稱" maxlength="20"><label class="fl" for="tag">一句話介紹</label><input id="tag" placeholder="一句話介紹" maxlength="80"></div></div>
 
 <div id="lists"></div>
 
-<div class="panel"><h2>節次時間表 <em>填每一節的開始與結束時間</em></h2><div class="tw"><table id="tt"></table></div></div>
+<div class="panel pane" id="p-sched"><h2>課表與時間</h2><p class="sub">先填每一節的時間,再填一週的課表(每天 8 節)。</p>
+<div class="cell"><h3 class="ch">節次時間表</h3><div class="tw"><table id="tt"></table></div></div>
+<div class="cell"><h3 class="ch">每週課表</h3><div class="tw"><table id="tb"></table></div></div></div>
 
-<div class="panel"><h2>每週課表</h2><div class="tw"><table id="tb"></table></div></div>
+<div class="panel pane" id="p-photos"><h2>相簿 <em id="cp"></em></h2><p class="sub">照片會自動縮小後上傳,每張限制在約 900KB 內。</p>
+<div class="cell"><h3 class="ch">上傳照片</h3><input id="up" type="file" accept="image/*" multiple aria-label="選擇照片"></div>
+<div class="cell"><h3 class="ch">所有照片</h3><div class="pics" id="pics"></div></div></div>
 
-<div class="panel"><h2>相簿 <em id="cp"></em></h2>
-<div class="row"><input id="up" type="file" accept="image/*" multiple aria-label="選擇照片"></div>
-<div class="pics" id="pics"></div></div>
+<div class="panel pane" id="p-students"><h2>學生帳號 <em id="cs"></em></h2><p class="sub">同學用「座號 + 密碼」登入班級網頁。密碼只會在建立當下顯示一次。</p>
+<div class="cell"><h3 class="ch">新增單一學生</h3>
+<form id="sf"><input name="no" type="number" min="1" max="99" placeholder="座號" required style="flex:0 1 90px" aria-label="座號"><input name="name" placeholder="名稱" required maxlength="12" aria-label="名稱"><input name="pw" id="spw" placeholder="密碼(至少 6 碼)" required minlength="6" maxlength="30" aria-label="密碼"><button type="button" id="rnd">隨機密碼</button><button class="pri">建立帳號</button></form></div>
+<div class="cell"><h3 class="ch">整班一次建立</h3>
+<details><summary>展開貼上(每行:座號,名稱,密碼)</summary><textarea id="bulk" placeholder="1,王小明,abc123&#10;2,李小華,xyz789"></textarea><button class="pri" id="bulkgo" type="button">批次建立</button></details></div>
+<div class="hint" id="made" hidden></div>
+<div class="cell"><h3 class="ch">學生名單</h3><ul id="ls"></ul></div></div>
+
+<div class="panel pane" id="p-teachers"><h2>教師帳號 <em id="ct"></em></h2><p class="sub">老師用「帳號 + 密碼」登入後台,可管理所有內容與學生帳號,但不能管理教師帳號。</p>
+<div class="cell"><h3 class="ch">新增教師</h3>
+<form id="tf"><input name="user" placeholder="登入帳號(英數字)" required pattern="[A-Za-z0-9_]{2,16}" maxlength="16" aria-label="登入帳號"><input name="name" placeholder="老師名稱" required maxlength="12" aria-label="老師名稱"><input name="pw" id="tpw" placeholder="密碼(至少 6 碼)" required minlength="6" maxlength="30" aria-label="密碼"><button type="button" id="trnd">隨機密碼</button><button class="pri">建立教師帳號</button></form></div>
+<div class="hint" id="tmade" hidden></div>
+<div class="cell"><h3 class="ch">教師名單</h3><ul id="lt"></ul></div></div>
+
+</div></div>
 </div>
 </main>
 <div id="toast" role="status"></div>
@@ -113,17 +171,31 @@ const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric'
 const list=(ul,rows,empty)=>{$(ul).innerHTML=rows.length?rows.join(''):`<li class="empty">${empty}</li>`};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3000)};
 const S={ann:[],evt:[],hw:[],msg:[],photos:[],sched:{},times:{}};
+let ROS=[],ROT=[],ROLE='';
 const CFG=[
  ['ann','公告',[['t','公告內容','text']]],
  ['evt','行事曆',[['t','活動名稱','text'],['d','','date']]],
  ['hw','作業',[['t','作業內容','text'],['d','','date']]],
- ['msg','留言牆(可刪除不當留言)',[]]
+ ['msg','留言',[]]
 ];
-$('#lists').innerHTML=CFG.map(([k,l,fs])=>`<div class="panel"><h2>${l} <em id="c-${k}"></em></h2>
-${fs.length?`<form data-k="${k}">${fs.map(([n,p,t])=>`<input name="${n}" type="${t}" placeholder="${p}" required maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form>`:''}
-<ul id="l-${k}"></ul></div>`).join('');
+const DESC={ann:'發布給全班看的公告,最新的一則會顯示在首頁。',evt:'新增考試、活動等日期,首頁會顯示倒數天數。',hw:'新增作業與截止日,勾選代表已完成。',msg:'同學留的言,可以刪除不適當的內容。'};
+$('#lists').innerHTML=CFG.map(([k,l,fs])=>`<div class="panel pane" id="p-${k}"><h2>${l} <em id="c-${k}"></em></h2><p class="sub">${DESC[k]}</p>
+${fs.length?`<div class="cell"><h3 class="ch">新增${l}</h3><form data-k="${k}">${fs.map(([n,p,t])=>`<input name="${n}" type="${t}" placeholder="${p}" required maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form></div>`:''}
+<div class="cell"><h3 class="ch">${k==='msg'?'全部留言':'已發布的'+l}</h3><ul id="l-${k}"></ul></div></div>`).join('');
 
-function draw(k){
+const go=p=>{document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));document.querySelectorAll('#snav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.pane===p));scrollTo({top:0})};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-pane]');if(b)go(b.dataset.pane)});
+function refresh(){
+  const open=S.hw.filter(h=>!h.done).length,filled=Object.values(S.sched).filter(Boolean).length;
+  const B={ann:S.ann.length,evt:S.evt.length,hw:open,photos:S.photos.length,msg:S.msg.length,students:ROS.length,teachers:ROT.length};
+  Object.entries(B).forEach(([k,v])=>{const el=$('#b-'+k);if(el)el.textContent=v||''});
+  const T=[['ann','公告',S.ann.length,'則'],['evt','行事曆',S.evt.length,'項'],['hw','作業',open,'項未完成'],['sched','課表與時間',filled,'/ 40 格已填'],['photos','相簿',S.photos.length,'張'],['msg','留言',S.msg.length,'則'],['students','學生帳號',ROS.length,'位']];
+  if(ROLE==='admin')T.push(['teachers','教師帳號',ROT.length,'位']);
+  T.push(['site','基本設定',($('#title').value||'—'),'班級名稱']);
+  $('#tiles').innerHTML=T.map(([p,l,n,u])=>`<button class="tile" data-pane="${p}"><span class="tl">${l}</span><b>${esc(n)}</b><small>${u}</small><i>進入 ›</i></button>`).join('');
+}
+function draw(k){draw0(k);refresh()}
+function draw0(k){
   if(k==='photos'){$('#cp').textContent=S.photos.length?S.photos.length+' 張':'';
     $('#pics').innerHTML=[...S.photos].sort((a,b)=>b.ts-a.ts).map(p=>`<div class="pw"><img src="${esc(p.url)}" alt="班級照片"><button class="x" data-k="photos" data-id="${p.id}" aria-label="刪除照片">×</button></div>`).join('');return}
   if(k==='times'){let h='<tr><th>節次</th><th>開始</th><th>結束</th></tr>';
@@ -147,7 +219,7 @@ if(!FIREBASE_CONFIG.projectId){$('#cfgnote').hidden=false;$('#lf').hidden=true}
 else{
   const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bad=e=>toast('同步失敗:'+(e.code||e.message));
   const run=p=>Promise.resolve(p).catch(e=>toast(e.code==='permission-denied'?'沒有權限(UID 還沒加進規則?)':'操作失敗:'+(e.code||e.message)));
-  let unsub=[],ROS=[];
+  let unsub=[];
   const sec=initializeApp(FIREBASE_CONFIG,'sec'),secAuth=getAuth(sec);
   const emsg=e=>e.code==='auth/weak-password'?'密碼至少 6 碼':e.code==='permission-denied'?'沒有權限(規則還沒更新?)':'失敗:'+(e.code||e.message);
   const drawRos=()=>{$('#cs').textContent=ROS.length?ROS.length+' 位':'';
@@ -164,7 +236,6 @@ else{
     el.hidden=false;el.innerHTML='<b>已建立,請現在記下密碼(之後不會再顯示):</b>\n'+esc(txt)+'\n<button id="cp2" type="button" style="margin-top:8px">複製</button>';
     $('#cp2').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('已複製'))};
   const rnd=()=>{const c='abcdefghjkmnpqrstuvwxyz23456789';return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('')};
-  let ROT=[];
   const drawTea=()=>{$('#lt').innerHTML=[...ROT].sort((a,b)=>a.username<b.username?-1:1).map(o=>`<li><span class="av2">師</span><span class="t"><b>${esc(o.name)}</b><small>帳號:${esc(o.username)}</small></span><button data-rt="${o.id}">重設密碼</button><button class="x" data-dt="${o.id}" aria-label="停用教師帳號">×</button></li>`).join('')||'<li class="empty">還沒有教師帳號</li>'};
   async function makeT(user,name,pw){
     const email=`t-${user}-${Date.now().toString(36)}@class.invalid`;
@@ -203,14 +274,13 @@ else{
     if(ds){const r=ROS.find(x=>x.id===ds.dataset.ds);if(!r||!confirm(`確定要停用座號 ${r.no} ${r.name} 的帳號嗎?`))return;
       run(deleteDoc(doc(db,'students',r.id)));run(deleteDoc(doc(db,'login',String(r.no))))}});
   const start=()=>{
-    if(ROLE==='admin')unsub.push(onSnapshot(collection(db,'teachers'),s=>{ROT=s.docs.map(d=>({id:d.id,...d.data()}));drawTea()},bad));
+    if(ROLE==='admin')unsub.push(onSnapshot(collection(db,'teachers'),s=>{ROT=s.docs.map(d=>({id:d.id,...d.data()}));drawTea();refresh()},bad));
     unsub.push(onSnapshot(doc(db,'meta','times'),s=>{S.times=(s.data()||{}).t||{};if(!document.activeElement.closest('#tt'))draw('times')},bad));
-    unsub.push(onSnapshot(collection(db,'students'),s=>{ROS=s.docs.map(d=>({id:d.id,...d.data()}));drawRos()},bad));
+    unsub.push(onSnapshot(collection(db,'students'),s=>{ROS=s.docs.map(d=>({id:d.id,...d.data()}));drawRos();refresh()},bad));
     ['ann','evt','hw','msg','photos'].forEach(k=>unsub.push(onSnapshot(collection(db,k),s=>{S[k]=s.docs.map(d=>({id:d.id,...d.data()}));draw(k)},bad)));
-    unsub.push(onSnapshot(doc(db,'meta','site'),s=>{const m=s.data()||{};if(document.activeElement!==$('#title'))$('#title').value=m.title||'我們班';if(document.activeElement!==$('#tag'))$('#tag').value=m.tag||''},bad));
+    unsub.push(onSnapshot(doc(db,'meta','site'),s=>{const m=s.data()||{};if(document.activeElement!==$('#title'))$('#title').value=m.title||'我們班';if(document.activeElement!==$('#tag'))$('#tag').value=m.tag||'';refresh()},bad));
     unsub.push(onSnapshot(doc(db,'meta','sched'),s=>{S.sched=(s.data()||{}).cells||{};if(!document.activeElement.closest('#tb'))draw('sched')},bad));
   };
-  let ROLE='';
   onAuthStateChanged(auth,async u=>{
     unsub.forEach(f=>f());unsub=[];
     const show=(on,label)=>{$('#login').hidden=on;$('#app').hidden=!on;$('#out').hidden=!on;$('#who').hidden=!on;if(on)$('#who').textContent=label};
@@ -219,7 +289,7 @@ else{
       if((await getDoc(doc(db,'students',u.uid))).exists())throw 0;
       const tr=await getDoc(doc(db,'teachers',u.uid));
       if(tr.exists())ROLE='teacher';else{await getDocs(collection(db,'teachers'));ROLE='admin'}
-      $('#tpanel').hidden=ROLE!=='admin';
+      $('#nt').hidden=ROLE!=='admin';go('home');refresh();
       show(true,ROLE==='admin'?'UID:'+u.uid:'老師・'+tr.data().name);
       start();
     }catch(e){await signOut(auth);show(false);$('#err').textContent='此帳號沒有後台權限'}
