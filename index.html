@@ -186,6 +186,9 @@ body.locked .app{display:none}
 }
 @media(max-width:600px){.quick{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+.qf{flex-wrap:nowrap;margin:12px 0 0;padding-top:12px;border-top:1px solid var(--line)}
+.qf input{flex:1 1 auto}
+.qf .btn{padding:11px 20px;flex:none}
 </style>
 </head>
 <body class="locked">
@@ -216,12 +219,13 @@ body.locked .app{display:none}
 <div class="col">
 <div class="banner"><div><h1 id="bt"></h1><p id="bs"></p></div><div class="q">未來的你,<br>會感謝現在努力的自己。</div></div>
 <div class="card"><div class="quick" id="quick"></div></div>
-<div class="two"><div class="card" id="ov-ann"></div><div class="card" id="ov-today"></div></div>
+<div class="two"><div class="card" id="ov-ann"></div><div class="col"><div class="card" id="ov-today"></div><div class="card" id="ov-hw"></div></div></div>
 <button class="card rem" id="ov-rem" data-go="sched"></button>
 </div>
 <div class="col">
 <div class="card" id="ov-cal"></div>
-<div class="card" id="ov-chat"></div>
+<div class="card"><div id="ov-chat"></div>
+<form id="fm2" class="qf"><input name="m" placeholder="說點什麼…" maxlength="300" required aria-label="直接留言"><button class="btn">送出</button></form></div>
 <div class="card" id="ov-pics"></div>
 </div>
 </div></section>
@@ -331,6 +335,8 @@ function render(){
   /* homework */
   const open=D.hw.filter(h=>!h.done).sort((a,b)=>a.d<b.d?-1:1);
   put('#lh',[...D.hw].sort((p,q)=>(!!p.done-!!q.done)||(p.d<q.d?-1:1)).map(o=>{const n=dleft(o.d);return `<li class="row ${o.done?'done':''}"><span class="ck">${o.done?'✓':''}</span><span class="t"><span>${esc(o.t)}</span><small>${esc(o.d)}</small></span><span class="pill ${!o.done&&n<=1?'hot':''}">${when(n)}</span></li>`}).join('')||'<li class="empty">目前沒有作業</li>');
+  const dueNow=open.filter(h=>dleft(h.d)<=1);
+  put('#ov-hw',ch('今日作業','sched','sched','查看全部')+`<ul>${dueNow.length?dueNow.map(o=>{const n=dleft(o.d);return `<li class="row"><span class="ck"></span><span class="t"><span>${esc(o.t)}</span><small>${esc(o.d)}</small></span><span class="pill ${n<=0?'hot':''}">${n<0?'已逾期':n===0?'今天截止':'明天截止'}</span></li>`}).join(''):`<li class="empty">${open[0]?`今天沒有要交的作業,下一個:${esc(open[0].t)}(${when(dleft(open[0].d))})`:'目前沒有作業'}</li>`}</ul>`);
   const o0=open[0],e0=up[0];
   put('#ov-rem',`<span class="ri">${ic(I.cap)}</span><span><b>本週小提醒</b><small>${o0?`作業「${esc(o0.t)}」${dleft(o0.d)<=0?'今天':'在 '+when(dleft(o0.d))}截止,記得完成喔!`:e0?`${esc(e0.t)}:${when(dleft(e0.d))}。`:'目前沒有待辦事項,好好休息!'}</small></span>${ic(I.go)}`);
   /* schedule */
@@ -353,7 +359,7 @@ function render(){
 render();setInterval(render,60000);
 
 /* ---------- firebase ---------- */
-if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false;setUser('訪客','未連線')}
+if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false;$('#fm').hidden=true;$('#fm2').hidden=true;setUser('訪客','未連線')}
 else{
   const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bad=()=>{};
   let unsubs=[],me=null,last=0,staff={name:'管理員',role:'管理員'};
@@ -366,7 +372,7 @@ else{
     unsubs.push(onSnapshot(doc(db,'meta','sched'),s=>{D.sched=(s.data()||{}).cells||{};render()},bad));
     unsubs.push(onSnapshot(doc(db,'meta','times'),s=>{D.times=(s.data()||{}).t||{};render()},bad));
     if(me)setUser(me.name,'座號 '+me.no);else setUser(staff.name,staff.role);
-    $('#fm').hidden=!me;$('#fmnote').hidden=!!me;
+    $('#fm').hidden=!me;$('#fm2').hidden=!me;$('#fmnote').hidden=!!me;
   };
   onAuthStateChanged(auth,async u=>{
     if(!u){lock();return}
@@ -384,11 +390,12 @@ else{
     catch(err){$('#gerr').textContent='座號或密碼錯誤'}};
   try{$('#no').value=localStorage.getItem('cls-no')||''}catch(e){}
   $('#out').onclick=()=>{$('#umenu').hidden=true;signOut(auth)};
-  $('#fm').onsubmit=async e=>{e.preventDefault();
+  const send=async e=>{e.preventDefault();
     if(!me)return;if(Date.now()-last<15000){alert('留言太快了,請稍等幾秒');return}
     const m=e.target.m.value.trim();if(!m)return;
     try{await addDoc(collection(db,'msg'),{n:me.name,no:me.no,m,ts:Date.now()});last=Date.now();e.target.m.value=''}
     catch(err){alert('送出失敗,請稍後再試')}};
+  $('#fm').onsubmit=send;$('#fm2').onsubmit=send;
 }
 </script>
 </body>
