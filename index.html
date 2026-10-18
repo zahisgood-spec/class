@@ -67,7 +67,7 @@ section.on{display:block}
 .banner h1{margin:0;font:900 clamp(28px,4vw,46px)/1.25 "Noto Serif TC",serif;font-style:italic;transform:rotate(-3deg);text-shadow:0 4px 24px rgba(120,180,255,.6);overflow-wrap:anywhere}
 .banner p{margin:10px 0 0;font-size:16px;opacity:.95}
 .banner .q{font-size:14px;line-height:1.7;opacity:.9;max-width:14em;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.5)}
-.quick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .qt{position:relative;text-align:left;display:flex;flex-direction:column;gap:3px;padding:16px;border-radius:16px;background:color-mix(in srgb,var(--tc) 9%,var(--card));border:1px solid color-mix(in srgb,var(--tc) 22%,transparent);transition:transform .15s}
 .qt:hover{transform:translateY(-3px)}
 .qi{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--tc) 18%,var(--card));color:var(--tc);margin-bottom:8px}
@@ -177,7 +177,7 @@ body.locked .app{display:none}
 .gswap:hover{filter:brightness(.96)}
 [data-theme=dark] .gswap{background:#14532d;color:#bbf7d0}
 .gerr{min-height:1.6em;margin:12px 0 0;font-size:14px;color:#c0392b}
-@media(max-width:1200px){.home{grid-template-columns:1fr}.quick{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:1200px){.home{grid-template-columns:1fr}}
 @media(max-width:899px){
  .app{grid-template-columns:64px minmax(0,1fr)}
  .side{height:100vh;height:100dvh;padding:calc(14px + env(safe-area-inset-top,0px)) 6px calc(14px + env(safe-area-inset-bottom,0px));gap:18px;align-items:center;overflow-y:auto;scrollbar-width:none}
@@ -196,14 +196,17 @@ body.locked .app{display:none}
  .card{padding:16px}
  .banner{padding:24px;min-height:160px}
  table{min-width:0}th,td{padding:8px 2px;font-size:12px}td{height:44px}tr>:first-child{width:44px}
- #dock{width:min(380px,calc(100vw - 16px));right:8px}
- #dock:not(.open){height:calc(54px + env(safe-area-inset-bottom,0px))}
- #dock.open{height:min(580px,calc(100vh - 90px));height:min(580px,calc(100dvh - 90px))}
+ #dock{left:0;right:0;width:auto;border-radius:22px 22px 0 0;height:calc(62px + env(safe-area-inset-bottom,0px))}
+ #dock.open{height:100vh;height:100dvh;border-radius:0;border:0}
+ #dh{min-height:62px;padding-top:8px}
+ #dock.open #dh{padding-top:calc(8px + env(safe-area-inset-top,0px))}
+ #dh::before{content:"";position:absolute;top:6px;left:50%;width:40px;height:4px;border-radius:2px;background:var(--line);transform:translateX(-50%)}
+ #dock.open #dh::before{top:calc(6px + env(safe-area-inset-top,0px))}
 }
 @media(max-width:700px){.two,.calpage{grid-template-columns:1fr}.banner .q{display:none}}
 @media(max-width:600px){
- .quick{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
- .qt{align-items:center;text-align:center;padding:10px 2px;border-radius:14px}
+ .quick{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+ .qt{align-items:center;text-align:center;padding:12px 2px;border-radius:14px}
  .qt small,.qt .go{display:none}
  .qi{width:36px;height:36px;margin-bottom:4px}
  .qt b{font-size:11px;line-height:1.3;overflow-wrap:anywhere}
@@ -219,6 +222,10 @@ body.locked .app{display:none}
 #dock{position:fixed;right:24px;bottom:0;width:380px;z-index:25;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -10px 40px -12px rgba(15,30,80,.38);display:flex;flex-direction:column;height:54px;overflow:hidden;transition:height .3s cubic-bezier(.2,.8,.2,1)}
 #dock.open{height:min(580px,calc(100vh - 90px))}
 #dock.drag{transition:none}
+#dock:not(.open){border-color:rgba(212,175,55,.6);animation:dglow 2.8s ease-in-out infinite}
+#dock:not(.open)::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#f6e27a,#d4af37,#fff3b8,transparent);background-size:200% 100%;animation:dflow 2.2s linear infinite;pointer-events:none}
+@keyframes dglow{0%,100%{box-shadow:0 -6px 24px -10px rgba(212,175,55,.35),0 -10px 40px -12px rgba(15,30,80,.38)}50%{box-shadow:0 -8px 34px -4px rgba(246,226,122,.9),0 -10px 40px -12px rgba(15,30,80,.38)}}
+@keyframes dflow{to{background-position:200% 0}}
 #dh{display:flex;align-items:center;gap:12px;padding:0 16px;min-height:54px;flex:none;position:relative;cursor:pointer;touch-action:none;user-select:none}
 .dt{flex:1;min-width:0;line-height:1.35}
 .dt b{display:block;font-size:15px}
@@ -445,7 +452,7 @@ const now0=new Date();let CAL={y:now0.getFullYear(),m:now0.getMonth()};let me=nu
 /* ---------- static UI ---------- */
 const NAVS=[['ov','首頁','home'],['news','班級公告','ann'],['cal','行事曆','cal'],['sched','課表・作業','sched'],['gal','班級相簿','gal']];
 $('#nav').innerHTML=NAVS.map(([t,l,i],k)=>`<button role="tab" data-go="${t}" aria-selected="${k===0}">${ic(I[i])}${l}</button>`).join('');
-const QT=[['news','班級公告','查看最新消息','ann','#3b82f6'],['gal','班級相簿','回顧美好時光','gal','#8b5cf6'],['cal','行事曆','查看重要日期','cal','#10b981'],['sched','課表・作業','查看課表與作業','sched','#f97316'],['chat','聊天室','一起聊聊吧','chat','#6366f1']];
+const QT=[['news','班級公告','查看最新消息','ann','#3b82f6'],['gal','班級相簿','回顧美好時光','gal','#8b5cf6'],['cal','行事曆','查看重要日期','cal','#10b981'],['sched','課表・作業','查看課表與作業','sched','#f97316']];
 $('#quick').innerHTML=QT.map(([t,l,s,i,c])=>`<button class="qt" data-go="${t}" style="--tc:${c}"><span class="qi">${ic(I[i])}</span><b>${l}</b><small>${s}</small>${ic(I.go).replace('class="ic"','class="ic go"')}</button>`).join('');
 
 const seen=()=>{try{return +localStorage.getItem('cls-seen')||0}catch(e){return 0}};
@@ -494,6 +501,7 @@ let drag=null;
 dh.addEventListener('pointerdown',e=>{drag={y:e.clientY,h:dock.offsetHeight,moved:false};dh.setPointerCapture(e.pointerId)});
 dh.addEventListener('pointerup',e=>{if(!drag)return;const d=drag,dy=e.clientY-d.y;drag=null;dock.classList.remove('drag');dock.style.height='';
   if(!d.moved||!mob())setOpen(!dock.classList.contains('open'));else setOpen(dy<0)});
+dh.addEventListener('pointermove',e=>{if(!drag||!mob())return;const dy=e.clientY-drag.y;if(Math.abs(dy)>6){drag.moved=true;dock.classList.add('drag');dock.style.height=Math.max(62,Math.min(innerHeight,drag.h-dy))+'px'}});
 dh.addEventListener('pointercancel',()=>{drag=null;dock.classList.remove('drag');dock.style.height=''});
 dh.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setOpen(!dock.classList.contains('open'))}});
 ci.addEventListener('input',()=>{ci.style.height='auto';ci.style.height=Math.min(ci.scrollHeight,110)+'px'});
