@@ -53,7 +53,7 @@ nav button[aria-selected=true]{background:linear-gradient(100deg,#2f6bff,#1d54e0
 #umenu{position:absolute;right:0;top:calc(100% + 8px);background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:6px;min-width:130px}
 #umenu button{width:100%;text-align:left;padding:10px 14px;border-radius:10px;font-weight:700}
 #umenu button:hover{background:var(--hover)}
-main{padding:24px 28px calc(48px + env(safe-area-inset-bottom,0px))}
+main{padding:24px 28px calc(96px + env(safe-area-inset-bottom,0px))}
 .note{margin:0 0 16px;font-size:14px;color:#7a5600;background:#fff0c4;border-radius:12px;padding:10px 16px}
 section{display:none}
 section.on{display:block}
@@ -181,7 +181,7 @@ body.locked .app{display:none}
  .brand small,.sfoot{display:none}.brand b{font-size:15px;white-space:nowrap}.logo{width:36px;height:36px;font-size:17px;border-radius:10px}
  nav{flex-direction:row;gap:4px}nav button{padding:9px 14px;white-space:nowrap;font-size:14px}nav .ic{display:none}
  .topbar{position:static;padding:12px 16px}.un{display:none}
- main{padding:16px 16px calc(40px + env(safe-area-inset-bottom,0px))}
+ main{padding:16px 16px calc(96px + env(safe-area-inset-bottom,0px))}
  .two,.calpage{grid-template-columns:1fr}.banner{padding:24px;min-height:160px}.banner .q{display:none}
 }
 @media(max-width:600px){.quick{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -189,6 +189,42 @@ body.locked .app{display:none}
 .qf{flex-wrap:nowrap;margin:12px 0 0;padding-top:12px;border-top:1px solid var(--line)}
 .qf input{flex:1 1 auto}
 .qf .btn{padding:11px 20px;flex:none}
+
+[data-theme=light]{--chatbg:#e4ebf6;--mine:#8de06f;--mineink:#10230a;--other:#fff}
+[data-theme=dark]{--chatbg:#0d1424;--mine:#1fa85a;--mineink:#fff;--other:#1d2740}
+#dock{position:fixed;right:24px;bottom:0;width:380px;z-index:25;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -10px 40px -12px rgba(15,30,80,.38);display:flex;flex-direction:column;height:54px;overflow:hidden;transition:height .3s cubic-bezier(.2,.8,.2,1)}
+#dock.open{height:min(580px,calc(100vh - 90px))}
+#dock.drag{transition:none}
+#dh{display:flex;align-items:center;gap:12px;padding:0 16px;min-height:54px;flex:none;position:relative;cursor:pointer;touch-action:none;user-select:none}
+.dt{flex:1;min-width:0;line-height:1.35}
+.dt b{display:block;font-size:15px}
+.dt small{display:block;color:var(--mute);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#dock.open .dt small{display:none}
+.ub{min-width:20px;height:20px;border-radius:10px;background:#ef4444;color:#fff;font:700 12px/20px "Noto Sans TC",sans-serif;font-style:normal;text-align:center;padding:0 6px}
+.chev{transition:transform .3s;color:var(--mute)}
+#dock.open .chev{transform:rotate(180deg)}
+#cmain{display:flex;flex-direction:column;flex:1;min-height:0}
+#cbody{flex:1;min-height:0;overflow-y:auto;background:var(--chatbg);padding:14px 12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
+.ds{text-align:center;margin:4px 0}
+.ds span{display:inline-block;background:rgba(40,60,100,.35);color:#fff;font-size:12px;border-radius:999px;padding:2px 12px}
+.m{display:flex;gap:8px;align-items:flex-start}
+.m .mc{min-width:0;max-width:80%}
+.m small{display:block;color:var(--mute);font-size:12px;margin:0 0 2px 2px}
+.mr{display:flex;align-items:flex-end;gap:6px}
+.bb{background:var(--other);padding:8px 13px;border-radius:4px 16px 16px 16px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5;box-shadow:0 1px 1px rgba(0,0,0,.07)}
+.m time{color:var(--mute);font-size:11px;white-space:nowrap;flex:none}
+.m.me{justify-content:flex-end;align-items:flex-end}
+.m.me .bb{background:var(--mine);color:var(--mineink);border-radius:16px 4px 16px 16px;max-width:80%}
+#cf{display:flex;flex-wrap:nowrap;gap:8px;align-items:flex-end;margin:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line);flex:none}
+#ci{flex:1 1 auto;min-height:42px;max-height:110px;border-radius:21px;padding:10px 16px;resize:none;line-height:1.5;overflow-y:auto}
+.send{width:42px;height:42px;border-radius:50%;background:var(--pri);color:#fff;display:grid;place-items:center;flex:none}
+.send:hover{filter:brightness(1.1)}
+@media(max-width:899px){
+ #dock{left:0;right:0;width:auto;border-radius:22px 22px 0 0;height:calc(62px + env(safe-area-inset-bottom,0px))}
+ #dock.open{height:84vh}
+ #dh{min-height:62px;padding-top:8px}
+ #dh::before{content:"";position:absolute;top:6px;left:50%;width:40px;height:4px;border-radius:2px;background:var(--line);transform:translateX(-50%)}
+}
 </style>
 </head>
 <body class="locked">
@@ -224,8 +260,7 @@ body.locked .app{display:none}
 </div>
 <div class="col">
 <div class="card" id="ov-cal"></div>
-<div class="card"><div id="ov-chat"></div>
-<form id="fm2" class="qf"><input name="m" placeholder="說點什麼…" maxlength="300" required aria-label="直接留言"><button class="btn">送出</button></form></div>
+<div class="card" id="ov-chat"></div>
 <div class="card" id="ov-pics"></div>
 </div>
 </div></section>
@@ -236,13 +271,14 @@ body.locked .app{display:none}
 <div class="card"><div class="ch"><h3>每週課表</h3></div><div class="tw"><table id="tb"></table></div></div>
 <div class="card"><div class="ch"><h3>作業提醒</h3></div><ul id="lh"></ul></div></div></section>
 <section id="gal"><h2 class="pg">班級相簿</h2><div class="card"><div class="pics" id="pics"></div></div></section>
-<section id="chat"><h2 class="pg">聊天室</h2><div class="card">
-<form id="fm"><textarea name="m" placeholder="想對大家說什麼?" required maxlength="300" aria-label="留言內容"></textarea><button class="btn">送出留言</button></form>
-<p class="empty" id="fmnote" hidden>管理員與老師請從後台管理留言。</p>
-<ul id="lm"></ul></div></section>
+
 </main>
 </div>
 </div>
+<div id="dock"><div id="dh" role="button" tabindex="0" aria-expanded="false" aria-controls="cmain"><span class="chi"><svg class="ic" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/></svg></span><div class="dt"><b>班級聊天室</b><small id="dsub"></small></div><i class="ub" id="ub" hidden>0</i><svg class="ic chev" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></div>
+<div id="cmain" inert><div id="cbody" aria-live="polite"></div>
+<form id="cf"><textarea id="ci" name="m" rows="1" maxlength="300" placeholder="輸入訊息" aria-label="輸入訊息"></textarea><button class="send" aria-label="送出"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></form>
+<p class="empty" id="cnote" hidden style="padding:12px 16px;margin:0;background:var(--card)">管理員與老師請從後台管理留言。</p></div></div>
 <dialog id="dlg"><img id="big" alt="放大的照片"></dialog>
 
 <script type="module">
@@ -262,10 +298,10 @@ const put=(sel,h)=>{const el=$(sel);if(el.dataset.h!==h){el.dataset.h=h;el.inner
 const ic=p=>`<svg class="ic" viewBox="0 0 24 24">${p}</svg>`;
 const I={home:'<path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>',ann:'<path d="M3 10v4h3l7 4V6L6 10H3zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/>',cal:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',sched:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',gal:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/>',chat:'<path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/>',cap:'<path d="M2 9l10-5 10 5-10 5zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>',go:'<path d="M9 6l6 6-6 6"/>',pin:'<path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'};
 const D={title:'我們班',tag:'班級專屬網站,公告、課表、照片都在這裡。',ann:[],evt:[],hw:[],sched:{},times:{},photos:[],msg:[]};
-const now0=new Date();let CAL={y:now0.getFullYear(),m:now0.getMonth()};
+const now0=new Date();let CAL={y:now0.getFullYear(),m:now0.getMonth()};let me=null;
 
 /* ---------- static UI ---------- */
-const NAVS=[['ov','首頁','home'],['news','班級公告','ann'],['cal','行事曆','cal'],['sched','課表・作業','sched'],['gal','班級相簿','gal'],['chat','聊天室','chat']];
+const NAVS=[['ov','首頁','home'],['news','班級公告','ann'],['cal','行事曆','cal'],['sched','課表・作業','sched'],['gal','班級相簿','gal']];
 $('#nav').innerHTML=NAVS.map(([t,l,i],k)=>`<button role="tab" data-go="${t}" aria-selected="${k===0}">${ic(I[i])}${l}</button>`).join('');
 const QT=[['news','班級公告','查看最新消息','ann','#3b82f6'],['gal','班級相簿','回顧美好時光','gal','#8b5cf6'],['cal','行事曆','查看重要日期','cal','#10b981'],['sched','課表・作業','查看課表與作業','sched','#f97316'],['chat','聊天室','一起聊聊吧','chat','#6366f1']];
 $('#quick').innerHTML=QT.map(([t,l,s,i,c])=>`<button class="qt" data-go="${t}" style="--tc:${c}"><span class="qi">${ic(I[i])}</span><b>${l}</b><small>${s}</small>${ic(I.go).replace('class="ic"','class="ic go"')}</button>`).join('');
@@ -279,7 +315,7 @@ function go(t){
   $('#qres').hidden=true;scrollTo({top:0,behavior:'smooth'});
 }
 document.addEventListener('click',e=>{
-  const g=e.target.closest('[data-go]');if(g){if(g.closest('#qres'))$('#q').value='';go(g.dataset.go);return}
+  const g=e.target.closest('[data-go]');if(g){if(g.closest('#qres'))$('#q').value='';if(g.dataset.go==='chat'){setOpen(true);return}go(g.dataset.go);return}
   const c=e.target.closest('[data-cal]');if(c){const v=+c.dataset.cal;if(!v){const n=new Date();CAL={y:n.getFullYear(),m:n.getMonth()}}else{CAL.m+=v;if(CAL.m<0){CAL.m=11;CAL.y--}if(CAL.m>11){CAL.m=0;CAL.y++}}render();return}
   const im=e.target.closest('.pics img,.thumbs img');if(im){$('#big').src=im.src;$('#dlg').showModal();return}
   if(!e.target.closest('.search'))$('#qres').hidden=true;
@@ -299,6 +335,28 @@ $('#q').oninput=()=>{
   box.innerHTML=R.slice(0,8).map(r=>`<button data-go="${r[0]}"><small>${r[1]}</small>${esc(r[2])}</button>`).join('')||'<p class="empty" style="padding:10px 12px">找不到相關內容</p>';box.hidden=false;
 };
 const setUser=(name,role)=>{$('#un').textContent=name;$('#ur').textContent=role;$('#uav').textContent=[...name][0]||'我'};
+
+/* ---------- chat dock ---------- */
+const dock=$('#dock'),dh=$('#dh'),ci=$('#ci'),mob=()=>matchMedia('(max-width:899px)').matches;
+const chatSeen=()=>{try{return +localStorage.getItem('cls-chat-seen')||0}catch(e){return 0}};
+const markSeen=()=>{try{localStorage.setItem('cls-chat-seen',Date.now())}catch(e){}};
+try{if(!localStorage.getItem('cls-chat-seen'))localStorage.setItem('cls-chat-seen',Date.now())}catch(e){}
+const isMine=o=>!!me&&o.n===me.name&&(o.no==null||o.no===me.no);
+const toEnd=()=>{const b=$('#cbody');b.scrollTop=b.scrollHeight};
+function setOpen(o){
+  dock.classList.toggle('open',o);dock.style.height='';$('#cmain').inert=!o;dh.setAttribute('aria-expanded',o);
+  if(o){markSeen();toEnd();setTimeout(toEnd,330);if(!mob()&&!$('#cf').hidden)ci.focus({preventScroll:true})}
+  render();
+}
+let drag=null;
+dh.addEventListener('pointerdown',e=>{drag={y:e.clientY,h:dock.offsetHeight,moved:false};dh.setPointerCapture(e.pointerId)});
+dh.addEventListener('pointermove',e=>{if(!drag||!mob())return;const dy=e.clientY-drag.y;if(Math.abs(dy)>6){drag.moved=true;dock.classList.add('drag');dock.style.height=Math.max(62,Math.min(innerHeight*.92,drag.h-dy))+'px'}});
+dh.addEventListener('pointerup',e=>{if(!drag)return;const d=drag,dy=e.clientY-d.y;drag=null;dock.classList.remove('drag');dock.style.height='';
+  if(!d.moved||!mob())setOpen(!dock.classList.contains('open'));else setOpen(dy<0)});
+dh.addEventListener('pointercancel',()=>{drag=null;dock.classList.remove('drag');dock.style.height=''});
+dh.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setOpen(!dock.classList.contains('open'))}});
+ci.addEventListener('input',()=>{ci.style.height='auto';ci.style.height=Math.min(ci.scrollHeight,110)+'px'});
+ci.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();$('#cf').requestSubmit()}});
 
 /* ---------- render ---------- */
 const TAG={'置頂':'pin','活動':'act','一般':'gen'};
@@ -349,8 +407,18 @@ function render(){
   put('#ov-today',ch('今日課程','sched','sched','查看課表')+`<ul>${cr.join('')||`<li class="empty">${td>=0&&td<5?'今天沒有課程':'今天是假日,好好休息!'}</li>`}</ul>`);
   /* chat */
   const M=byNew(D.msg);
-  put('#ov-chat',ch('班級聊天','chat','chat','查看全部')+(M.slice(0,3).map(o=>`<div class="msgr">${avatar(o.n)}<div class="t"><b>${esc(o.n)}</b><small>${hm(o.ts)}</small><br>${esc(o.m)}</div></div>`).join('')||'<p class="empty">還沒有留言</p>'));
-  put('#lm',M.map(o=>`<li class="msgr">${avatar(o.n)}<div class="t"><b>${esc(o.n)}</b><small>${o.no?'座號 '+esc(o.no)+' · ':''}${md(o.ts)} ${hm(o.ts)}</small><br>${esc(o.m)}</div></li>`).join('')||'<li class="empty">還沒有留言,來當第一個吧</li>');
+  put('#ov-chat',ch('班級聊天','chat','chat','開啟聊天室')+(M.slice(0,3).map(o=>`<div class="msgr">${avatar(o.n)}<div class="t"><b>${esc(o.n)}</b><small>${hm(o.ts)}</small><br>${esc(o.m)}</div></div>`).join('')||'<p class="empty">還沒有留言</p>'));
+  /* chat dock */
+  const isOpen=dock.classList.contains('open'),cb=$('#cbody'),near=cb.scrollHeight-cb.scrollTop-cb.clientHeight<90;
+  const L=[...D.msg].sort((a,b)=>a.ts-b.ts).slice(-150);let dk='',cm='';
+  L.forEach(o=>{const d=new Date(o.ts);
+    if(d.toDateString()!==dk){dk=d.toDateString();cm+=`<div class="ds"><span>${d.getMonth()+1}/${d.getDate()} 週${'日一二三四五六'[d.getDay()]}</span></div>`}
+    cm+=isMine(o)?`<div class="m me"><time>${hm(o.ts)}</time><div class="bb">${esc(o.m)}</div></div>`:`<div class="m">${avatar(o.n)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}</small><div class="mr"><div class="bb">${esc(o.m)}</div><time>${hm(o.ts)}</time></div></div></div>`});
+  cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
+  const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
+  if(isOpen)markSeen();
+  const lm=L[L.length-1];$('#dsub').textContent=lm?`${lm.n}:${lm.m}`:'還沒有訊息,說聲嗨吧!';
+  const un=isOpen?0:D.msg.filter(o=>o.ts>chatSeen()&&!isMine(o)).length;$('#ub').textContent=un>99?'99+':un;$('#ub').hidden=!un;
   /* photos */
   const P=byNew(D.photos);
   put('#ov-pics',ch('班級相簿','gal','gal','查看全部')+(P.length?`<div class="thumbs">${P.slice(0,3).map(p=>`<img src="${esc(p.url)}" alt="班級照片" loading="lazy">`).join('')}</div>`:'<p class="empty">相簿還是空的</p>'));
@@ -359,10 +427,10 @@ function render(){
 render();setInterval(render,60000);
 
 /* ---------- firebase ---------- */
-if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false;$('#fm').hidden=true;$('#fm2').hidden=true;setUser('訪客','未連線')}
+if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false;$('#cf').hidden=true;$('#cnote').hidden=false;$('#cnote').textContent='尚未連線,無法留言';setUser('訪客','未連線')}
 else{
   const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bad=()=>{};
-  let unsubs=[],me=null,last=0,staff={name:'管理員',role:'管理員'};
+  let unsubs=[],last=0,staff={name:'管理員',role:'管理員'};
   const stop=()=>{unsubs.forEach(f=>f());unsubs=[]};
   const lock=msg=>{stop();me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#lf').hidden=false};
   const start=()=>{
@@ -372,7 +440,7 @@ else{
     unsubs.push(onSnapshot(doc(db,'meta','sched'),s=>{D.sched=(s.data()||{}).cells||{};render()},bad));
     unsubs.push(onSnapshot(doc(db,'meta','times'),s=>{D.times=(s.data()||{}).t||{};render()},bad));
     if(me)setUser(me.name,'座號 '+me.no);else setUser(staff.name,staff.role);
-    $('#fm').hidden=!me;$('#fm2').hidden=!me;$('#fmnote').hidden=!!me;
+    $('#cf').hidden=!me;$('#cnote').hidden=!!me;render();
   };
   onAuthStateChanged(auth,async u=>{
     if(!u){lock();return}
@@ -391,11 +459,11 @@ else{
   try{$('#no').value=localStorage.getItem('cls-no')||''}catch(e){}
   $('#out').onclick=()=>{$('#umenu').hidden=true;signOut(auth)};
   const send=async e=>{e.preventDefault();
-    if(!me)return;if(Date.now()-last<15000){alert('留言太快了,請稍等幾秒');return}
-    const m=e.target.m.value.trim();if(!m)return;
-    try{await addDoc(collection(db,'msg'),{n:me.name,no:me.no,m,ts:Date.now()});last=Date.now();e.target.m.value=''}
+    if(!me||Date.now()-last<1500)return;
+    const t=$('#ci'),m=t.value.trim();if(!m)return;
+    try{await addDoc(collection(db,'msg'),{n:me.name,no:me.no,m,ts:Date.now()});last=Date.now();t.value='';t.style.height='';setTimeout(toEnd,150)}
     catch(err){alert('送出失敗,請稍後再試')}};
-  $('#fm').onsubmit=send;$('#fm2').onsubmit=send;
+  $('#cf').onsubmit=send;
 }
 </script>
 </body>
