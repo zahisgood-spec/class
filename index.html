@@ -343,6 +343,8 @@ body.locked .app{display:none}
 @keyframes ud-in{from{opacity:0;transform:translateY(8px) scale(.96)}}
 @media(prefers-reduced-motion:reduce){.ud,.ud-box{animation:none}}
 .ud-ok{background:var(--pri);color:#fff}
+.ud-i+.ud-i{margin-top:10px}
+.ud-e{min-height:1.4em;margin:10px 0 0;font-size:13px;color:#ef4444}
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:radial-gradient(140% 40% at 10% 106%,rgba(110,175,255,.7),transparent 70%),linear-gradient(160deg,#0a1840,#0c2a6c 60%,#123f95);--bo-ink:#fff;--bo-mute:rgba(255,255,255,.72);--bo-chip:rgba(255,255,255,.12);--bo-mkc:#f6e27a;position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
 #boot.out{opacity:0;visibility:hidden;pointer-events:none}
@@ -473,7 +475,7 @@ setTimeout(fd,4000);
 <div class="search"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" placeholder="搜尋公告、活動、作業、留言…" autocomplete="off" aria-label="搜尋"><div id="qres" hidden></div></div>
 <button class="ib" id="bell" aria-label="新公告"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0"/></svg><i id="bn" hidden>0</i></button>
 <button class="ib" id="theme" aria-label="切換亮色與暗色"><svg class="ic tl" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><svg class="ic td" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
-<div class="usr"><button id="uchip" aria-haspopup="true"><span class="uav" id="uav">我</span><span class="un"><b id="un"></b><small id="ur"></small></span><svg class="ic" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div id="umenu" hidden><button id="out">登出</button></div></div>
+<div class="usr"><button id="uchip" aria-haspopup="true"><span class="uav" id="uav">我</span><span class="un"><b id="un"></b><small id="ur"></small></span><svg class="ic" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div id="umenu" hidden><button id="setb">設定</button><button id="out">登出</button></div></div>
 </header>
 <main id="mw" data-v="ov">
 <p class="note" id="note" hidden>尚未設定 Firebase:請打開 index.html,把設定貼到 FIREBASE_CONFIG。</p>
@@ -514,7 +516,7 @@ setTimeout(fd,4000);
 <script type="module">
 const BT=window.__boot||{task(){},done(){},isClosed(){return true},begin(){},set(){}};
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence,EmailAuthProvider,reauthenticateWithCredential,updatePassword} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,collection,doc,onSnapshot,addDoc,getDoc,query,orderBy,limit,updateDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const FIREBASE_CONFIG={apiKey:"AIzaSyCjH-28OnHBKh8cFuL3rPkmxtmV7ixvAnU",authDomain:"class-9ab0a.firebaseapp.com",projectId:"class-9ab0a",storageBucket:"class-9ab0a.firebasestorage.app",messagingSenderId:"1061856226694",appId:"1:1061856226694:web:fa6467c7db7008df329007"};
 const $=s=>document.querySelector(s);
@@ -775,6 +777,26 @@ else{
       await signInWithEmailAndPassword(auth,email,$('#tpw').value);$('#tpw').value='';try{localStorage.setItem('cls-tu',v)}catch(x){}}
     catch(err){$('#gerr').textContent='帳號或密碼錯誤'}};
   $('#out').onclick=()=>{$('#umenu').hidden=true;signOut(auth)};
+  /* ---------- 設定:修改密碼 ---------- */
+  const pwErr=c=>c==='auth/wrong-password'||c==='auth/invalid-credential'||c==='auth/invalid-login-credentials'?'目前密碼不正確':c==='auth/weak-password'?'新密碼至少 6 碼':c==='auth/too-many-requests'?'嘗試次數太多,請稍後再試':c==='auth/network-request-failed'?'網路不穩,請稍後再試':'修改失敗,請稍後再試';
+  const pwDlg=()=>{const u=auth.currentUser;if(!u||!u.email)return;
+    const prev=document.activeElement,el=document.createElement('div');el.className='ud';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
+    el.innerHTML=`<div class="ud-box"><h3 class="ud-t">設定</h3><p class="ud-m">修改登入密碼(至少 6 碼)</p><input class="ud-i" type="password" data-f="o" placeholder="目前密碼" autocomplete="current-password" aria-label="目前密碼"><input class="ud-i" type="password" data-f="n" placeholder="新密碼" autocomplete="new-password" aria-label="新密碼"><input class="ud-i" type="password" data-f="c" placeholder="再輸入一次新密碼" autocomplete="new-password" aria-label="再輸入一次新密碼"><p class="ud-e" aria-live="polite"></p><div class="ud-b"><button type="button" class="ud-ok">儲存</button><button type="button" class="ud-c">取消</button></div></div>`;
+    const f=k=>el.querySelector(`[data-f=${k}]`),er=el.querySelector('.ud-e'),ok=el.querySelector('.ud-ok');let busy=false;
+    const close=()=>{el.remove();try{prev&&prev.focus&&prev.focus({preventScroll:true})}catch(x){}};
+    const save=async()=>{if(busy)return;const o=f('o').value,n=f('n').value,c=f('c').value;
+      if(!o){er.textContent='請輸入目前密碼';f('o').focus();return}
+      if(n.length<6){er.textContent='新密碼至少 6 碼';f('n').focus();return}
+      if(n!==c){er.textContent='兩次輸入的新密碼不一樣';f('c').focus();return}
+      if(n===o){er.textContent='新密碼不能和目前密碼相同';f('n').focus();return}
+      busy=true;ok.disabled=true;ok.textContent='儲存中…';er.textContent='';
+      try{await reauthenticateWithCredential(u,EmailAuthProvider.credential(u.email,o));await updatePassword(u,n);close();uiAlert('密碼已更新,下次請用新密碼登入。')}
+      catch(err){er.textContent=pwErr(err&&err.code);busy=false;ok.disabled=false;ok.textContent='儲存'}};
+    ok.onclick=save;el.querySelector('.ud-c').onclick=close;
+    el.addEventListener('mousedown',e=>{if(e.target===el)close()});
+    el.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close()}else if(e.key==='Enter'&&!e.isComposing){e.preventDefault();save()}});
+    document.body.appendChild(el);f('o').focus()};
+  $('#setb').onclick=()=>{$('#umenu').hidden=true;pwDlg()};
   const send=async e=>{e.preventDefault();
     if(Date.now()-last<1500)return;
     const t=$('#ci'),m=t.value.trim();if(!m)return;
