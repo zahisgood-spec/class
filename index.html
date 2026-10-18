@@ -239,8 +239,8 @@ body.locked .app{display:none}
 @keyframes dlsp{to{transform:rotate(360deg)}}
 @keyframes dlbar{to{transform:scaleX(1)}}
 #cbody{overflow-x:hidden}
-#cbody .m .bb.ib{background:transparent;padding:0;box-shadow:none;border-radius:0;max-width:none;line-height:0;white-space:normal}
-.bb.ib img{display:block;width:min(200px,56vw);height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:18px;cursor:zoom-in;background:rgba(0,0,0,.08);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+#cbody .m .bb.imgb{background:transparent;padding:0;box-shadow:none;border-radius:0;max-width:none;line-height:0;white-space:normal;width:min(200px,56vw);min-width:min(200px,56vw);flex:none}
+.bb.imgb img{display:block;width:min(200px,56vw);height:min(200px,56vw);aspect-ratio:1/1;object-fit:cover;border-radius:18px;cursor:zoom-in;background:rgba(0,0,0,.08);box-shadow:0 1px 3px rgba(0,0,0,.18)}
 .att{width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.08);color:var(--ink);display:grid;place-items:center;flex:none}
 .att:hover{filter:brightness(.95)}
 #cpre{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--card);border-top:1px solid var(--line);flex:none}
@@ -626,7 +626,7 @@ function render(){
   const L=[...D.msg].sort((a,b)=>a.ts-b.ts).slice(-150);let dk='',cm='';
   L.forEach(o=>{const d=new Date(o.ts);
     if(d.toDateString()!==dk){dk=d.toDateString();cm+=`<div class="ds"><span>${d.getMonth()+1}/${d.getDate()} 週${'日一二三四五六'[d.getDay()]}</span></div>`}
-    const sc=(RB[o.role]?' st-'+o.role:'')+(isFile(o)?' fb':'')+(isImg(o)?' ib':'');
+    const sc=(RB[o.role]?' st-'+o.role:'')+(isFile(o)?' fb':'')+(isImg(o)?' imgb':'');
     cm+=isMine(o)?`<div class="m me"><time>${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}">${bubble(o)}</div></div></div>`:`<div class="m">${avatar(o.n,o.role)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${hm(o.ts)}</time></div></div></div>`});
   cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
   const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
