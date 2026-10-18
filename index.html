@@ -218,6 +218,18 @@ body.locked .app{display:none}
 
 [data-theme=light]{--chatbg:#e4ebf6;--mine:#8de06f;--mineink:#10230a;--other:#fff}
 [data-theme=dark]{--chatbg:#0d1424;--mine:#1fa85a;--mineink:#fff;--other:#1d2740}
+#chint{margin:0;padding:6px 16px;font-size:12px;color:var(--mute);background:var(--card);border-top:1px solid var(--line);flex:none}
+.bb.fb{white-space:normal;padding:10px 12px;min-width:210px}
+.fc{display:flex;flex-direction:column;gap:8px}
+.fh{display:flex;align-items:center;gap:10px}
+.fi{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:20px;background:rgba(0,0,0,.08);flex:none}
+.fm{min-width:0}.fm b{display:block;font-size:14px;overflow-wrap:anywhere}
+.m .fm small,.m.me .fm small{display:block;margin:0;font-size:12px;opacity:.7;color:inherit}
+.fp{font-size:13px;opacity:.75;overflow-wrap:anywhere}
+.fx{font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:240px;overflow-y:auto;background:rgba(0,0,0,.06);border-radius:8px;padding:8px 10px;line-height:1.55}
+.fa{display:flex;gap:8px}
+.fa button{font-size:13px;font-weight:700;padding:5px 14px;border-radius:999px;background:rgba(0,0,0,.1);color:inherit}
+.fa button:last-child{background:var(--pri);color:#fff}
 #ntf{position:fixed;left:0;right:0;top:calc(10px + env(safe-area-inset-top,0px));z-index:90;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 12px}
 .nt{pointer-events:auto;display:flex;gap:10px;align-items:center;width:min(380px,100%);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:10px 14px;box-shadow:0 14px 40px -10px rgba(15,30,80,.45);cursor:pointer;text-align:left;animation:ntin .35s cubic-bezier(.2,.8,.2,1) both}
 .nt.out{animation:ntout .3s ease forwards}
@@ -422,14 +434,14 @@ setTimeout(fd,4000);
 <button class="card rem" id="ov-rem" data-go="sched"></button>
 </div>
 <div class="col">
-<div class="card" id="ov-cal"></div>
-<div class="card" id="ov-chat"></div>
 <div class="card" id="ov-pics"></div>
+<div class="card" id="ov-chat"></div>
+<div class="card" id="ov-cal"></div>
 </div>
 </div></section>
 
 <section id="news"><h2 class="pg">班級公告</h2><div class="card"><ul id="la"></ul></div></section>
-<section id="cal"><h2 class="pg">行事曆</h2><div class="calpage"><div class="card calbig" id="cal2"></div><div class="card"><div class="ch"><h3>所有活動</h3></div><ul id="le"></ul></div></div></section>
+<section id="cal"><h2 class="pg">行事曆</h2><div class="calpage"><div class="card calbig" id="cal2"></div><div class="card"><div class="ch"><h3 id="letitle">所有活動</h3></div><ul id="le"></ul></div></div></section>
 <section id="sched"><h2 class="pg">課表・作業</h2><div class="stack">
 <div class="card"><div class="ch"><h3>每週課表</h3></div><div class="tw"><table id="tb"></table></div></div>
 <div class="card"><div class="ch"><h3>作業提醒</h3></div><ul id="lh"></ul></div></div></section>
@@ -440,7 +452,8 @@ setTimeout(fd,4000);
 </div>
 <div id="dock"><div id="dh" role="button" tabindex="0" aria-expanded="false" aria-controls="cmain"><span class="chi"><svg class="ic" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/></svg></span><div class="dt"><b>班級聊天室</b><small id="dsub"></small></div><i class="ub" id="ub" hidden>0</i><svg class="ic chev" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></div>
 <div id="cmain" inert><div id="cbody" aria-live="polite"></div>
-<form id="cf"><textarea id="ci" name="m" rows="1" maxlength="300" placeholder="輸入訊息" aria-label="輸入訊息"></textarea><button class="send" aria-label="送出"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></form>
+<p id="chint" hidden></p>
+<form id="cf"><textarea id="ci" name="m" rows="1" maxlength="1000" placeholder="輸入訊息" aria-label="輸入訊息"></textarea><button class="send" aria-label="送出"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></form>
 <p class="empty" id="cnote" hidden style="padding:12px 16px;margin:0;background:var(--card)">管理員與老師請從後台管理留言。</p></div></div>
 <div id="ntf" aria-live="polite"></div>
 <dialog id="dlg"><img id="big" alt="放大的照片"></dialog>
@@ -466,10 +479,10 @@ const D={title:'我們班',tag:'班級專屬網站,公告、課表、照片都�
 const now0=new Date();let CAL={y:now0.getFullYear(),m:now0.getMonth()};let me=null,myUid=null;
 
 /* ---------- static UI ---------- */
-const NAVS=[['ov','首頁','home'],['news','班級公告','ann'],['cal','行事曆','cal'],['sched','課表・作業','sched'],['gal','班級相簿','gal']];
+const NAVS=[['ov','首頁','home'],['news','班級公告','ann'],['gal','班級相簿','gal'],['sched','課表・作業','sched'],['cal','行事曆','cal']];
 const SH={'班級公告':'公告','課表・作業':'課表','班級相簿':'相簿'};
 $('#nav').innerHTML=NAVS.map(([t,l,i],k)=>`<button role="tab" data-go="${t}" aria-selected="${k===0}">${ic(I[i])}<span class="nl-f">${l}</span><span class="nl-s">${SH[l]||l}</span></button>`).join('');
-const QT=[['news','班級公告','查看最新消息','ann','#3b82f6'],['gal','班級相簿','回顧美好時光','gal','#8b5cf6'],['cal','行事曆','查看重要日期','cal','#10b981'],['sched','課表・作業','查看課表與作業','sched','#f97316']];
+const QT=[['news','班級公告','查看最新消息','ann','#3b82f6'],['gal','班級相簿','回顧美好時光','gal','#8b5cf6'],['sched','課表・作業','查看課表與作業','sched','#f97316'],['cal','行事曆','查看重要日期','cal','#10b981']];
 $('#quick').innerHTML=QT.map(([t,l,s,i,c])=>`<button class="qt" data-go="${t}" style="--tc:${c}"><span class="qi">${ic(I[i])}</span><b>${l}</b><small>${s}</small>${ic(I.go).replace('class="ic"','class="ic go"')}</button>`).join('');
 
 const seen=()=>{try{return +localStorage.getItem('cls-seen')||0}catch(e){return 0}};
@@ -497,7 +510,7 @@ $('#q').oninput=()=>{
   D.ann.forEach(o=>{if(has(o.title)||has(o.t))R.push(['news','公告',o.title||o.t])});
   D.evt.forEach(o=>{if(has(o.t))R.push(['cal','活動',o.t+'  '+o.d])});
   D.hw.forEach(o=>{if(has(o.t))R.push(['sched','作業',o.t])});
-  D.msg.forEach(o=>{if(has(o.m)||has(o.n))R.push(['chat','留言',(RB[o.role]?RB[o.role][0]+' ':'')+o.n+':'+o.m])});
+  D.msg.forEach(o=>{if(has(o.m)||has(o.n))R.push(['chat','留言',(RB[o.role]?RB[o.role][0]+' ':'')+o.n+':'+pv(o)])});
   box.innerHTML=R.slice(0,8).map(r=>`<button data-go="${r[0]}"><small>${r[1]}</small>${esc(r[2])}</button>`).join('')||'<p class="empty" style="padding:10px 12px">找不到相關內容</p>';box.hidden=false;
 };
 const setUser=(name,role)=>{$('#un').textContent=name;$('#ur').textContent=role;$('#uav').textContent=[...name][0]||'我'};
@@ -521,7 +534,7 @@ dh.addEventListener('pointerup',e=>{if(!drag)return;const d=drag,dy=e.clientY-d.
 dh.addEventListener('pointermove',e=>{if(!drag||!mob())return;const dy=e.clientY-drag.y;if(Math.abs(dy)>6){drag.moved=true;dock.classList.add('drag');dock.style.height=Math.max(62,Math.min(innerHeight,drag.h-dy))+'px'}});
 dh.addEventListener('pointercancel',()=>{drag=null;dock.classList.remove('drag');dock.style.height=''});
 dh.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setOpen(!dock.classList.contains('open'))}});
-ci.addEventListener('input',()=>{ci.style.height='auto';ci.style.height=Math.min(ci.scrollHeight,110)+'px'});
+ci.addEventListener('input',()=>{ci.style.height='auto';ci.style.height=Math.min(ci.scrollHeight,110)+'px';const n=clen(ci.value),h=$('#chint');h.hidden=n<=LONG;h.textContent=`已輸入 ${n} 字,超過 ${LONG} 字會以檔案方式傳送`});
 ci.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing&&!matchMedia('(pointer:coarse)').matches){e.preventDefault();$('#cf').requestSubmit()}});
 
 /* ---------- render ---------- */
@@ -529,6 +542,11 @@ const TAG={'置頂':'pin','活動':'act','一般':'gen'};
 const annSort=()=>[...D.ann].sort((a,b)=>((b.tag==='置頂')-(a.tag==='置頂'))||b.ts-a.ts);
 const annItem=(o,first)=>{const tg=o.tag||'一般',ti=o.title||o.t,bd=o.title?o.t:'';return `<li class="ai${first?' first':''}"><span class="tg t-${TAG[tg]||'gen'}">${esc(tg)}</span><div><b>${esc(ti)}</b>${bd?`<p>${esc(bd)}</p>`:''}</div><time>${md(o.ts)}</time></li>`};
 const ch=(t,i,g,l)=>`<div class="ch"><span class="chi">${ic(I[i])}</span><h3>${t}</h3><button class="lk" data-go="${g}">${l} ›</button></div>`;
+const LONG=100,clen=s=>[...String(s||'')].length,isFile=o=>clen(o.m)>LONG,pv=o=>isFile(o)?'📄 傳送了一個檔案':o.m;
+const fname=o=>{const d=new Date(o.ts);return `長訊息-${p2(d.getMonth()+1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}.txt`};
+const EXP=new Set();
+const fileCard=o=>`<div class="fc"><div class="fh"><span class="fi">📄</span><div class="fm"><b>${esc(fname(o))}</b><small>${clen(o.m)} 字・文字檔</small></div></div>${EXP.has(o.id)?`<div class="fx">${esc(o.m)}</div>`:`<div class="fp">${esc([...String(o.m)].slice(0,28).join(''))}…</div>`}<div class="fa"><button type="button" data-ex="${esc(o.id)}">${EXP.has(o.id)?'收合':'查看'}</button><button type="button" data-dl="${esc(o.id)}">下載</button></div></div>`;
+const bubble=o=>isFile(o)?fileCard(o):esc(o.m);
 const RB={admin:['🎇','管理員'],teacher:['🐛','老師']};
 const rb=r=>RB[r]?`<span class="rb rb-${r}">${RB[r][0]} ${RB[r][1]}</span>`:'';
 const avatar=(n,r)=>RB[r]?`<span class="av st-${r}" title="${RB[r][1]}">${RB[r][0]}</span>`:`<span class="av" style="background:hsl(${hue(n)} 55% 52%)">${esc([...String(n)][0]||'?')}</span>`;
@@ -539,9 +557,10 @@ function calCard(big){
   const {y,m}=CAL,start=(new Date(y,m,1).getDay()+6)%7,days=new Date(y,m+1,0).getDate(),prev=new Date(y,m,0).getDate(),tk=new Date().toDateString();
   const ev={},hw={};D.evt.forEach(e=>ev[e.d]=1);D.hw.filter(h=>!h.done).forEach(h=>hw[h.d]=1);
   let g=['一','二','三','四','五','六','日'].map(w=>`<div class="w">${w}</div>`).join('');
-  for(let i=0;i<42;i++){
+  const rows=Math.ceil((start+days)/7)*7;
+  for(let i=0;i<rows;i++){
     const d=i-start+1,o=d<1||d>days,n=d<1?prev+d:d>days?d-days:d,dt=new Date(y,m+(d<1?-1:d>days?1:0),n),key=dt.getFullYear()+'-'+p2(dt.getMonth()+1)+'-'+p2(dt.getDate());
-    g+=`<div class="d${o?' o':''}${dt.toDateString()===tk?' t':''}">${n}${ev[key]?'<i class="e"></i>':''}${hw[key]?'<i class="h"></i>':''}</div>`;
+    g+=o?'<div class="d o"></div>':`<div class="d${dt.toDateString()===tk?' t':''}">${n}${ev[key]?'<i class="e"></i>':''}${hw[key]?'<i class="h"></i>':''}</div>`;
   }
   return `<div class="calh"><h3>${y}年${m+1}月</h3><button data-cal="-1" aria-label="上個月">‹</button><button data-cal="0">今天</button><button data-cal="1" aria-label="下個月">›</button></div><div class="cg">${g}</div>`;
 }
@@ -556,7 +575,8 @@ function render(){
   put('#ov-ann',ch('最新公告','ann','news','查看全部')+`<ul>${A.slice(0,4).map((o,i)=>annItem(o,i===0)).join('')||'<li class="empty">目前沒有公告</li>'}</ul>`);
   /* events */
   const up=D.evt.filter(e=>dleft(e.d)>=0).sort((a,b)=>a.d<b.d?-1:1);
-  put('#le',[...D.evt].sort((p,q)=>{const u=dleft(p.d)<0,v=dleft(q.d)<0;return u!==v?u-v:(u?(p.d<q.d?1:-1):(p.d<q.d?-1:1))}).map(o=>{const n=dleft(o.d),d=new Date(o.d+'T00:00:00');return `<li class="row ev ${n<0?'past':''}"><div class="date"><b>${d.getDate()}</b><span>${d.getMonth()+1}月</span></div><span class="t">${esc(o.t)}</span><span class="pill ${n>=0&&n<=3?'hot':''}">${when(n)}</span></li>`}).join('')||'<li class="empty">目前沒有活動</li>');
+  const mk=CAL.y+'-'+p2(CAL.m+1);$('#letitle').textContent=(CAL.m+1)+' 月的活動';
+  put('#le',D.evt.filter(e=>String(e.d).startsWith(mk)).sort((p,q)=>{const u=dleft(p.d)<0,v=dleft(q.d)<0;return u!==v?u-v:(u?(p.d<q.d?1:-1):(p.d<q.d?-1:1))}).map(o=>{const n=dleft(o.d),d=new Date(o.d+'T00:00:00');return `<li class="row ev ${n<0?'past':''}"><div class="date"><b>${d.getDate()}</b><span>${d.getMonth()+1}月</span></div><span class="t">${esc(o.t)}</span><span class="pill ${n>=0&&n<=3?'hot':''}">${when(n)}</span></li>`}).join('')||'<li class="empty">這個月沒有活動</li>');
   put('#ov-cal',calCard());put('#cal2',calCard());
   /* homework */
   const open=D.hw.filter(h=>!h.done).sort((a,b)=>a.d<b.d?-1:1);
@@ -575,18 +595,18 @@ function render(){
   put('#ov-today',ch('今日課程','sched','sched','查看課表')+`<ul>${cr.join('')||`<li class="empty">${td>=0&&td<5?'今天沒有課程':'今天是假日,好好休息!'}</li>`}</ul>`);
   /* chat */
   const M=byNew(D.msg);
-  put('#ov-chat',ch('班級聊天','chat','chat','開啟聊天室')+(M.slice(0,3).map(o=>`<div class="msgr">${avatar(o.n,o.role)}<div class="t"><b>${esc(o.n)}</b>${rb(o.role)}<small>${hm(o.ts)}</small><br>${esc(o.m)}</div></div>`).join('')||'<p class="empty">還沒有留言</p>'));
+  put('#ov-chat',ch('班級聊天','chat','chat','開啟聊天室')+(M.slice(0,3).map(o=>`<div class="msgr">${avatar(o.n,o.role)}<div class="t"><b>${esc(o.n)}</b>${rb(o.role)}<small>${hm(o.ts)}</small><br>${esc(pv(o))}</div></div>`).join('')||'<p class="empty">還沒有留言</p>'));
   /* chat dock */
   const isOpen=dock.classList.contains('open'),cb=$('#cbody'),near=cb.scrollHeight-cb.scrollTop-cb.clientHeight<90;
   const L=[...D.msg].sort((a,b)=>a.ts-b.ts).slice(-150);let dk='',cm='';
   L.forEach(o=>{const d=new Date(o.ts);
     if(d.toDateString()!==dk){dk=d.toDateString();cm+=`<div class="ds"><span>${d.getMonth()+1}/${d.getDate()} 週${'日一二三四五六'[d.getDay()]}</span></div>`}
-    const sc=RB[o.role]?' st-'+o.role:'';
-    cm+=isMine(o)?`<div class="m me"><time>${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}">${esc(o.m)}</div></div></div>`:`<div class="m">${avatar(o.n,o.role)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${esc(o.m)}</div><time>${hm(o.ts)}</time></div></div></div>`});
+    const sc=(RB[o.role]?' st-'+o.role:'')+(isFile(o)?' fb':'');
+    cm+=isMine(o)?`<div class="m me"><time>${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}">${bubble(o)}</div></div></div>`:`<div class="m">${avatar(o.n,o.role)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${hm(o.ts)}</time></div></div></div>`});
   cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
   const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
   if(isOpen)markSeen();
-  const lm=L[L.length-1];$('#dsub').textContent=lm?`${RB[lm.role]?RB[lm.role][0]+' ':''}${lm.n}:${lm.m}`:'還沒有訊息,說聲嗨吧!';
+  const lm=L[L.length-1];$('#dsub').textContent=lm?`${RB[lm.role]?RB[lm.role][0]+' ':''}${lm.n}:${pv(lm)}`:'還沒有訊息,說聲嗨吧!';
   const un=isOpen?0:D.msg.filter(o=>o.ts>chatSeen()&&!isMine(o)).length;$('#ub').textContent=un>99?'99+':un;$('#ub').hidden=!un;document.title=(un?'('+(un>99?'99+':un)+') ':'')+D.title;
   /* photos */
   const P=byNew(D.photos);
@@ -596,11 +616,19 @@ function render(){
 {const sp=()=>{$('#q').placeholder=matchMedia('(max-width:899px)').matches?'搜尋…':'搜尋公告、活動、作業、留言…'};sp();matchMedia('(max-width:899px)').addEventListener('change',sp)}
 render();setInterval(render,60000);
 
+/* ---------- 長訊息檔案:查看 / 下載 ---------- */
+$('#cbody').addEventListener('click',e=>{
+  const x=e.target.closest('[data-ex]'),d=e.target.closest('[data-dl]');
+  if(x){const id=x.dataset.ex;EXP.has(id)?EXP.delete(id):EXP.add(id);render();return}
+  if(d){const o=D.msg.find(m=>m.id===d.dataset.dl);if(!o)return;
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+o.m],{type:'text/plain;charset=utf-8'}));a.download=fname(o);
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}});
+
 /* ---------- 新訊息通知 ---------- */
 const ntf=$('#ntf');
 function toastMsg(o){
   const el=document.createElement('div');el.className='nt';el.setAttribute('role','button');
-  el.innerHTML=`${avatar(o.n,o.role)}<div class="tx"><b>${esc(o.n)}${rb(o.role)}</b><p>${esc(o.m)}</p></div>`;
+  el.innerHTML=`${avatar(o.n,o.role)}<div class="tx"><b>${esc(o.n)}${rb(o.role)}</b><p>${esc(pv(o))}</p></div>`;
   const rm=()=>{el.classList.add('out');setTimeout(()=>el.remove(),300)};
   el.onclick=()=>{rm();setOpen(true)};
   ntf.appendChild(el);while(ntf.children.length>3)ntf.firstChild.remove();
@@ -616,7 +644,7 @@ function notifyMsg(o){
   if(!document.hidden)toastMsg(o);
   try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}
   if(document.hidden&&'Notification' in window&&Notification.permission==='granted'){
-    try{const n=new Notification((RB[o.role]?RB[o.role][0]+' ':'')+o.n+' 在班級聊天室說',{body:o.m,tag:'cls-chat'});n.onclick=()=>{window.focus();n.close();setOpen(true)}}catch(e){}
+    try{const n=new Notification((RB[o.role]?RB[o.role][0]+' ':'')+o.n+' 在班級聊天室說',{body:pv(o),tag:'cls-chat'});n.onclick=()=>{window.focus();n.close();setOpen(true)}}catch(e){}
   }
 }
 
@@ -669,7 +697,7 @@ else{
   const send=async e=>{e.preventDefault();
     if(Date.now()-last<1500)return;
     const t=$('#ci'),m=t.value.trim();if(!m)return;
-    try{await addDoc(collection(db,'msg'),me?{n:me.name,no:me.no,m,ts:Date.now()}:{n:staff.name,role:staff.key,uid:myUid,m,ts:Date.now()});last=Date.now();t.value='';t.style.height='';setTimeout(toEnd,150)}
+    try{await addDoc(collection(db,'msg'),me?{n:me.name,no:me.no,m,ts:Date.now()}:{n:staff.name,role:staff.key,uid:myUid,m,ts:Date.now()});last=Date.now();t.value='';t.style.height='';$('#chint').hidden=true;setTimeout(toEnd,150)}
     catch(err){alert('送出失敗,請稍後再試')}};
   $('#cf').onsubmit=send;
 }
