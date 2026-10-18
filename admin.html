@@ -92,6 +92,7 @@ main,.top>div{max-width:1120px}
 @media(max-width:860px){.shell{grid-template-columns:1fr}.snav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:9;flex-direction:row;overflow-x:auto;scrollbar-width:none;border-radius:14px;padding:8px}.snav h4{display:none}.snav button{width:auto;white-space:nowrap;gap:8px;padding:8px 14px}}
 .keep{flex-basis:100%;display:flex;gap:8px;align-items:center;font-size:14px;color:var(--mute);cursor:pointer}
 .keep input{flex:none;width:18px;height:18px;accent-color:#d4af37}
+select{font:inherit;color:var(--ink);background:var(--chip);border:1px solid transparent;border-radius:8px;padding:10px 14px}
 </style>
 </head>
 <body>
@@ -124,7 +125,7 @@ main,.top>div{max-width:1120px}
 <div class="content">
 
 <div class="panel pane on" id="p-home"><h2>總覽</h2><p class="sub">在這裡可以直接發布公告,或點任何一格進入對應的管理區。</p>
-<div class="cell"><h3 class="ch">發布公告</h3><form data-k="ann"><input name="t" placeholder="想對全班說什麼?" required maxlength="160" aria-label="公告內容"><button class="pri">發布</button></form></div>
+<div class="cell"><h3 class="ch">發布公告</h3><form data-k="ann"><input name="title" placeholder="公告標題" required maxlength="80" aria-label="標題"><input name="t" placeholder="內容(可不填)" maxlength="160" aria-label="內容"><select name="tag" aria-label="類型"><option>一般</option><option>活動</option><option>置頂</option></select><button class="pri">發布</button></form></div>
 <div class="tiles" id="tiles"></div>
 <p class="hint" style="margin-top:18px"><b>怎麼用:</b>先在「學生帳號」建立座號、名稱、密碼,同學用座號加密碼登入班級網頁。「教師帳號」只有你(擁有者)看得到,老師可用帳號加密碼登入這個後台,權限和你一樣,只是不能管理教師帳號。</p></div>
 
@@ -176,14 +177,14 @@ const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clea
 const S={ann:[],evt:[],hw:[],msg:[],photos:[],sched:{},times:{}};
 let ROS=[],ROT=[],ROLE='';
 const CFG=[
- ['ann','公告',[['t','公告內容','text']]],
+ ['ann','公告',[['title','標題','text'],['t','內容(可不填)','text'],['tag','','select']]],
  ['evt','行事曆',[['t','活動名稱','text'],['d','','date']]],
  ['hw','作業',[['t','作業內容','text'],['d','','date']]],
  ['msg','留言',[]]
 ];
 const DESC={ann:'發布給全班看的公告,最新的一則會顯示在首頁。',evt:'新增考試、活動等日期,首頁會顯示倒數天數。',hw:'新增作業與截止日,勾選代表已完成。',msg:'同學留的言,可以刪除不適當的內容。'};
 $('#lists').innerHTML=CFG.map(([k,l,fs])=>`<div class="panel pane" id="p-${k}"><h2>${l} <em id="c-${k}"></em></h2><p class="sub">${DESC[k]}</p>
-${fs.length?`<div class="cell"><h3 class="ch">${k==='ann'?'發布':'新增'}${l}</h3><form data-k="${k}">${fs.map(([n,p,t])=>`<input name="${n}" type="${t}" placeholder="${p}" required maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form></div>`:''}
+${fs.length?`<div class="cell"><h3 class="ch">${k==='ann'?'發布':'新增'}${l}</h3><form data-k="${k}">${fs.map(([n,p,t])=>t==='select'?`<select name="${n}" aria-label="類型"><option>一般</option><option>活動</option><option>置頂</option></select>`:`<input name="${n}" type="${t}" placeholder="${p}" ${n==='t'&&k==='ann'?'':'required'} maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form></div>`:''}
 <div class="cell"><h3 class="ch">${k==='msg'?'全部留言':'已發布的'+l}</h3><ul id="l-${k}"></ul></div></div>`).join('');
 
 const go=p=>{document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));document.querySelectorAll('#snav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.pane===p));scrollTo({top:0})};
@@ -211,7 +212,7 @@ function draw0(k){
   $('#c-'+k).textContent=S[k].length?S[k].length+' 筆':'';
   const sorted=[...S[k]].sort((a,b)=>(b.ts||0)-(a.ts||0)||(a.d<b.d?-1:1));
   $('#l-'+k).innerHTML=sorted.length?sorted.map(o=>{
-    const main=k==='msg'?`<b>${esc(o.n)}</b>${o.no?` · 座號 ${esc(o.no)}`:''}<br>${esc(o.m)}`:esc(o.t);
+    const main=k==='msg'?`<b>${esc(o.n)}</b>${o.no?` · 座號 ${esc(o.no)}`:''}<br>${esc(o.m)}`:k==='ann'?`${o.tag&&o.tag!=='一般'?`<b>[${esc(o.tag)}]</b> `:''}${esc(o.title||o.t)}${o.title&&o.t?`<br><small>${esc(o.t)}</small>`:''}`:esc(o.t);
     const sub=o.ts&&k!=='evt'&&k!=='hw'?new Date(o.ts).toLocaleString('zh-TW'):esc(o.d);
     const ck=k==='hw'?`<input type="checkbox" style="flex:none;width:20px;height:20px" data-tog="${o.id}" ${o.done?'checked':''} aria-label="已完成">`:'';
     return `<li>${ck}<span class="t">${main}<small>${sub}${k==='hw'&&o.done?' · 已完成':''}</small></span><button class="x" data-k="${k}" data-id="${o.id}" aria-label="刪除">×</button></li>`}).join(''):'<li class="empty">還沒有內容</li>';
