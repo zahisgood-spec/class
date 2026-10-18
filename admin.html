@@ -89,7 +89,27 @@ main,.top>div{max-width:1120px}
 .tile b{font-size:34px;line-height:1.2;font-weight:900;overflow-wrap:anywhere}
 .tile small{display:block;color:var(--mute)}
 .tile i{margin-top:auto;font-style:normal;font-size:13px;font-weight:700;color:var(--gt)}
-@media(max-width:860px){.shell{grid-template-columns:1fr}.snav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:9;flex-direction:row;overflow-x:auto;scrollbar-width:none;border-radius:14px;padding:8px}.snav h4{display:none}.snav button{width:auto;white-space:nowrap;gap:8px;padding:8px 14px}}
+.snav .ic,.nl-s{display:none}
+.ed{font-size:13px;padding:5px 12px}
+.edli form{flex:1;margin:0}
+@media(max-width:860px){
+ main{padding:14px 10px 80px}
+ .top>div{padding:10px 12px}.logo small{display:none}
+ #who{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .shell{grid-template-columns:58px minmax(0,1fr);gap:12px}
+ .snav{top:calc(env(safe-area-inset-top,0px) + 64px);max-height:calc(100vh - 80px);max-height:calc(100dvh - 80px);overflow-y:auto;scrollbar-width:none;flex-direction:column;padding:8px 4px;border-radius:16px;gap:4px;z-index:9}
+ .snav::-webkit-scrollbar{display:none}
+ .snav h4{display:none}
+ .snav button{flex-direction:column;justify-content:center;gap:3px;position:relative;width:100%;padding:9px 0;font-size:11.5px;text-align:center;border-radius:12px;line-height:1.2;white-space:nowrap}
+ .snav .ic{display:block;width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+ .snav .nl-f{display:none}.snav .nl-s{display:inline}
+ .snav .b{position:absolute;top:2px;right:1px;min-width:17px;padding:0 5px;font-size:10px;line-height:17px}
+ .pane>h2{font-size:24px}
+ .cell{padding:14px;border-radius:16px}
+ .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .tile{padding:14px;min-height:104px}.tile b{font-size:26px}
+ table{min-width:0}td input{font-size:13px;padding:10px 1px}th{font-size:12px}
+}
 .keep{flex-basis:100%;display:flex;gap:8px;align-items:center;font-size:14px;color:var(--mute);cursor:pointer}
 .keep input{flex:none;width:18px;height:18px;accent-color:#d4af37}
 select{font:inherit;color:var(--ink);background:var(--chip);border:1px solid transparent;border-radius:8px;padding:10px 14px}
@@ -215,19 +235,19 @@ setTimeout(fd,4000);
 <div class="shell">
 <aside class="snav" id="snav" aria-label="後台分類">
 <h4>總覽</h4>
-<button data-pane="home" aria-selected="true">首頁總覽</button>
+<button data-pane="home" aria-selected="true"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span class="nl-f">首頁總覽</span><span class="nl-s">首頁</span></button>
 <h4>內容管理</h4>
-<button data-pane="ann" aria-selected="false">公告<span class="b" id="b-ann"></span></button>
-<button data-pane="evt" aria-selected="false">行事曆<span class="b" id="b-evt"></span></button>
-<button data-pane="hw" aria-selected="false">作業<span class="b" id="b-hw"></span></button>
-<button data-pane="sched" aria-selected="false">課表與時間</button>
-<button data-pane="photos" aria-selected="false">相簿<span class="b" id="b-photos"></span></button>
-<button data-pane="msg" aria-selected="false">留言<span class="b" id="b-msg"></span></button>
+<button data-pane="ann" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><path d="M3 10v4h3l7 4V6L6 10H3zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/></svg><span class="nl-f">公告</span><span class="nl-s">公告</span><span class="b" id="b-ann"></span></button>
+<button data-pane="evt" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg><span class="nl-f">行事曆</span><span class="nl-s">行事曆</span><span class="b" id="b-evt"></span></button>
+<button data-pane="hw" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h9"/></svg><span class="nl-f">作業</span><span class="nl-s">作業</span><span class="b" id="b-hw"></span></button>
+<button data-pane="sched" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="nl-f">課表與時間</span><span class="nl-s">課表</span></button>
+<button data-pane="photos" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><span class="nl-f">相簿</span><span class="nl-s">相簿</span><span class="b" id="b-photos"></span></button>
+<button data-pane="msg" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/></svg><span class="nl-f">留言</span><span class="nl-s">留言</span><span class="b" id="b-msg"></span></button>
 <h4>帳號</h4>
-<button data-pane="students" aria-selected="false">學生帳號<span class="b" id="b-students"></span></button>
-<button data-pane="teachers" id="nt" aria-selected="false" hidden>教師帳號<span class="b" id="b-teachers"></span></button>
+<button data-pane="students" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg><span class="nl-f">學生帳號</span><span class="nl-s">學生</span><span class="b" id="b-students"></span></button>
+<button data-pane="teachers" id="nt" aria-selected="false" hidden><svg class="ic" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/></svg><span class="nl-f">教師帳號</span><span class="nl-s">教師</span><span class="b" id="b-teachers"></span></button>
 <h4>設定</h4>
-<button data-pane="site" aria-selected="false">基本設定</button>
+<button data-pane="site" aria-selected="false"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span class="nl-f">基本設定</span><span class="nl-s">設定</span></button>
 </aside>
 <div class="content">
 
@@ -284,7 +304,7 @@ const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric'
 const list=(ul,rows,empty)=>{$(ul).innerHTML=rows.length?rows.join(''):`<li class="empty">${empty}</li>`};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3000)};
 const S={ann:[],evt:[],hw:[],msg:[],photos:[],sched:{},times:{}};
-let ROS=[],ROT=[],ROLE='';
+let ROS=[],ROT=[],ROLE='',EDIT=null;
 const CFG=[
  ['ann','公告',[['title','標題','text'],['t','內容(可不填)','text'],['tag','','select']]],
  ['evt','行事曆',[['t','活動名稱','text'],['d','','date']]],
@@ -321,10 +341,11 @@ function draw0(k){
   $('#c-'+k).textContent=S[k].length?S[k].length+' 筆':'';
   const sorted=[...S[k]].sort((a,b)=>(b.ts||0)-(a.ts||0)||(a.d<b.d?-1:1));
   $('#l-'+k).innerHTML=sorted.length?sorted.map(o=>{
+    if(k==='ann'&&EDIT===o.id){const tg=o.tag||'一般',ti=o.title||o.t,bd=o.title?o.t:'';return `<li class="edli"><form data-edit="${o.id}"><input name="title" value="${esc(ti)}" required maxlength="80" aria-label="標題"><input name="t" value="${esc(bd)}" maxlength="160" placeholder="內容(可不填)" aria-label="內容"><select name="tag" aria-label="類型">${['一般','活動','置頂'].map(x=>`<option${x===tg?' selected':''}>${x}</option>`).join('')}</select><button class="pri">儲存</button><button type="button" data-edc>取消</button></form></li>`}
     const main=k==='msg'?`<b>${esc(o.n)}</b>${o.role==='admin'?' <small>🎇 管理員</small>':o.role==='teacher'?' <small>🐛 老師</small>':''}${o.no?` · 座號 ${esc(o.no)}`:''}<br>${esc(o.m)}`:k==='ann'?`${o.tag&&o.tag!=='一般'?`<b>[${esc(o.tag)}]</b> `:''}${esc(o.title||o.t)}${o.title&&o.t?`<br><small>${esc(o.t)}</small>`:''}`:esc(o.t);
     const sub=o.ts&&k!=='evt'&&k!=='hw'?new Date(o.ts).toLocaleString('zh-TW'):esc(o.d);
     const ck=k==='hw'?`<input type="checkbox" style="flex:none;width:20px;height:20px" data-tog="${o.id}" ${o.done?'checked':''} aria-label="已完成">`:'';
-    return `<li>${ck}<span class="t">${main}<small>${sub}${k==='hw'&&o.done?' · 已完成':''}</small></span><button class="x" data-k="${k}" data-id="${o.id}" aria-label="刪除">×</button></li>`}).join(''):'<li class="empty">還沒有內容</li>';
+    return `<li>${ck}<span class="t">${main}<small>${sub}${k==='hw'&&o.done?' · 已完成':''}</small></span>${k==='ann'?`<button class="ed" data-ed="${o.id}">編輯</button>`:''}<button class="x" data-k="${k}" data-id="${o.id}" aria-label="刪除">×</button></li>`}).join(''):'<li class="empty">還沒有內容</li>';
 }
 draw('sched');draw('times');draw('photos');
 
@@ -392,7 +413,7 @@ else{
     if(ROLE==='admin')unsub.push(onSnapshot(collection(db,'teachers'),s=>{ROT=s.docs.map(d=>({id:d.id,...d.data()}));drawTea();refresh();BT.done('teachers')},bd('teachers')));
     unsub.push(onSnapshot(doc(db,'meta','times'),s=>{S.times=(s.data()||{}).t||{};if(!document.activeElement.closest('#tt'))draw('times');BT.done('times')},bd('times')));
     unsub.push(onSnapshot(collection(db,'students'),s=>{ROS=s.docs.map(d=>({id:d.id,...d.data()}));drawRos();refresh();BT.done('students')},bd('students')));
-    ['ann','evt','hw','msg','photos'].forEach(k=>unsub.push(onSnapshot(collection(db,k),s=>{S[k]=s.docs.map(d=>({id:d.id,...d.data()}));draw(k);BT.done(k)},bd(k))));
+    ['ann','evt','hw','msg','photos'].forEach(k=>unsub.push(onSnapshot(collection(db,k),s=>{S[k]=s.docs.map(d=>({id:d.id,...d.data()}));if(k==='ann'&&EDIT){refresh()}else draw(k);BT.done(k)},bd(k))));
     unsub.push(onSnapshot(doc(db,'meta','site'),s=>{const m=s.data()||{};if(document.activeElement!==$('#title'))$('#title').value=m.title||'我們班';if(document.activeElement!==$('#tag'))$('#tag').value=m.tag||'';if(document.activeElement!==$('#lclass'))$('#lclass').value=m.loadClass||'';if(document.activeElement!==$('#ltext'))$('#ltext').value=m.loadText||'';try{localStorage.setItem('cls-boot',JSON.stringify({c:m.loadClass||m.title||'',t:m.loadText||''}))}catch(x){}BT.set(m.loadClass||m.title,m.loadText);refresh();BT.done('site')},bd('site')));
     unsub.push(onSnapshot(doc(db,'meta','sched'),s=>{S.sched=(s.data()||{}).cells||{};if(!document.activeElement.closest('#tb'))draw('sched');BT.done('sched')},bd('sched')));
   };
@@ -422,6 +443,13 @@ else{
     run(addDoc(collection(db,k),o));f.reset()});
   document.addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(!b||!confirm('確定要刪除嗎?'))return;
     run(deleteDoc(doc(db,b.dataset.k,b.dataset.id)))});
+  document.addEventListener('click',e=>{
+    const ed=e.target.closest('[data-ed]');
+    if(ed){EDIT=ed.dataset.ed;draw0('ann');const i=document.querySelector('#l-ann form[data-edit] input');if(i){i.focus();i.scrollIntoView({block:'center',behavior:'smooth'})}return}
+    if(e.target.closest('[data-edc]')){EDIT=null;draw0('ann')}});
+  document.addEventListener('submit',async e=>{const f=e.target,id=f.dataset.edit;if(!id)return;e.preventDefault();
+    const fd=new FormData(f);
+    try{await updateDoc(doc(db,'ann',id),{title:fd.get('title').trim(),t:fd.get('t').trim(),tag:fd.get('tag')});EDIT=null;draw0('ann');toast('已儲存')}catch(err){toast(emsg(err))}});
   document.addEventListener('change',e=>{const t=e.target.dataset&&e.target.dataset.tog;if(t)run(updateDoc(doc(db,'hw',t),{done:e.target.checked}))});
   const saveSite=()=>run(setDoc(doc(db,'meta','site'),{title:$('#title').value.trim()||'我們班',tag:$('#tag').value.trim(),loadClass:$('#lclass').value.trim(),loadText:$('#ltext').value.trim()}));
   $('#title').onchange=saveSite;$('#tag').onchange=saveSite;$('#lclass').onchange=saveSite;$('#ltext').onchange=saveSite;

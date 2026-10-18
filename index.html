@@ -218,6 +218,14 @@ body.locked .app{display:none}
 
 [data-theme=light]{--chatbg:#e4ebf6;--mine:#8de06f;--mineink:#10230a;--other:#fff}
 [data-theme=dark]{--chatbg:#0d1424;--mine:#1fa85a;--mineink:#fff;--other:#1d2740}
+#ntf{position:fixed;left:0;right:0;top:calc(10px + env(safe-area-inset-top,0px));z-index:90;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 12px}
+.nt{pointer-events:auto;display:flex;gap:10px;align-items:center;width:min(380px,100%);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:10px 14px;box-shadow:0 14px 40px -10px rgba(15,30,80,.45);cursor:pointer;text-align:left;animation:ntin .35s cubic-bezier(.2,.8,.2,1) both}
+.nt.out{animation:ntout .3s ease forwards}
+.nt .tx{min-width:0;flex:1;line-height:1.35}
+.nt b{display:block;font-size:14px}
+.nt p{margin:0;font-size:13px;color:var(--mute);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+@keyframes ntin{from{opacity:0;transform:translateY(-14px) scale(.96)}}
+@keyframes ntout{to{opacity:0;transform:translateY(-10px) scale(.96)}}
 #dock{position:fixed;right:24px;bottom:0;width:380px;z-index:25;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0;box-shadow:0 -10px 40px -12px rgba(15,30,80,.38);display:flex;flex-direction:column;height:54px;overflow:hidden;transition:height .3s cubic-bezier(.2,.8,.2,1)}
 #dock.open{height:min(580px,calc(100vh - 90px))}
 #dock.drag{transition:none}
@@ -434,6 +442,7 @@ setTimeout(fd,4000);
 <div id="cmain" inert><div id="cbody" aria-live="polite"></div>
 <form id="cf"><textarea id="ci" name="m" rows="1" maxlength="300" placeholder="輸入訊息" aria-label="輸入訊息"></textarea><button class="send" aria-label="送出"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></form>
 <p class="empty" id="cnote" hidden style="padding:12px 16px;margin:0;background:var(--card)">管理員與老師請從後台管理留言。</p></div></div>
+<div id="ntf" aria-live="polite"></div>
 <dialog id="dlg"><img id="big" alt="放大的照片"></dialog>
 
 <script type="module">
@@ -502,7 +511,7 @@ const isMine=o=>me?(!o.role&&o.n===me.name&&(o.no==null||o.no===me.no)):(!!myUid
 const toEnd=()=>{const b=$('#cbody');b.scrollTop=b.scrollHeight};
 function setOpen(o){
   dock.classList.toggle('open',o);dock.style.height='';$('#cmain').inert=!o;dh.setAttribute('aria-expanded',o);
-  if(o){markSeen();toEnd();setTimeout(toEnd,330);if(!mob()&&!$('#cf').hidden)ci.focus({preventScroll:true})}
+  if(o){askNotif();markSeen();toEnd();setTimeout(toEnd,330);if(!mob()&&!$('#cf').hidden)ci.focus({preventScroll:true})}
   render();
 }
 let drag=null;
@@ -578,7 +587,7 @@ function render(){
   const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
   if(isOpen)markSeen();
   const lm=L[L.length-1];$('#dsub').textContent=lm?`${RB[lm.role]?RB[lm.role][0]+' ':''}${lm.n}:${lm.m}`:'還沒有訊息,說聲嗨吧!';
-  const un=isOpen?0:D.msg.filter(o=>o.ts>chatSeen()&&!isMine(o)).length;$('#ub').textContent=un>99?'99+':un;$('#ub').hidden=!un;
+  const un=isOpen?0:D.msg.filter(o=>o.ts>chatSeen()&&!isMine(o)).length;$('#ub').textContent=un>99?'99+':un;$('#ub').hidden=!un;document.title=(un?'('+(un>99?'99+':un)+') ':'')+D.title;
   /* photos */
   const P=byNew(D.photos);
   put('#ov-pics',ch('班級相簿','gal','gal','查看全部')+(P.length?`<div class="thumbs">${P.slice(0,3).map(p=>`<img src="${esc(p.url)}" alt="班級照片" loading="lazy">`).join('')}</div>`:'<p class="empty">相簿還是空的</p>'));
@@ -587,17 +596,42 @@ function render(){
 {const sp=()=>{$('#q').placeholder=matchMedia('(max-width:899px)').matches?'搜尋…':'搜尋公告、活動、作業、留言…'};sp();matchMedia('(max-width:899px)').addEventListener('change',sp)}
 render();setInterval(render,60000);
 
+/* ---------- 新訊息通知 ---------- */
+const ntf=$('#ntf');
+function toastMsg(o){
+  const el=document.createElement('div');el.className='nt';el.setAttribute('role','button');
+  el.innerHTML=`${avatar(o.n,o.role)}<div class="tx"><b>${esc(o.n)}${rb(o.role)}</b><p>${esc(o.m)}</p></div>`;
+  const rm=()=>{el.classList.add('out');setTimeout(()=>el.remove(),300)};
+  el.onclick=()=>{rm();setOpen(true)};
+  ntf.appendChild(el);while(ntf.children.length>3)ntf.firstChild.remove();
+  setTimeout(rm,5500);
+}
+function askNotif(){
+  if(!('Notification' in window)||Notification.permission!=='default')return;
+  try{if(localStorage.getItem('cls-nask'))return;localStorage.setItem('cls-nask','1')}catch(e){}
+  try{Notification.requestPermission()}catch(e){}
+}
+function notifyMsg(o){
+  if(dock.classList.contains('open')&&!document.hidden)return;
+  if(!document.hidden)toastMsg(o);
+  try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}
+  if(document.hidden&&'Notification' in window&&Notification.permission==='granted'){
+    try{const n=new Notification((RB[o.role]?RB[o.role][0]+' ':'')+o.n+' 在班級聊天室說',{body:o.m,tag:'cls-chat'});n.onclick=()=>{window.focus();n.close();setOpen(true)}}catch(e){}
+  }
+}
+
 /* ---------- firebase ---------- */
 if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false;$('#cf').hidden=true;$('#cnote').hidden=false;$('#cnote').textContent='尚未連線,無法留言';setUser('訪客','未連線');BT.done('auth')}
 else{
   const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bd=id=>()=>BT.done(id);
-  let unsubs=[],last=0,staff={name:'管理員',role:'管理員',key:'admin'};
-  const stop=()=>{unsubs.forEach(f=>f());unsubs=[]};
+  let unsubs=[],last=0,msgReady=false,staff={name:'管理員',role:'管理員',key:'admin'};
+  const stop=()=>{unsubs.forEach(f=>f());unsubs=[];msgReady=false};
+  const msgChg=s=>{if(!msgReady){msgReady=true;return}s.docChanges().forEach(c=>{if(c.type!=='added')return;const o=c.doc.data();if(c.doc.metadata.hasPendingWrites||isMine(o)||Date.now()-(o.ts||0)>60000)return;notifyMsg({id:c.doc.id,...o})})};
   const lock=msg=>{stop();me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#gforms').hidden=false};
   const start=()=>{
     document.body.classList.remove('locked');
     [['ann','公告'],['evt','行事曆'],['hw','作業'],['photos','相簿'],['msg','留言'],['site','班級設定'],['sched','課表'],['times','上課時間']].forEach(([k,l])=>BT.task(k,l,1));
-    ['ann','evt','hw','photos','msg'].forEach(k=>unsubs.push(onSnapshot(collection(db,k),s=>{D[k]=s.docs.map(d=>({id:d.id,...d.data()}));render();BT.done(k)},bd(k))));
+    ['ann','evt','hw','photos','msg'].forEach(k=>unsubs.push(onSnapshot(collection(db,k),s=>{if(k==='msg')msgChg(s);D[k]=s.docs.map(d=>({id:d.id,...d.data()}));render();BT.done(k)},bd(k))));
     unsubs.push(onSnapshot(doc(db,'meta','site'),s=>{const m=s.data()||{};if(m.title)D.title=m.title;if(m.tag)D.tag=m.tag;try{localStorage.setItem('cls-boot',JSON.stringify({c:m.loadClass||m.title||'',t:m.loadText||''}))}catch(x){}BT.set(m.loadClass||m.title,m.loadText);render();BT.done('site')},bd('site')));
     unsubs.push(onSnapshot(doc(db,'meta','sched'),s=>{D.sched=(s.data()||{}).cells||{};render();BT.done('sched')},bd('sched')));
     unsubs.push(onSnapshot(doc(db,'meta','times'),s=>{D.times=(s.data()||{}).t||{};render();BT.done('times')},bd('times')));
