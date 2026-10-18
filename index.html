@@ -230,6 +230,28 @@ body.locked .app{display:none}
 .fa{display:flex;gap:8px}
 .fa button{font-size:13px;font-weight:700;padding:5px 14px;border-radius:999px;background:rgba(0,0,0,.1);color:inherit}
 .fa button:last-child{background:var(--pri);color:#fff}
+.fa .dl{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:6px}
+.fa .dl:disabled{cursor:default}
+.fa .dl.busy{opacity:.92}
+.fa .dl.ok{background:#16a34a;color:#fff}
+.dl .sp{width:12px;height:12px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:dlsp .7s linear infinite;flex:none}
+.dl .bar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:rgba(255,255,255,.9);transform-origin:left;transform:scaleX(0);animation:dlbar 1.1s linear forwards}
+@keyframes dlsp{to{transform:rotate(360deg)}}
+@keyframes dlbar{to{transform:scaleX(1)}}
+.bb.ib{padding:4px;line-height:0;white-space:normal}
+.bb.ib img{display:block;width:min(220px,58vw);height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:12px;cursor:zoom-in;background:rgba(0,0,0,.08)}
+.att{width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.08);color:var(--ink);display:grid;place-items:center;flex:none}
+.att:hover{filter:brightness(.95)}
+#cpre{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--card);border-top:1px solid var(--line);flex:none}
+#cpre[hidden]{display:none}
+#cpre img{width:56px;height:56px;aspect-ratio:1/1;object-fit:cover;border-radius:8px;flex:none}
+#cpre span{flex:1;min-width:0;font-size:12px;color:var(--mute)}
+#cpre button{font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;background:rgba(0,0,0,.1);color:inherit;flex:none}
+#cpre #cps{background:var(--pri);color:#fff}
+#cpre button:disabled{opacity:.6}
+#lb{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.85);display:grid;place-items:center;cursor:zoom-out}
+#lb[hidden]{display:none}
+#lb img{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:8px}
 #ntf{position:fixed;left:0;right:0;top:calc(10px + env(safe-area-inset-top,0px));z-index:90;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 12px}
 .nt{pointer-events:auto;display:flex;gap:10px;align-items:center;width:min(380px,100%);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:10px 14px;box-shadow:0 14px 40px -10px rgba(15,30,80,.45);cursor:pointer;text-align:left;animation:ntin .35s cubic-bezier(.2,.8,.2,1) both}
 .nt.out{animation:ntout .3s ease forwards}
@@ -453,8 +475,9 @@ setTimeout(fd,4000);
 <div id="dock"><div id="dh" role="button" tabindex="0" aria-expanded="false" aria-controls="cmain"><span class="chi"><svg class="ic" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/></svg></span><div class="dt"><b>班級聊天室</b><small id="dsub"></small></div><i class="ub" id="ub" hidden>0</i><svg class="ic chev" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></div>
 <div id="cmain" inert><div id="cbody" aria-live="polite"></div>
 <p id="chint" hidden></p>
-<form id="cf"><textarea id="ci" name="m" rows="1" maxlength="1000" placeholder="輸入訊息" aria-label="輸入訊息"></textarea><button class="send" aria-label="送出"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></form>
+<div id="cpre" hidden><img alt="預覽"><span>圖片會以 1:1 置中裁切後傳送</span><button type="button" id="cpx">取消</button><button type="button" id="cps">傳送</button></div><form id="cf"><button type="button" class="att" id="cimg" aria-label="傳送圖片"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button><input type="file" id="cfile" accept="image/*" hidden><textarea id="ci" name="m" rows="1" maxlength="1000" placeholder="輸入訊息" aria-label="輸入訊息"></textarea><button class="send" aria-label="送出"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></form>
 <p class="empty" id="cnote" hidden style="padding:12px 16px;margin:0;background:var(--card)">管理員與老師請從後台管理留言。</p></div></div>
+<div id="lb" hidden><img alt="圖片"></div>
 <div id="ntf" aria-live="polite"></div>
 <dialog id="dlg"><img id="big" alt="放大的照片"></dialog>
 
@@ -462,7 +485,7 @@ setTimeout(fd,4000);
 const BT=window.__boot||{task(){},done(){},isClosed(){return true},begin(){},set(){}};
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,collection,doc,onSnapshot,addDoc,getDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,collection,doc,onSnapshot,addDoc,getDoc,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const FIREBASE_CONFIG={apiKey:"AIzaSyCjH-28OnHBKh8cFuL3rPkmxtmV7ixvAnU",authDomain:"class-9ab0a.firebaseapp.com",projectId:"class-9ab0a",storageBucket:"class-9ab0a.firebasestorage.app",messagingSenderId:"1061856226694",appId:"1:1061856226694:web:fa6467c7db7008df329007"};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -542,11 +565,12 @@ const TAG={'置頂':'pin','活動':'act','一般':'gen'};
 const annSort=()=>[...D.ann].sort((a,b)=>((b.tag==='置頂')-(a.tag==='置頂'))||b.ts-a.ts);
 const annItem=(o,first)=>{const tg=o.tag||'一般',ti=o.title||o.t,bd=o.title?o.t:'';return `<li class="ai${first?' first':''}"><span class="tg t-${TAG[tg]||'gen'}">${esc(tg)}</span><div><b>${esc(ti)}</b>${bd?`<p>${esc(bd)}</p>`:''}</div><time>${md(o.ts)}</time></li>`};
 const ch=(t,i,g,l)=>`<div class="ch"><span class="chi">${ic(I[i])}</span><h3>${t}</h3><button class="lk" data-go="${g}">${l} ›</button></div>`;
-const LONG=100,clen=s=>[...String(s||'')].length,isFile=o=>clen(o.m)>LONG,pv=o=>isFile(o)?'📄 傳送了一個檔案':o.m;
+const LONG=100,clen=s=>[...String(s||'')].length,isFile=o=>clen(o.m)>LONG,isImg=o=>typeof o.img==='string'&&o.img.startsWith('data:image/'),pv=o=>isImg(o)?'🖼 傳送了一張圖片':isFile(o)?'📄 傳送了一個檔案':o.m;
 const fname=o=>{const d=new Date(o.ts);return `長訊息-${p2(d.getMonth()+1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}.txt`};
-const EXP=new Set();
-const fileCard=o=>`<div class="fc"><div class="fh"><span class="fi">📄</span><div class="fm"><b>${esc(fname(o))}</b><small>${clen(o.m)} 字・文字檔</small></div></div>${EXP.has(o.id)?`<div class="fx">${esc(o.m)}</div>`:`<div class="fp">${esc([...String(o.m)].slice(0,28).join(''))}…</div>`}<div class="fa"><button type="button" data-ex="${esc(o.id)}">${EXP.has(o.id)?'收合':'查看'}</button><button type="button" data-dl="${esc(o.id)}">下載</button></div></div>`;
-const bubble=o=>isFile(o)?fileCard(o):esc(o.m);
+const EXP=new Set(),DL=new Map();
+const dlBtn=id=>{const s=DL.get(id);if(!s)return `<button type="button" data-dl="${esc(id)}">下載</button>`;if(s.st==='busy')return `<button type="button" class="dl busy" disabled><i class="sp"></i>下載中…<b class="bar" style="animation-delay:-${Date.now()-s.t0}ms"></b></button>`;return `<button type="button" class="dl ok" disabled>✓ 已下載</button>`};
+const fileCard=o=>`<div class="fc"><div class="fh"><span class="fi">📄</span><div class="fm"><b>${esc(fname(o))}</b><small>${clen(o.m)} 字・文字檔</small></div></div>${EXP.has(o.id)?`<div class="fx">${esc(o.m)}</div>`:`<div class="fp">${esc([...String(o.m)].slice(0,28).join(''))}…</div>`}<div class="fa"><button type="button" data-ex="${esc(o.id)}">${EXP.has(o.id)?'收合':'查看'}</button>${dlBtn(o.id)}</div></div>`;
+const bubble=o=>isImg(o)?`<img data-img="1" src="${esc(o.img)}" alt="圖片" width="220" height="220" decoding="async">`:isFile(o)?fileCard(o):esc(o.m);
 const RB={admin:['🎇','管理員'],teacher:['🐛','老師']};
 const rb=r=>RB[r]?`<span class="rb rb-${r}">${RB[r][0]} ${RB[r][1]}</span>`:'';
 const avatar=(n,r)=>RB[r]?`<span class="av st-${r}" title="${RB[r][1]}">${RB[r][0]}</span>`:`<span class="av" style="background:hsl(${hue(n)} 55% 52%)">${esc([...String(n)][0]||'?')}</span>`;
@@ -601,7 +625,7 @@ function render(){
   const L=[...D.msg].sort((a,b)=>a.ts-b.ts).slice(-150);let dk='',cm='';
   L.forEach(o=>{const d=new Date(o.ts);
     if(d.toDateString()!==dk){dk=d.toDateString();cm+=`<div class="ds"><span>${d.getMonth()+1}/${d.getDate()} 週${'日一二三四五六'[d.getDay()]}</span></div>`}
-    const sc=(RB[o.role]?' st-'+o.role:'')+(isFile(o)?' fb':'');
+    const sc=(RB[o.role]?' st-'+o.role:'')+(isFile(o)?' fb':'')+(isImg(o)?' ib':'');
     cm+=isMine(o)?`<div class="m me"><time>${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}">${bubble(o)}</div></div></div>`:`<div class="m">${avatar(o.n,o.role)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${hm(o.ts)}</time></div></div></div>`});
   cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
   const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
@@ -620,9 +644,17 @@ render();setInterval(render,60000);
 $('#cbody').addEventListener('click',e=>{
   const x=e.target.closest('[data-ex]'),d=e.target.closest('[data-dl]');
   if(x){const id=x.dataset.ex;EXP.has(id)?EXP.delete(id):EXP.add(id);render();return}
-  if(d){const o=D.msg.find(m=>m.id===d.dataset.dl);if(!o)return;
-    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+o.m],{type:'text/plain;charset=utf-8'}));a.download=fname(o);
-    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}});
+  if(d){const id=d.dataset.dl,o=D.msg.find(m=>m.id===id);if(!o||DL.has(id))return;
+    DL.set(id,{st:'busy',t0:Date.now()});render();
+    setTimeout(()=>{
+      const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+o.m],{type:'text/plain;charset=utf-8'}));a.download=fname(o);
+      document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+      DL.set(id,{st:'done'});render();setTimeout(()=>{DL.delete(id);render()},1800)},1100)}});
+/* 圖片放大 */
+{const lb=$('#lb');
+$('#cbody').addEventListener('click',e=>{const im=e.target.closest('[data-img]');if(!im)return;lb.querySelector('img').src=im.getAttribute('src');lb.hidden=false});
+lb.addEventListener('click',()=>{lb.hidden=true});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')lb.hidden=true})}
 
 /* ---------- 新訊息通知 ---------- */
 const ntf=$('#ntf');
@@ -659,7 +691,7 @@ else{
   const start=()=>{
     document.body.classList.remove('locked');
     [['ann','公告'],['evt','行事曆'],['hw','作業'],['photos','相簿'],['msg','留言'],['site','班級設定'],['sched','課表'],['times','上課時間']].forEach(([k,l])=>BT.task(k,l,1));
-    ['ann','evt','hw','photos','msg'].forEach(k=>unsubs.push(onSnapshot(collection(db,k),s=>{if(k==='msg')msgChg(s);D[k]=s.docs.map(d=>({id:d.id,...d.data()}));render();BT.done(k)},bd(k))));
+    ['ann','evt','hw','photos','msg'].forEach(k=>unsubs.push(onSnapshot(k==='msg'?query(collection(db,'msg'),orderBy('ts','desc'),limit(200)):collection(db,k),s=>{if(k==='msg')msgChg(s);D[k]=s.docs.map(d=>({id:d.id,...d.data()}));render();BT.done(k)},bd(k))));
     unsubs.push(onSnapshot(doc(db,'meta','site'),s=>{const m=s.data()||{};if(m.title)D.title=m.title;if(m.tag)D.tag=m.tag;try{localStorage.setItem('cls-boot',JSON.stringify({c:m.loadClass||m.title||'',t:m.loadText||''}))}catch(x){}BT.set(m.loadClass||m.title,m.loadText);render();BT.done('site')},bd('site')));
     unsubs.push(onSnapshot(doc(db,'meta','sched'),s=>{D.sched=(s.data()||{}).cells||{};render();BT.done('sched')},bd('sched')));
     unsubs.push(onSnapshot(doc(db,'meta','times'),s=>{D.times=(s.data()||{}).t||{};render();BT.done('times')},bd('times')));
@@ -700,6 +732,23 @@ else{
     try{await addDoc(collection(db,'msg'),me?{n:me.name,no:me.no,m,ts:Date.now()}:{n:staff.name,role:staff.key,uid:myUid,m,ts:Date.now()});last=Date.now();t.value='';t.style.height='';$('#chint').hidden=true;setTimeout(toEnd,150)}
     catch(err){alert('送出失敗,請稍後再試')}};
   $('#cf').onsubmit=send;
+  /* ---------- 圖片訊息 (1:1) ---------- */
+  {const IMG_MAX=95000,cpre=$('#cpre'),cfile=$('#cfile'),pimg=cpre.querySelector('img');let PEND=null;
+  const sq=f=>new Promise((res,rej)=>{const u=URL.createObjectURL(f),im=new Image();
+    im.onload=()=>{try{const s=Math.min(im.naturalWidth,im.naturalHeight),sx=(im.naturalWidth-s)/2,sy=(im.naturalHeight-s)/2;let px=480,q=.74,url='';
+      for(let i=0;i<7;i++){const c=document.createElement('canvas');c.width=c.height=px;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,px,px);x.drawImage(im,sx,sy,s,s,0,0,px,px);url=c.toDataURL('image/jpeg',q);if(url.length<IMG_MAX)break;px=Math.round(px*.85);q=Math.max(.4,q-.06)}
+      URL.revokeObjectURL(u);url.length<IMG_MAX?res(url):rej(new Error('big'))}catch(e){rej(e)}};
+    im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('load'))};im.src=u});
+  const clr=()=>{PEND=null;cpre.hidden=true;pimg.removeAttribute('src');cfile.value=''};
+  $('#cimg').onclick=()=>cfile.click();
+  $('#cpx').onclick=clr;
+  cfile.onchange=async()=>{const f=cfile.files&&cfile.files[0];if(!f)return;
+    if(!/^image\//.test(f.type)){alert('請選擇圖片檔');cfile.value='';return}
+    try{PEND=await sq(f);pimg.src=PEND;cpre.hidden=false;setTimeout(toEnd,100)}catch(err){clr();alert('這張圖片無法處理,請換一張(建議 JPG / PNG)')}};
+  $('#cps').onclick=async()=>{if(!PEND||Date.now()-last<1500)return;const b=$('#cps');b.disabled=true;b.textContent='傳送中…';
+    try{await addDoc(collection(db,'msg'),me?{n:me.name,no:me.no,m:'',img:PEND,ts:Date.now()}:{n:staff.name,role:staff.key,uid:myUid,m:'',img:PEND,ts:Date.now()});last=Date.now();clr();setTimeout(toEnd,150)}
+    catch(err){alert('圖片送出失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}
+    finally{b.disabled=false;b.textContent='傳送'}};}
 }
 </script>
 </body>
