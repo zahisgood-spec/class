@@ -253,6 +253,10 @@ body.locked .app{display:none}
 #lb{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.85);display:grid;place-items:center;cursor:zoom-out}
 #lb[hidden]{display:none}
 #lb img{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:8px}
+.mdot{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:var(--mute);align-self:center;opacity:.75;transition:background .15s,opacity .15s}
+.mdot .ic{width:16px;height:16px}
+.mdot:hover,.mdot:focus-visible{background:var(--chip);opacity:1}
+@media(hover:hover){.m.me .mdot{opacity:.35}.m.me:hover .mdot,.mdot:focus-visible{opacity:1}}
 #cmenu{position:fixed;z-index:96;display:flex;background:#1f2937;color:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);overflow:hidden}
 #cmenu[hidden]{display:none}
 #cmenu button{padding:10px 18px;font-size:14px;font-weight:700;color:#fff;background:none}
@@ -637,7 +641,7 @@ function render(){
   L.forEach(o=>{const d=new Date(o.ts);
     if(d.toDateString()!==dk){dk=d.toDateString();cm+=`<div class="ds"><span>${d.getMonth()+1}/${d.getDate()} 週${'日一二三四五六'[d.getDay()]}</span></div>`}
     const sc=(RB[o.role]?' st-'+o.role:'')+(isFile(o)?' fb':'')+(isImg(o)?' imgb':'');
-    cm+=isMine(o)?`<div class="m me"><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}" data-mid="${esc(o.id)}">${bubble(o)}</div></div></div>`:`<div class="m">${avatar(o.n,o.role)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time></div></div></div>`});
+    cm+=isMine(o)?`<div class="m me"><button type="button" class="mdot" data-mdot="${esc(o.id)}" aria-label="更多選項" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg></button><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}" data-mid="${esc(o.id)}">${bubble(o)}</div></div></div>`:`<div class="m">${avatar(o.n,o.role)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time></div></div></div>`});
   cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
   const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
   if(isOpen)markSeen();
@@ -764,9 +768,9 @@ else{
   {const cb=$('#cbody'),mn=document.createElement('div'),bar=$('#cedit');mn.id='cmenu';mn.hidden=true;document.body.appendChild(mn);
   let EDIT=null,lp=null,sx=0,sy=0,skip=false;
   const closeMenu=()=>{mn.hidden=true};
-  const openMenu=el=>{const id=el.dataset.mid,o=D.msg.find(x=>x.id===id);if(!o)return;
+  const openMenu=(el,id)=>{id=id||el.dataset.mid;const o=D.msg.find(x=>x.id===id);if(!o)return;
     mn.innerHTML=(isImg(o)?'':`<button type="button" data-a="edit" data-id="${esc(id)}">編輯</button>`)+`<button type="button" class="dg" data-a="del" data-id="${esc(id)}">刪除</button>`;
-    mn.hidden=false;const r=el.getBoundingClientRect(),w=mn.offsetWidth,h=mn.offsetHeight;
+    mn.dataset.for=id;mn.hidden=false;const r=el.getBoundingClientRect(),w=mn.offsetWidth,h=mn.offsetHeight;
     let top=r.top-h-8;if(top<8)top=r.bottom+8;top=Math.max(8,Math.min(top,innerHeight-h-8));
     mn.style.top=top+'px';mn.style.left=Math.min(Math.max(8,r.right-w),innerWidth-w-8)+'px'};
   const endEdit=()=>{EDIT=null;bar.hidden=true;ci.value='';ci.style.height='';$('#chint').hidden=true};
@@ -784,14 +788,14 @@ else{
   const cimg0=$('#cimg').onclick;$('#cimg').onclick=()=>{if(!EDIT)cimg0()};
   /* 點擊(文字訊息)/ 長按或右鍵(圖片)開選單 */
   cb.addEventListener('click',e=>{if(skip){skip=false;e.stopPropagation();e.preventDefault()}},true);
-  cb.addEventListener('click',e=>{const b=e.target.closest('[data-mid]');if(!b||e.target.closest('button')||b.querySelector('[data-img]'))return;openMenu(b)});
+  cb.addEventListener('click',e=>{const d=e.target.closest('[data-mdot]');if(!d)return;const id=d.dataset.mdot;if(!mn.hidden&&mn.dataset.for===id){closeMenu();return}openMenu(d,id)});
   cb.addEventListener('contextmenu',e=>{const b=e.target.closest('[data-mid]');if(!b)return;e.preventDefault();openMenu(b)});
   cb.addEventListener('pointerdown',e=>{skip=false;const b=e.target.closest('[data-mid]');if(!b||e.pointerType==='mouse')return;sx=e.clientX;sy=e.clientY;lp=setTimeout(()=>{lp=null;skip=true;openMenu(b)},500)});
   const cancelLP=()=>{if(lp){clearTimeout(lp);lp=null}};
   cb.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-sx,e.clientY-sy)>8)cancelLP()});
   ['pointerup','pointercancel','pointerleave'].forEach(n=>cb.addEventListener(n,cancelLP));
   cb.addEventListener('scroll',()=>{cancelLP();closeMenu()},{passive:true});
-  document.addEventListener('click',e=>{if(!mn.hidden&&!mn.contains(e.target)&&!e.target.closest('[data-mid]'))closeMenu()});
+  document.addEventListener('click',e=>{if(!mn.hidden&&!mn.contains(e.target)&&!e.target.closest('[data-mid],[data-mdot]'))closeMenu()});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();if(EDIT)endEdit()}});}
 }
 </script>
