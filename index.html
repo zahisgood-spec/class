@@ -5,199 +5,172 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>我們班</title>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('cls-theme')||'light'}catch(e){}</script>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--g:#1ed760;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px)}
-[data-theme=light]{--page:#e6e6e6;--card:#fff;--ink:#121212;--mute:#6b6b6b;--line:rgba(0,0,0,.09);--hover:rgba(0,0,0,.05);--chip:rgba(0,0,0,.07);--hero:#b5ebc9;--gt:#0e7a36;color-scheme:light}
-[data-theme=dark]{--page:#000;--card:#121212;--ink:#fff;--mute:#b3b3b3;--line:rgba(255,255,255,.1);--hover:rgba(255,255,255,.08);--chip:rgba(255,255,255,.1);--hero:#1c5a37;--gt:#1ed760;color-scheme:dark}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[data-theme=light]{--bg:#faf8f3;--card:#fff;--ink:#17140f;--mute:#7a7366;--line:rgba(40,30,10,.1);--hover:rgba(60,45,10,.05);--chip:rgba(60,45,10,.06);--gt:#8a6200;--gbg:linear-gradient(160deg,#fffaf0,#fff0c8);--glow:rgba(212,175,55,.2);--topbg:rgba(250,248,243,.82);color-scheme:light}
+[data-theme=dark]{--bg:#0e0e10;--card:#17171a;--ink:#f4f1ea;--mute:#a39d90;--line:rgba(255,255,255,.1);--hover:rgba(255,255,255,.06);--chip:rgba(255,255,255,.08);--gt:#e8c34a;--gbg:linear-gradient(160deg,#211b0f,#120f09);--glow:rgba(212,175,55,.15);--topbg:rgba(14,14,16,.82);color-scheme:dark}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:90px}
-body{margin:0;background:var(--page);color:var(--ink);font:400 16px/1.6 "Noto Sans TC",system-ui,sans-serif;transition:background .25s,color .25s}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--page)}
+body{margin:0;background:radial-gradient(70% 45% at 85% 0,var(--glow),transparent 70%),var(--bg);background-attachment:fixed;color:var(--ink);font:400 16px/1.65 "Noto Sans TC",system-ui,sans-serif;transition:background-color .25s,color .25s}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--topbg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
 button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--g);outline-offset:2px}
-.app{display:grid;grid-template-columns:248px 1fr;gap:8px;padding:8px 8px 88px}
-.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 8px);height:calc(100vh - 96px - env(safe-area-inset-top,0px));background:var(--card);border-radius:12px;padding:20px 12px;display:flex;flex-direction:column;gap:20px}
-.brand{display:flex;align-items:center;gap:10px;padding:0 10px;font-weight:900;font-size:18px}
-.mark{width:32px;height:32px;border-radius:50%;background:var(--g);color:#052b13;display:grid;place-items:center;font-size:16px}
-nav{display:flex;flex-direction:column;gap:2px}
-nav button{display:flex;align-items:center;gap:14px;background:none;border:0;border-radius:8px;padding:11px 12px;color:var(--mute);font-weight:700;font-size:15px;text-align:left;transition:color .2s,background .2s}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #d4af37;outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--topbg);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.tb{max-width:1120px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:20px}
+.brand{display:flex;align-items:center;gap:10px;font:900 18px "Noto Serif TC",serif;white-space:nowrap}
+.mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#b8860b,#f6e27a 55%,#d4af37);color:#2a2000;display:grid;place-items:center;font-size:17px}
+nav{display:flex;gap:4px;margin:0 auto;overflow-x:auto;scrollbar-width:none}
+nav button{background:none;border:0;padding:8px 14px;color:var(--mute);font-weight:700;font-size:14px;position:relative;white-space:nowrap;transition:color .2s}
 nav button:hover{color:var(--ink)}
-nav button[aria-selected=true]{color:var(--ink);background:var(--hover)}
-nav svg,#theme svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.sf{margin-top:auto}
-#theme{display:flex;align-items:center;gap:12px;width:100%;background:var(--chip);border:0;border-radius:999px;padding:10px 16px;font-weight:700;font-size:14px}
+nav button[aria-selected=true]{color:var(--ink)}
+nav button[aria-selected=true]::after{content:"";position:absolute;left:14px;right:14px;bottom:-1px;height:2px;border-radius:2px;background:linear-gradient(90deg,#b8860b,#f6e27a,#b8860b)}
+#theme{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--chip);display:grid;place-items:center;padding:0}
 #theme:hover{background:var(--hover)}
-[data-theme=light] .tl,[data-theme=dark] .td{display:none}
-.mw{background:var(--card);border-radius:12px;min-width:0;overflow:hidden}
-.hero{display:flex;gap:24px;align-items:flex-end;padding:64px 32px 28px;background:linear-gradient(180deg,var(--hero),transparent)}
-.cover{flex:none;width:clamp(120px,20vw,208px);aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#1ed760,#0fa3b1);color:#052b13;display:grid;place-items:center;font-weight:900;font-size:clamp(56px,10vw,104px);box-shadow:0 12px 40px rgba(0,0,0,.28)}
-.hero small{font-weight:700;font-size:13px;display:block}
-h1{margin:4px 0 10px;font-weight:900;font-size:clamp(40px,8vw,96px);line-height:1.05;letter-spacing:-.02em;overflow-wrap:anywhere}
-.tag{margin:0 0 8px;color:var(--mute);font-size:15px}
+#theme svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+[data-theme=light] .td,[data-theme=dark] .tl{display:none}
+main{max-width:1120px;margin:0 auto;padding:0 24px 80px}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:center;padding:56px 0 40px}
+.kick{font-size:13px;font-weight:700;letter-spacing:.24em;color:var(--gt)}
+h1{font:900 clamp(56px,9.5vw,120px)/1.04 "Noto Serif TC",serif;letter-spacing:.01em;margin:6px 0 14px;overflow-wrap:anywhere}
+.tag{margin:0 0 10px;color:var(--mute);font-size:17px;max-width:28em}
 .meta{color:var(--mute);font-size:14px}
-.note{margin:16px 32px 0;font-size:14px;color:#8a5a00;background:#fff3cf;border-radius:10px;padding:10px 16px}
+.note{margin:0 0 20px;font-size:14px;color:#7a5600;background:#fff0c4;border-radius:12px;padding:10px 16px}
 .note[hidden]{display:none}
-.body{padding:8px 32px 48px}
+.gold{border-radius:24px;padding:1.5px;background:linear-gradient(115deg,#b8860b,#f6e27a,#d4af37,#fff3b8,#b8860b,#f6e27a);background-size:300% 100%;animation:flow 7s linear infinite;box-shadow:0 18px 50px -18px rgba(212,175,55,.55)}
+.in{position:relative;overflow:hidden;border-radius:22.5px;background:var(--gbg);padding:26px 28px}
+.in::after{content:"";position:absolute;top:-60%;left:-70%;width:38%;height:220%;transform:rotate(20deg);background:linear-gradient(90deg,transparent,rgba(255,238,170,.5),transparent);animation:sweep 5s ease-in-out infinite;pointer-events:none}
+.in::before{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(246,226,122,.45),transparent 70%);animation:pulse 3.5s ease-in-out infinite;pointer-events:none}
+.in>*{position:relative;z-index:1}
+@keyframes flow{to{background-position:300% 0}}
+@keyframes sweep{0%{left:-70%}55%,100%{left:140%}}
+@keyframes pulse{50%{opacity:.35;transform:scale(1.15)}}
+.gtext{font-weight:900;letter-spacing:.2em;font-size:14px;background:linear-gradient(100deg,#9a6f00 20%,#f0c93c 50%,#9a6f00 80%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 3.5s linear infinite}
+[data-theme=dark] .gtext{background-image:linear-gradient(100deg,#c79a1a 20%,#fff1b0 50%,#c79a1a 80%);-webkit-background-clip:text;background-clip:text}
+.ah{display:flex;align-items:center}
+.feat{font:700 clamp(20px,2.3vw,26px)/1.5 "Noto Serif TC",serif;margin:16px 0 6px;overflow-wrap:anywhere}
+.ts{color:var(--mute);font-size:13px}
+.older{list-style:none;margin:18px 0 0;padding:12px 0 0;border-top:1px solid rgba(212,175,55,.4)}
+.older li{display:flex;gap:14px;justify-content:space-between;align-items:baseline;padding:6px 0;font-size:14px}
+.older small{color:var(--mute);white-space:nowrap}
+.more{margin-left:auto;background:none;border:0;color:var(--mute);font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px}
+.more:hover{color:var(--ink);background:var(--hover)}
 section{display:none}
 section.on{display:block}
-.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:36px}
-h2{font-size:24px;font-weight:900;margin:24px 0 8px;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px}
-h2 em{font:500 13px "Noto Sans TC",sans-serif;color:var(--mute);font-style:normal}
+.pg{font:900 clamp(30px,5vw,44px)/1.2 "Noto Serif TC",serif;margin:32px 0 20px}
+.bento,.cols{display:grid;grid-template-columns:repeat(12,1fr);gap:18px}
+.bc{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;min-width:0;animation:rise .55s both;box-shadow:0 1px 2px rgba(40,30,10,.04)}
+.bc:nth-child(2){animation-delay:.06s}.bc:nth-child(3){animation-delay:.12s}.bc:nth-child(4){animation-delay:.18s}.bc:nth-child(5){animation-delay:.24s}.bc:nth-child(6){animation-delay:.3s}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}}
+.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s12{grid-column:span 12}
+.bc h3{margin:0 0 12px;font:900 17px "Noto Serif TC",serif;display:flex;align-items:baseline;gap:8px}
+.bc h3 em{font:500 12px "Noto Sans TC",sans-serif;color:var(--mute);font-style:normal}
+.lab{font-size:12px;font-weight:700;color:var(--mute);letter-spacing:.14em;margin-bottom:8px}
+.big{font:900 clamp(60px,7vw,88px)/1 "Noto Serif TC",serif;color:var(--gt)}
+.big i{font:700 16px "Noto Sans TC",sans-serif;color:var(--mute);margin-left:8px;font-style:normal}
+.et{font-weight:700;font-size:18px;margin:12px 0 2px;overflow-wrap:anywhere}
 ul{list-style:none;margin:0;padding:0}
-.row{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-radius:8px;transition:background .15s}
+.row{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:10px 10px;border-radius:10px;transition:background .15s}
 .row:hover{background:var(--hover)}
+.row.sm{padding:7px 8px}
+.row.one{grid-template-columns:1fr auto}
 .row.ev{grid-template-columns:52px 1fr auto}
-.row.hw{grid-template-columns:28px 1fr auto}
+.row.sm.ev{grid-template-columns:44px 1fr auto}
 .row.m{grid-template-columns:40px 1fr;align-items:start}
+.row.sm.m{grid-template-columns:34px 1fr}
 .n{color:var(--mute);text-align:center;font-variant-numeric:tabular-nums}
 .t{min-width:0;overflow-wrap:anywhere}
 .t small,.row>small{color:var(--mute);font-size:13px;display:block;line-height:1.4}
-.date{width:52px;text-align:center;border-radius:10px;padding:6px 0;background:var(--chip)}
-.date b{display:block;font-weight:900;font-size:21px;line-height:1.1}
+.date{width:52px;text-align:center;border-radius:12px;padding:6px 0;background:var(--chip)}
+.sm .date{width:44px;padding:4px 0}
+.date b{display:block;font:900 21px/1.1 "Noto Serif TC",serif}
+.sm .date b{font-size:17px}
 .date span{font-size:12px;color:var(--mute)}
 .past{opacity:.45}
 .pill{font-size:12px;font-weight:700;color:var(--gt);background:var(--chip);border-radius:999px;padding:3px 12px;white-space:nowrap}
-.pill.hot{background:var(--g);color:#052b13}
+.pill.hot{background:linear-gradient(100deg,#d4af37,#f6e27a);color:#2a2000}
+.new{font-size:11px;font-weight:900;letter-spacing:.1em;color:#2a2000;background:linear-gradient(100deg,#d4af37,#f6e27a);border-radius:999px;padding:1px 9px;margin-right:8px;vertical-align:1px}
 .done .t>span{text-decoration:line-through;opacity:.5}
-.ck{width:22px;height:22px;border-radius:50%;border:2px solid var(--mute);display:grid;place-items:center;font-size:12px;font-weight:900;color:#052b13;justify-self:center}
-.done .ck{background:var(--g);border-color:var(--g)}
-.empty{display:block;color:var(--mute);padding:10px 12px}
-.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin-top:12px}
+.ck{width:22px;height:22px;border-radius:50%;border:2px solid var(--mute);display:grid;place-items:center;font-size:12px;font-weight:900;color:#2a2000;justify-self:center}
+.done .ck{background:#d4af37;border-color:#d4af37}
+.empty{display:block;color:var(--mute);padding:8px 10px}
+.prog{height:5px;border-radius:3px;background:var(--chip);margin-top:10px;overflow:hidden}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,#b8860b,#f6e27a);border-radius:3px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:14px}
 table{border-collapse:collapse;width:100%;min-width:560px}
 th,td{padding:12px 8px;text-align:center;border-top:1px solid var(--line);border-left:1px solid var(--line)}
 tr>:first-child{border-left:0;width:44px;color:var(--mute)}
-thead th{border-top:0;font-size:13px;color:var(--mute);font-weight:700}
-th.today,td.today{background:rgba(30,215,96,.12)}
+thead th{border-top:0;font-size:13px;color:var(--mute)}
+th.today,td.today{background:rgba(212,175,55,.13)}
 th.today{color:var(--gt)}
 td{height:52px;font-weight:500}
-.pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:18px;margin-top:12px}
-.ph{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:var(--chip);margin:0}
-.ph img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;transition:transform .4s}
+.pics{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+.ph{position:relative;aspect-ratio:1;border-radius:14px;overflow:hidden;background:var(--chip);margin:0}
+.ph img,.thumbs img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;transition:transform .4s}
 .ph:hover img{transform:scale(1.05)}
-.ph::after{content:"+";position:absolute;right:10px;bottom:10px;width:42px;height:42px;border-radius:50%;background:var(--g);color:#052b13;display:grid;place-items:center;font:700 26px/1 sans-serif;opacity:0;transform:translateY(8px);transition:.25s;box-shadow:0 8px 16px rgba(0,0,0,.3);pointer-events:none}
+.ph::after{content:"+";position:absolute;right:10px;bottom:10px;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#d4af37,#f6e27a);color:#2a2000;display:grid;place-items:center;font:700 24px/1 sans-serif;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none}
 .ph:hover::after{opacity:1;transform:none}
-.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#052b13}
-form{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 16px}
-input,textarea{font:inherit;color:var(--ink);background:var(--chip);border:1px solid transparent;border-radius:8px;padding:11px 14px;min-width:0;flex:1 1 140px}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.thumbs img{aspect-ratio:1;border-radius:12px}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#2a2000}
+.sm .av{width:32px;height:32px;font-size:14px}
+#ov-msg ul{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:6px}
+form{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+input,textarea{font:inherit;color:var(--ink);background:var(--chip);border:1px solid transparent;border-radius:10px;padding:11px 14px;min-width:0;flex:1 1 140px}
 textarea{flex-basis:100%;min-height:80px;resize:vertical}
-.btn{font-weight:700;color:#052b13;background:var(--g);border:0;border-radius:999px;padding:11px 28px;transition:transform .15s}
+.btn{font-weight:700;color:#2a2000;background:linear-gradient(100deg,#d4af37,#f6e27a);border:0;border-radius:999px;padding:11px 28px;transition:transform .15s}
 .btn:hover{transform:scale(1.04)}
-.player{position:fixed;left:0;right:0;bottom:0;z-index:30;height:calc(72px + env(safe-area-inset-bottom,0px));padding:0 16px env(safe-area-inset-bottom,0px);display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:16px;align-items:center;background:var(--page)}
-.pl{display:flex;align-items:center;gap:12px;min-width:0}
-.pc{flex:none;width:48px;height:48px;border-radius:6px;background:linear-gradient(135deg,#1ed760,#0fa3b1);display:grid;place-items:center;color:#052b13;font-weight:900}
-.pl b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pl small,.pm small{color:var(--mute);font-size:12px}
-.pm{text-align:center}
-.bar{height:5px;border-radius:3px;background:var(--chip);margin-top:6px;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--g);border-radius:3px;transition:width .6s}
-.pr{text-align:right;font-weight:900;font-size:20px;color:var(--gt)}
 dialog{border:0;background:none;padding:0;max-width:94vw}
 dialog::backdrop{background:rgba(0,0,0,.85)}
-dialog img{max-width:94vw;max-height:88vh;border-radius:12px}
-@media(max-width:899px){
- .app{grid-template-columns:1fr;gap:0;padding:0 0 88px}
- .side{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;height:auto;border-radius:0;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line)}
- .brand{flex:1;padding:0}
- .sf{order:2;margin:0;width:auto}
- #theme{padding:8px 14px}#theme span{display:none}
- nav{order:3;flex-direction:row;width:100%;overflow-x:auto;scrollbar-width:none;gap:8px}
- nav button{background:var(--chip);border-radius:999px;padding:7px 16px;white-space:nowrap;font-size:14px}
- nav svg{display:none}
- nav button[aria-selected=true]{background:var(--g);color:#052b13}
- .mw{border-radius:0}
- .hero{padding:32px 18px 20px;gap:16px}
- .body{padding:4px 18px 40px}.note{margin:12px 18px 0}
- .player{grid-template-columns:1fr auto}.pm{display:none}
-}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-
-[data-theme=light]{--c2:#f6f6f7}
-[data-theme=dark]{--c2:#1b1b1b}
-.mw:not([data-v=ov]) .hero,.mw:not([data-v=ov]) .note{display:none}
-.mw:not([data-v=ov]) .body{padding-top:20px}
-.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:8px}
-.bc{background:var(--c2);border:1px solid var(--line);border-radius:18px;padding:20px;min-width:0;animation:rise .55s both}
-.bc:nth-child(2){animation-delay:.06s}.bc:nth-child(3){animation-delay:.12s}.bc:nth-child(4){animation-delay:.18s}.bc:nth-child(5){animation-delay:.24s}.bc:nth-child(6){animation-delay:.3s}.bc:nth-child(7){animation-delay:.36s}
-@keyframes rise{from{opacity:0;transform:translateY(12px)}}
-.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}
-.bc h3{margin:0 0 10px;font-size:16px;font-weight:900;display:flex;align-items:baseline;gap:8px;letter-spacing:.01em}
-.bc h3 em{font:500 12px "Noto Sans TC",sans-serif;color:var(--mute);font-style:normal}
-.more{margin-left:auto;background:none;border:0;color:var(--mute);font-size:13px;font-weight:700;padding:2px 8px;border-radius:6px}
-.more:hover{color:var(--ink);background:var(--hover)}
-.lab{font-size:12px;font-weight:700;color:var(--mute);letter-spacing:.08em;margin-bottom:6px}
-.big{font-weight:900;font-size:clamp(56px,7vw,84px);line-height:1;letter-spacing:-.03em;color:var(--gt)}
-.big i{font:700 16px "Noto Sans TC",sans-serif;color:var(--mute);margin-left:8px;font-style:normal;letter-spacing:0}
-.et{font-weight:700;font-size:18px;margin:12px 0 2px;overflow-wrap:anywhere}
-.row.sm{padding:7px 8px;grid-template-columns:28px 1fr auto}
-.row.sm.one{grid-template-columns:1fr}
-.row.sm.ev{grid-template-columns:44px 1fr auto}
-.row.sm .date{width:44px;padding:4px 0}.row.sm .date b{font-size:17px}
-.row.sm.m{grid-template-columns:34px 1fr}
-.row.sm .av{width:32px;height:32px;font-size:14px}
-.prog{height:5px;border-radius:3px;background:var(--chip);margin-top:10px;overflow:hidden}
-.prog i{display:block;height:100%;background:var(--g);border-radius:3px}
-.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.thumbs img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;cursor:zoom-in;display:block;transition:transform .3s}
-.thumbs img:hover{transform:scale(1.03)}
-.bc .empty{padding:6px 8px}
-@media(max-width:1180px){.s4{grid-column:span 6}#ov-hw{grid-column:span 12}.s5,.s6,.s7{grid-column:span 12}}
-@media(max-width:700px){.s4{grid-column:span 12}.thumbs{grid-template-columns:repeat(2,1fr)}}
+dialog img{max-width:94vw;max-height:88vh;border-radius:14px}
+#mw[data-v]:not([data-v=ov]) .hero,#mw[data-v]:not([data-v=ov]) .note{display:none}
+@media(max-width:1000px){.hero{grid-template-columns:1fr;gap:28px;padding:36px 0 28px}.s4{grid-column:span 6}#ov-hw{grid-column:span 12}.s5,.s6,.s7{grid-column:span 12}}
+@media(max-width:700px){.tb{flex-wrap:wrap;gap:8px 12px;padding:10px 16px}.brand{flex:1}nav{order:3;width:100%;margin:0}main{padding:0 16px 80px}.s4{grid-column:span 12}.thumbs{grid-template-columns:repeat(2,1fr)}.in{padding:22px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div class="app">
-<aside class="side">
+<header class="top"><div class="tb">
 <div class="brand"><span class="mark" id="mk">我</span><span id="logo"></span></div>
 <nav id="nav" role="tablist">
-<button role="tab" data-t="ov" aria-selected="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>總攬</button>
-<button role="tab" data-t="news" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0"/></svg>公告・行事曆</button>
-<button role="tab" data-t="sched" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>課表・作業</button>
-<button role="tab" data-t="gal" aria-selected="false"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>相簿</button>
-<button role="tab" data-t="chat" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/></svg>留言牆</button>
+<button role="tab" data-t="ov" aria-selected="true">總攬</button>
+<button role="tab" data-t="news" aria-selected="false">公告・行事曆</button>
+<button role="tab" data-t="sched" aria-selected="false">課表・作業</button>
+<button role="tab" data-t="gal" aria-selected="false">相簿</button>
+<button role="tab" data-t="chat" aria-selected="false">留言牆</button>
 </nav>
-<div class="sf"><button id="theme" aria-label="切換亮色與暗色">
-<svg class="tl" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><svg class="td" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-<span class="tl">切換暗色</span><span class="td">切換亮色</span></button></div>
-</aside>
+<button id="theme" aria-label="切換亮色與暗色"><svg class="tl" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><svg class="td" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+</div></header>
 
-<div class="mw" id="mw" data-v="ov">
-<header class="hero">
-<div class="cover" id="cover" aria-hidden="true">我</div>
-<div style="min-width:0"><small>班級</small><h1 id="title"></h1><p class="tag" id="tag"></p><div class="meta" id="meta"></div></div>
-</header>
-<p class="note" id="note" hidden>尚未設定 Firebase:請打開 index.html,把設定貼到 FIREBASE_CONFIG。</p>
-<div class="body">
+<main id="mw" data-v="ov">
+<p class="note" id="note" hidden style="margin-top:20px">尚未設定 Firebase:請打開 index.html,把設定貼到 FIREBASE_CONFIG。</p>
+<div class="hero">
+<div><div class="kick">班級</div><h1 id="title"></h1><p class="tag" id="tag"></p><div class="meta" id="meta"></div></div>
+<div class="gold"><div class="in" id="annbox"></div></div>
+</div>
+
 <section id="ov" class="on"><div class="bento">
 <div class="bc s4" id="ov-next"></div>
 <div class="bc s4" id="ov-today"></div>
 <div class="bc s4" id="ov-hw"></div>
-<div class="bc s6" id="ov-ann"></div>
-<div class="bc s6" id="ov-evt"></div>
+<div class="bc s5" id="ov-evt"></div>
 <div class="bc s7" id="ov-pics"></div>
-<div class="bc s5" id="ov-msg"></div>
+<div class="bc s12" id="ov-msg"></div>
 </div></section>
-<section id="news"><div class="cols">
-<div><h2>公告 <em id="ca"></em></h2><ul id="la"></ul></div>
-<div><h2>行事曆 <em id="ce"></em></h2><ul id="le"></ul></div>
-</div></section>
-<section id="sched">
-<h2>每週課表</h2><div class="tw"><table id="tb"></table></div>
-<h2>作業提醒 <em id="ch"></em></h2><ul id="lh"></ul>
-</section>
-<section id="gal"><h2>班級相簿 <em id="cp"></em></h2><div class="pics" id="pics"></div></section>
-<section id="chat"><h2>留言牆 <em id="cm"></em></h2>
-<form id="fm"><input name="n" id="nm" placeholder="你的名字" required maxlength="12" aria-label="你的名字"><textarea name="m" placeholder="想對大家說什麼?" required maxlength="300" aria-label="留言內容"></textarea><button class="btn">送出留言</button></form>
-<ul id="lm"></ul></section>
-</div>
-</div>
-</div>
 
-<footer class="player" aria-live="polite">
-<div class="pl"><div class="pc" id="pcv">我</div><div style="min-width:0"><b id="pn">目前沒有待辦活動</b><small>下一個活動</small></div></div>
-<div class="pm"><small id="pp"></small><div class="bar"><i id="pf"></i></div></div>
-<div class="pr" id="pd">—</div>
-</footer>
+<section id="news"><h2 class="pg">公告・行事曆</h2><div class="cols">
+<div class="bc s6"><h3>公告 <em id="ca"></em></h3><ul id="la"></ul></div>
+<div class="bc s6"><h3>行事曆 <em id="ce"></em></h3><ul id="le"></ul></div>
+</div></section>
+<section id="sched"><h2 class="pg">課表・作業</h2>
+<div class="bc" style="margin-bottom:18px"><h3>每週課表</h3><div class="tw"><table id="tb"></table></div></div>
+<div class="bc"><h3>作業提醒 <em id="ch"></em></h3><ul id="lh"></ul></div>
+</section>
+<section id="gal"><h2 class="pg">相簿</h2><div class="bc"><h3>班級相簿 <em id="cp"></em></h3><div class="pics" id="pics"></div></div></section>
+<section id="chat"><h2 class="pg">留言牆</h2><div class="bc"><h3>大家的留言 <em id="cm"></em></h3>
+<form id="fm"><input name="n" id="nm" placeholder="你的名字" required maxlength="12" aria-label="你的名字"><textarea name="m" placeholder="想對大家說什麼?" required maxlength="300" aria-label="留言內容"></textarea><button class="btn">送出留言</button></form>
+<ul id="lm"></ul></div></section>
+</main>
 <dialog id="dlg"><img id="big" alt="放大的照片"></dialog>
 
 <script type="module">
@@ -210,6 +183,7 @@ const dleft=d=>Math.round((new Date(d+'T00:00:00')-new Date(new Date().toDateStr
 const when=n=>n<0?'已過':n===0?'今天':n+' 天後';
 const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 const list=(ul,rows,empty)=>{$(ul).innerHTML=rows.length?rows.join(''):`<li class="empty">${empty}</li>`};
+const hue=n=>[...n].reduce((h,c)=>h+c.charCodeAt(0),0)*47%360;
 const D={title:'我們班',tag:'班級專屬網站,公告、課表、照片都在這裡。',ann:[],evt:[],hw:[],sched:{},photos:[],msg:[]};
 
 $('#theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('cls-theme',t)}catch(e){}};
@@ -223,47 +197,44 @@ document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g
   const im=e.target.closest('.pics img,.thumbs img');if(im){$('#big').src=im.src;$('#dlg').showModal()}});
 $('#dlg').onclick=()=>$('#dlg').close();
 
+const put=(sel,h)=>{const el=$(sel);if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}};
+const head=(t,em,go)=>`<h3>${t}${em?` <em>${em}</em>`:''}<button class="more" data-go="${go}">查看全部 ›</button></h3>`;
+const byNew=a=>[...a].sort((x,y)=>y.ts-x.ts);
+
 function rMeta(){$('#meta').textContent=`${D.ann.length} 則公告 · ${D.evt.length} 個活動 · ${D.photos.length} 張照片 · ${D.msg.length} 則留言`}
-function rSite(){document.title=D.title;$('#logo').textContent=D.title;$('#title').textContent=D.title;$('#tag').textContent=D.tag;const ch=[...D.title][0]||'班';$('#cover').textContent=ch;$('#mk').textContent=ch;$('#pcv').textContent=ch}
-function rHero(){
-  const up=D.evt.filter(e=>dleft(e.d)>=0).sort((a,b)=>a.d<b.d?-1:1)[0],tot=D.hw.length,done=D.hw.filter(h=>h.done).length;
-  $('#pn').textContent=up?up.t:'目前沒有待辦活動';$('#pd').textContent=up?when(dleft(up.d)):'—';
-  $('#pp').textContent=tot?`作業完成 ${done} / ${tot}`:'目前沒有作業';$('#pf').style.width=(tot?done/tot*100:0)+'%';
-}
+function rSite(){document.title=D.title;$('#logo').textContent=D.title;$('#title').textContent=D.title;$('#tag').textContent=D.tag;$('#mk').textContent=[...D.title][0]||'班'}
 function rAnn(){$('#ca').textContent=D.ann.length?D.ann.length+' 則':'';
-  list('#la',[...D.ann].sort((a,b)=>b.ts-a.ts).map((o,i)=>`<li class="row"><span class="n">${i+1}</span><span class="t">${esc(o.t)}</span><small>${fmt(o.ts)}</small></li>`),'目前沒有公告');rMeta()}
+  list('#la',byNew(D.ann).map((o,i)=>`<li class="row one"><span class="t">${i===0?'<span class="new">最新</span>':''}${esc(o.t)}<small>${fmt(o.ts)}</small></span></li>`),'目前沒有公告');rMeta()}
 function rEvt(){$('#ce').textContent=D.evt.length?D.evt.length+' 項':'';
-  list('#le',[...D.evt].sort((p,q)=>{const u=dleft(p.d)<0,v=dleft(q.d)<0;return u!==v?u-v:(u?(p.d<q.d?1:-1):(p.d<q.d?-1:1))}).map(o=>{const n=dleft(o.d),d=new Date(o.d+'T00:00:00');return `<li class="row ev ${n<0?'past':''}"><div class="date"><b>${d.getDate()}</b><span>${d.getMonth()+1}月</span></div><span class="t">${esc(o.t)}</span><span class="pill ${n>=0&&n<=3?'hot':''}">${when(n)}</span></li>`}),'目前沒有活動');rHero();rMeta()}
+  list('#le',[...D.evt].sort((p,q)=>{const u=dleft(p.d)<0,v=dleft(q.d)<0;return u!==v?u-v:(u?(p.d<q.d?1:-1):(p.d<q.d?-1:1))}).map(o=>{const n=dleft(o.d),d=new Date(o.d+'T00:00:00');return `<li class="row ev ${n<0?'past':''}"><div class="date"><b>${d.getDate()}</b><span>${d.getMonth()+1}月</span></div><span class="t">${esc(o.t)}</span><span class="pill ${n>=0&&n<=3?'hot':''}">${when(n)}</span></li>`}),'目前沒有活動');rMeta()}
 function rHw(){const open=D.hw.filter(h=>!h.done).length;$('#ch').textContent=open?open+' 項未完成':'';
-  list('#lh',[...D.hw].sort((p,q)=>(!!p.done-!!q.done)||(p.d<q.d?-1:1)).map(o=>{const n=dleft(o.d);return `<li class="row hw ${o.done?'done':''}"><span class="ck">${o.done?'✓':''}</span><span class="t"><span>${esc(o.t)}</span><small>${esc(o.d)}</small></span><span class="pill ${!o.done&&n<=1?'hot':''}">${when(n)}</span></li>`}),'目前沒有作業');rHero()}
+  list('#lh',[...D.hw].sort((p,q)=>(!!p.done-!!q.done)||(p.d<q.d?-1:1)).map(o=>{const n=dleft(o.d);return `<li class="row ${o.done?'done':''}"><span class="ck">${o.done?'✓':''}</span><span class="t"><span>${esc(o.t)}</span><small>${esc(o.d)}</small></span><span class="pill ${!o.done&&n<=1?'hot':''}">${when(n)}</span></li>`}),'目前沒有作業')}
 function rSched(){const Dn=['一','二','三','四','五'],td=new Date().getDay()-1;
   let h='<thead><tr><th></th>'+Dn.map((d,i)=>`<th class="${i===td?'today':''}">週${d}</th>`).join('')+'</tr></thead><tbody>';
   for(let p=1;p<=7;p++)h+=`<tr><th>${p}</th>`+Dn.map((_,i)=>`<td class="${i===td?'today':''}">${esc(D.sched[i+'-'+p]||'')}</td>`).join('')+'</tr>';
   $('#tb').innerHTML=h+'</tbody>';rOv()}
 function rPics(){$('#cp').textContent=D.photos.length?D.photos.length+' 張':'';
-  $('#pics').innerHTML=D.photos.length?[...D.photos].sort((a,b)=>b.ts-a.ts).map(p=>`<figure class="ph"><img src="${esc(p.url)}" alt="班級照片" loading="lazy"></figure>`).join(''):'<p class="empty">相簿還是空的</p>';rMeta()}
+  $('#pics').innerHTML=D.photos.length?byNew(D.photos).map(p=>`<figure class="ph"><img src="${esc(p.url)}" alt="班級照片" loading="lazy"></figure>`).join(''):'<p class="empty">相簿還是空的</p>';rMeta()}
 function rMsg(){$('#cm').textContent=D.msg.length?D.msg.length+' 則':'';
-  list('#lm',[...D.msg].sort((a,b)=>b.ts-a.ts).map(o=>`<li class="row m"><span class="av" style="background:hsl(${[...o.n].reduce((h,c)=>h+c.charCodeAt(0),0)*47%360} 70% 70%)">${esc(o.n[0]||'?')}</span><span class="t"><b>${esc(o.n)}</b> <small style="display:inline">${fmt(o.ts)}</small><br>${esc(o.m)}</span></li>`),'還沒有留言,來當第一個吧');rMeta()}
+  list('#lm',byNew(D.msg).map(o=>`<li class="row m"><span class="av" style="background:hsl(${hue(o.n)} 70% 72%)">${esc(o.n[0]||'?')}</span><span class="t"><b>${esc(o.n)}</b> <small style="display:inline">${fmt(o.ts)}</small><br>${esc(o.m)}</span></li>`),'還沒有留言,來當第一個吧');rMeta()}
 
-const put=(sel,h)=>{const el=$(sel);if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}};
-const head=(t,em,go)=>`<h3>${t}${em?` <em>${em}</em>`:''}<button class="more" data-go="${go}">查看全部 ›</button></h3>`;
 function rOv(){
-  const td=new Date().getDay()-1,wk=['週一','週二','週三','週四','週五'];
+  const td=new Date().getDay()-1,wk=['週一','週二','週三','週四','週五'],A=byNew(D.ann);
+  put('#annbox',`<div class="ah"><span class="gtext">公　告</span><button class="more" data-go="news">全部 ›</button></div>`+(A[0]?`<p class="feat">${esc(A[0].t)}</p><div class="ts">${fmt(A[0].ts)}</div>`+(A.length>1?`<ul class="older">${A.slice(1,3).map(o=>`<li><span class="t">${esc(o.t)}</span><small>${fmt(o.ts)}</small></li>`).join('')}</ul>`:''):`<p class="feat" style="color:var(--mute)">目前沒有公告</p>`));
   const up=D.evt.filter(e=>dleft(e.d)>=0).sort((a,b)=>a.d<b.d?-1:1),n0=up[0];
   put('#ov-next',`<div class="lab">下一個活動</div>`+(n0?`<div class="big">${dleft(n0.d)===0?'今天':dleft(n0.d)}${dleft(n0.d)===0?'':'<i>天後</i>'}</div><p class="et">${esc(n0.t)}</p><small style="color:var(--mute)">${esc(n0.d)}</small>`:`<div class="big">—</div><p class="et">目前沒有待辦活動</p>`));
   const subj=[];if(td>=0&&td<5)for(let p=1;p<=7;p++){const s=D.sched[td+'-'+p];if(s)subj.push(`<li class="row sm"><span class="n">${p}</span><span class="t">${esc(s)}</span></li>`)}
   put('#ov-today',head('今日課表',td>=0&&td<5?wk[td]:'假日','sched')+`<ul>${subj.join('')||'<li class="empty">今天沒有課程</li>'}</ul>`);
   const open=D.hw.filter(h=>!h.done).sort((a,b)=>a.d<b.d?-1:1),tot=D.hw.length,done=tot-open.length;
   put('#ov-hw',head('作業',open.length?open.length+' 項未完成':'','sched')+`<ul>${open.slice(0,4).map(o=>{const n=dleft(o.d);return `<li class="row sm"><span class="ck"></span><span class="t">${esc(o.t)}</span><span class="pill ${n<=1?'hot':''}">${when(n)}</span></li>`}).join('')||`<li class="empty">${tot?'作業全部完成':'目前沒有作業'}</li>`}</ul>`+(tot?`<div class="prog"><i style="width:${done/tot*100}%"></i></div>`:''));
-  put('#ov-ann',head('最新公告',D.ann.length?D.ann.length+' 則':'','news')+`<ul>${[...D.ann].sort((a,b)=>b.ts-a.ts).slice(0,3).map(o=>`<li class="row sm one"><span class="t">${esc(o.t)}<small>${fmt(o.ts)}</small></span></li>`).join('')||'<li class="empty">目前沒有公告</li>'}</ul>`);
   put('#ov-evt',head('近期活動',up.length?up.length+' 項':'','news')+`<ul>${up.slice(0,4).map(o=>{const n=dleft(o.d),d=new Date(o.d+'T00:00:00');return `<li class="row sm ev"><div class="date"><b>${d.getDate()}</b><span>${d.getMonth()+1}月</span></div><span class="t">${esc(o.t)}</span><span class="pill ${n<=3?'hot':''}">${when(n)}</span></li>`}).join('')||'<li class="empty">目前沒有活動</li>'}</ul>`);
-  const ph=[...D.photos].sort((a,b)=>b.ts-a.ts).slice(0,4);
+  const ph=byNew(D.photos).slice(0,4);
   put('#ov-pics',head('最新照片',D.photos.length?D.photos.length+' 張':'','gal')+(ph.length?`<div class="thumbs">${ph.map(p=>`<img src="${esc(p.url)}" alt="班級照片" loading="lazy">`).join('')}</div>`:'<p class="empty">相簿還是空的</p>'));
-  put('#ov-msg',head('最新留言',D.msg.length?D.msg.length+' 則':'','chat')+`<ul>${[...D.msg].sort((a,b)=>b.ts-a.ts).slice(0,3).map(o=>`<li class="row sm m"><span class="av" style="background:hsl(${[...o.n].reduce((h,c)=>h+c.charCodeAt(0),0)*47%360} 70% 70%)">${esc(o.n[0]||'?')}</span><span class="t"><b>${esc(o.n)}</b><br>${esc(o.m)}</span></li>`).join('')||'<li class="empty">還沒有留言</li>'}</ul>`);
+  put('#ov-msg',head('最新留言',D.msg.length?D.msg.length+' 則':'','chat')+`<ul>${byNew(D.msg).slice(0,3).map(o=>`<li class="row sm m"><span class="av" style="background:hsl(${hue(o.n)} 70% 72%)">${esc(o.n[0]||'?')}</span><span class="t"><b>${esc(o.n)}</b><br>${esc(o.m)}</span></li>`).join('')||'<li class="empty">還沒有留言</li>'}</ul>`);
 }
 const R={ann:rAnn,evt:rEvt,hw:rHw,photos:rPics,msg:rMsg};
 Object.keys(R).forEach(k=>{const f=R[k];R[k]=()=>{f();rOv()}});
-rSite();rHero();rMeta();rAnn();rEvt();rHw();rSched();rPics();rMsg();rOv();
+rSite();rMeta();rAnn();rEvt();rHw();rSched();rPics();rMsg();rOv();
 
 if(!FIREBASE_CONFIG.projectId){$('#note').hidden=false}
 else{
