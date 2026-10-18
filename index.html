@@ -328,6 +328,21 @@ body.locked .app{display:none}
  #dock.open #dh::before{top:calc(6px + env(safe-area-inset-top,0px))}
 }
 
+.ud{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;background:rgba(10,18,40,.5);backdrop-filter:blur(2px);animation:ud-bg .15s ease}
+.ud-box{width:100%;max-width:400px;background:var(--card);color:var(--ink);border-radius:24px;padding:26px 26px 22px;box-shadow:0 24px 60px -12px rgba(0,0,0,.45);animation:ud-in .18s ease}
+.ud-t{margin:0 0 8px;font-size:19px;font-weight:900}
+.ud-m{margin:0;font-size:15px;line-height:1.7;color:var(--mute);white-space:pre-line;overflow-wrap:anywhere}
+.ud-i{display:block;width:100%;flex:none;margin:14px 0 0;font:inherit;color:var(--ink);background:var(--chip);border:1px solid transparent;border-radius:12px;padding:11px 14px}
+.ud-b{display:flex;flex-direction:row-reverse;justify-content:flex-start;gap:10px;margin-top:22px}
+.ud-b button{font:700 15px "Noto Sans TC",system-ui,sans-serif;border-radius:999px;padding:10px 26px;cursor:pointer;border:0;transition:filter .15s}
+.ud-b button:hover{filter:brightness(1.08)}
+.ud-c{background:var(--chip);color:var(--ink)}
+.ud-ok.dg{background:#ef4444!important;color:#fff!important}
+.ud button:focus-visible,.ud-i:focus-visible{outline:2px solid #d4af37;outline-offset:2px}
+@keyframes ud-bg{from{opacity:0}}
+@keyframes ud-in{from{opacity:0;transform:translateY(8px) scale(.96)}}
+@media(prefers-reduced-motion:reduce){.ud,.ud-box{animation:none}}
+.ud-ok{background:var(--pri);color:#fff}
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:radial-gradient(140% 40% at 10% 106%,rgba(110,175,255,.7),transparent 70%),linear-gradient(160deg,#0a1840,#0c2a6c 60%,#123f95);--bo-ink:#fff;--bo-mute:rgba(255,255,255,.72);--bo-chip:rgba(255,255,255,.12);--bo-mkc:#f6e27a;position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
 #boot.out{opacity:0;visibility:hidden;pointer-events:none}
@@ -504,6 +519,25 @@ import {getFirestore,collection,doc,onSnapshot,addDoc,getDoc,query,orderBy,limit
 const FIREBASE_CONFIG={apiKey:"AIzaSyCjH-28OnHBKh8cFuL3rPkmxtmV7ixvAnU",authDomain:"class-9ab0a.firebaseapp.com",projectId:"class-9ab0a",storageBucket:"class-9ab0a.firebasestorage.app",messagingSenderId:"1061856226694",appId:"1:1061856226694:web:fa6467c7db7008df329007"};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* ---------- 自訂對話框(取代 alert / confirm / prompt) ---------- */
+const ud=o=>new Promise(res=>{
+  const prev=document.activeElement,el=document.createElement('div');
+  el.className='ud';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
+  el.innerHTML=`<div class="ud-box"><h3 class="ud-t">${esc(o.title)}</h3><p class="ud-m">${esc(o.msg)}</p>${o.input?`<input class="ud-i" type="text" value="${esc(o.def||'')}" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="${esc(o.msg)}">`:''}<div class="ud-b"><button type="button" class="ud-ok${o.danger?' dg':''}">${esc(o.ok||'確定')}</button>${o.cancel===false?'':'<button type="button" class="ud-c">取消</button>'}</div></div>`;
+  const inp=el.querySelector('.ud-i'),okb=el.querySelector('.ud-ok');
+  const done=v=>{el.remove();try{prev&&prev.focus&&prev.focus({preventScroll:true})}catch(x){}res(v)};
+  const yes=()=>done(o.input?inp.value.trim():true),no=()=>done(o.input?null:false);
+  okb.onclick=yes;const cb=el.querySelector('.ud-c');if(cb)cb.onclick=no;
+  el.addEventListener('mousedown',e=>{if(e.target===el)no()});
+  el.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();no()}
+    else if(e.key==='Enter'&&!e.isComposing){e.preventDefault();e.stopPropagation();yes()}
+    else if(e.key==='Tab'){const f=[...el.querySelectorAll('input,button')],i=f.indexOf(document.activeElement);e.preventDefault();f[(i+(e.shiftKey?-1:1)+f.length)%f.length].focus()}});
+  document.body.appendChild(el);(inp||okb).focus();if(inp)inp.select();
+});
+const uiAlert=msg=>ud({title:'提示',msg,cancel:false});
+const uiConfirm=(msg,o)=>ud({title:'確認',msg,...(o||{})});
+const uiPrompt=(msg,def)=>ud({title:'輸入',msg,input:1,def});
 const dleft=d=>Math.round((new Date(d+'T00:00:00')-new Date(new Date().toDateString()))/864e5);
 const when=n=>n<0?'已過':n===0?'今天':n+' 天後';
 const p2=n=>String(n).padStart(2,'0');
@@ -745,7 +779,7 @@ else{
     if(Date.now()-last<1500)return;
     const t=$('#ci'),m=t.value.trim();if(!m)return;
     try{await addDoc(collection(db,'msg'),me?{n:me.name,no:me.no,m,ts:Date.now()}:{n:staff.name,role:staff.key,uid:myUid,m,ts:Date.now()});last=Date.now();t.value='';t.style.height='';$('#chint').hidden=true;setTimeout(toEnd,150)}
-    catch(err){alert('送出失敗,請稍後再試')}};
+    catch(err){uiAlert('送出失敗,請稍後再試')}};
   $('#cf').onsubmit=send;
   /* ---------- 圖片訊息 (1:1) ---------- */
   {const IMG_MAX=95000,cpre=$('#cpre'),cfile=$('#cfile'),pimg=cpre.querySelector('img');let PEND=null;
@@ -758,11 +792,11 @@ else{
   $('#cimg').onclick=()=>cfile.click();
   $('#cpx').onclick=clr;
   cfile.onchange=async()=>{const f=cfile.files&&cfile.files[0];if(!f)return;
-    if(!/^image\//.test(f.type)){alert('請選擇圖片檔');cfile.value='';return}
-    try{PEND=await sq(f);pimg.src=PEND;cpre.hidden=false;setTimeout(toEnd,100)}catch(err){clr();alert('這張圖片無法處理,請換一張(建議 JPG / PNG)')}};
+    if(!/^image\//.test(f.type)){uiAlert('請選擇圖片檔');cfile.value='';return}
+    try{PEND=await sq(f);pimg.src=PEND;cpre.hidden=false;setTimeout(toEnd,100)}catch(err){clr();uiAlert('這張圖片無法處理,請換一張(建議 JPG / PNG)')}};
   $('#cps').onclick=async()=>{if(!PEND||Date.now()-last<1500)return;const b=$('#cps');b.disabled=true;b.textContent='傳送中…';
     try{await addDoc(collection(db,'msg'),me?{n:me.name,no:me.no,m:'',img:PEND,ts:Date.now()}:{n:staff.name,role:staff.key,uid:myUid,m:'',img:PEND,ts:Date.now()});last=Date.now();clr();setTimeout(toEnd,150)}
-    catch(err){alert('圖片送出失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}
+    catch(err){uiAlert('圖片送出失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}
     finally{b.disabled=false;b.textContent='傳送'}};}
   /* ---------- 編輯 / 刪除自己的訊息 ---------- */
   {const cb=$('#cbody'),mn=document.createElement('div'),bar=$('#cedit');mn.id='cmenu';mn.hidden=true;document.body.appendChild(mn);
@@ -778,13 +812,13 @@ else{
   $('#cex').onclick=endEdit;
   mn.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.id,o=D.msg.find(x=>x.id===id);closeMenu();if(!o)return;
     if(b.dataset.a==='edit'){startEdit(o);return}
-    if(b.dataset.a==='del'){if(!confirm('要刪除這則訊息嗎?刪除後所有人都看不到。'))return;
-      try{if(EDIT&&EDIT.id===id)endEdit();await deleteDoc(doc(db,'msg',id))}catch(err){alert('刪除失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}}});
+    if(b.dataset.a==='del'){if(!await uiConfirm('要刪除這則訊息嗎?刪除後所有人都看不到。',{danger:1}))return;
+      try{if(EDIT&&EDIT.id===id)endEdit();await deleteDoc(doc(db,'msg',id))}catch(err){uiAlert('刪除失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}}});
   /* 送出時若在編輯模式 → 改為更新原訊息 */
   const sendOrig=$('#cf').onsubmit;
   $('#cf').onsubmit=async e=>{if(!EDIT)return sendOrig(e);e.preventDefault();
     const m=ci.value.trim();if(!m)return;if(m===EDIT.m){endEdit();return}
-    try{await updateDoc(doc(db,'msg',EDIT.id),{m,edited:true});endEdit()}catch(err){alert('編輯失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}};
+    try{await updateDoc(doc(db,'msg',EDIT.id),{m,edited:true});endEdit()}catch(err){uiAlert('編輯失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}};
   const cimg0=$('#cimg').onclick;$('#cimg').onclick=()=>{if(!EDIT)cimg0()};
   /* 點擊(文字訊息)/ 長按或右鍵(圖片)開選單 */
   cb.addEventListener('click',e=>{if(skip){skip=false;e.stopPropagation();e.preventDefault()}},true);

@@ -114,6 +114,21 @@ main,.top>div{max-width:1120px}
 .keep input{flex:none;width:18px;height:18px;accent-color:#d4af37}
 select{font:inherit;color:var(--ink);background:var(--chip);border:1px solid transparent;border-radius:8px;padding:10px 14px}
 
+.ud{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:24px;background:rgba(10,18,40,.5);backdrop-filter:blur(2px);animation:ud-bg .15s ease}
+.ud-box{width:100%;max-width:400px;background:var(--card);color:var(--ink);border-radius:24px;padding:26px 26px 22px;box-shadow:0 24px 60px -12px rgba(0,0,0,.45);animation:ud-in .18s ease}
+.ud-t{margin:0 0 8px;font-size:19px;font-weight:900}
+.ud-m{margin:0;font-size:15px;line-height:1.7;color:var(--mute);white-space:pre-line;overflow-wrap:anywhere}
+.ud-i{display:block;width:100%;flex:none;margin:14px 0 0;font:inherit;color:var(--ink);background:var(--chip);border:1px solid transparent;border-radius:12px;padding:11px 14px}
+.ud-b{display:flex;flex-direction:row-reverse;justify-content:flex-start;gap:10px;margin-top:22px}
+.ud-b button{font:700 15px "Noto Sans TC",system-ui,sans-serif;border-radius:999px;padding:10px 26px;cursor:pointer;border:0;transition:filter .15s}
+.ud-b button:hover{filter:brightness(1.08)}
+.ud-c{background:var(--chip);color:var(--ink)}
+.ud-ok.dg{background:#ef4444!important;color:#fff!important}
+.ud button:focus-visible,.ud-i:focus-visible{outline:2px solid #d4af37;outline-offset:2px}
+@keyframes ud-bg{from{opacity:0}}
+@keyframes ud-in{from{opacity:0;transform:translateY(8px) scale(.96)}}
+@media(prefers-reduced-motion:reduce){.ud,.ud-box{animation:none}}
+.ud-ok{background:linear-gradient(100deg,#d4af37,#f6e27a);color:#2a2000}
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:var(--page);--bo-ink:var(--ink);--bo-mute:var(--mute);--bo-chip:var(--chip);--bo-mkc:var(--gt);position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
 #boot.out{opacity:0;visibility:hidden;pointer-events:none}
@@ -299,6 +314,25 @@ const FIREBASE_CONFIG={apiKey:"AIzaSyCjH-28OnHBKh8cFuL3rPkmxtmV7ixvAnU",authDoma
 const $=s=>document.querySelector(s);
 $('#theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('cls-theme',t)}catch(e){}};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* ---------- 自訂對話框(取代 alert / confirm / prompt) ---------- */
+const ud=o=>new Promise(res=>{
+  const prev=document.activeElement,el=document.createElement('div');
+  el.className='ud';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
+  el.innerHTML=`<div class="ud-box"><h3 class="ud-t">${esc(o.title)}</h3><p class="ud-m">${esc(o.msg)}</p>${o.input?`<input class="ud-i" type="text" value="${esc(o.def||'')}" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="${esc(o.msg)}">`:''}<div class="ud-b"><button type="button" class="ud-ok${o.danger?' dg':''}">${esc(o.ok||'確定')}</button>${o.cancel===false?'':'<button type="button" class="ud-c">取消</button>'}</div></div>`;
+  const inp=el.querySelector('.ud-i'),okb=el.querySelector('.ud-ok');
+  const done=v=>{el.remove();try{prev&&prev.focus&&prev.focus({preventScroll:true})}catch(x){}res(v)};
+  const yes=()=>done(o.input?inp.value.trim():true),no=()=>done(o.input?null:false);
+  okb.onclick=yes;const cb=el.querySelector('.ud-c');if(cb)cb.onclick=no;
+  el.addEventListener('mousedown',e=>{if(e.target===el)no()});
+  el.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();no()}
+    else if(e.key==='Enter'&&!e.isComposing){e.preventDefault();e.stopPropagation();yes()}
+    else if(e.key==='Tab'){const f=[...el.querySelectorAll('input,button')],i=f.indexOf(document.activeElement);e.preventDefault();f[(i+(e.shiftKey?-1:1)+f.length)%f.length].focus()}});
+  document.body.appendChild(el);(inp||okb).focus();if(inp)inp.select();
+});
+const uiAlert=msg=>ud({title:'提示',msg,cancel:false});
+const uiConfirm=(msg,o)=>ud({title:'確認',msg,...(o||{})});
+const uiPrompt=(msg,def)=>ud({title:'輸入',msg,input:1,def});
 const dleft=d=>Math.round((new Date(d+'T00:00:00')-new Date(new Date().toDateString()))/864e5);
 const when=n=>n<0?'已過':n===0?'今天':n+' 天後';
 const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -387,9 +421,9 @@ else{
     try{await makeT(user,name,pw);showT(user,name,pw);e.target.reset()}catch(err){toast(emsg(err))}};
   document.addEventListener('click',async e=>{
     const rt=e.target.closest('[data-rt]'),dt=e.target.closest('[data-dt]');
-    if(rt){const r=ROT.find(x=>x.id===rt.dataset.rt);if(!r)return;const pw=prompt(`${r.name}(${r.username})的新密碼(至少 6 碼)`,rnd());if(!pw)return;
+    if(rt){const r=ROT.find(x=>x.id===rt.dataset.rt);if(!r)return;const pw=await uiPrompt(`${r.name}(${r.username})的新密碼(至少 6 碼)`,rnd());if(!pw)return;
       try{await makeT(r.username,r.name,pw);await deleteDoc(doc(db,'teachers',r.id));showT(r.username,r.name,pw)}catch(err){toast(emsg(err))}}
-    if(dt){const r=ROT.find(x=>x.id===dt.dataset.dt);if(!r||!confirm(`確定要停用 ${r.name} 的教師帳號嗎?`))return;
+    if(dt){const r=ROT.find(x=>x.id===dt.dataset.dt);if(!r||!(await uiConfirm(`確定要停用 ${r.name} 的教師帳號嗎?`,{danger:1})))return;
       run(deleteDoc(doc(db,'teachers',r.id)));run(deleteDoc(doc(db,'login','t_'+r.username)))}});
   $('#rnd').onclick=()=>{$('#spw').value=rnd()};
   $('#sf').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),no=parseInt(f.get('no'),10),name=f.get('name').trim(),pw=f.get('pw');
@@ -405,9 +439,9 @@ else{
     if(!bad2.length)$('#bulk').value=''};
   document.addEventListener('click',async e=>{
     const rs=e.target.closest('[data-rs]'),ds=e.target.closest('[data-ds]');if(ROLE!=='admin')return;
-    if(rs){const r=ROS.find(x=>x.id===rs.dataset.rs);if(!r)return;const pw=prompt(`座號 ${r.no} ${r.name} 的新密碼(至少 6 碼)`,rnd());if(!pw)return;
+    if(rs){const r=ROS.find(x=>x.id===rs.dataset.rs);if(!r)return;const pw=await uiPrompt(`座號 ${r.no} ${r.name} 的新密碼(至少 6 碼)`,rnd());if(!pw)return;
       try{await make(r.no,r.name,pw);await deleteDoc(doc(db,'students',r.id));showMade([[r.no,r.name,pw]])}catch(err){toast(emsg(err))}}
-    if(ds){const r=ROS.find(x=>x.id===ds.dataset.ds);if(!r||!confirm(`確定要停用座號 ${r.no} ${r.name} 的帳號嗎?`))return;
+    if(ds){const r=ROS.find(x=>x.id===ds.dataset.ds);if(!r||!(await uiConfirm(`確定要停用座號 ${r.no} ${r.name} 的帳號嗎?`,{danger:1})))return;
       run(deleteDoc(doc(db,'students',r.id)));run(deleteDoc(doc(db,'login',String(r.no))))}});
   const bd=id=>e=>{BT.done(id);bad(e)};
   const start=()=>{
@@ -448,7 +482,7 @@ else{
     const fd=new FormData(f),o={};[...fd.keys()].forEach(n=>o[n]=fd.get(n).trim());
     if(k==='ann')o.ts=Date.now();if(k==='hw')o.done=false;
     run(addDoc(collection(db,k),o));f.reset()});
-  document.addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(!b||(b.dataset.k==='msg'&&ROLE!=='admin')||!confirm('確定要刪除嗎?'))return;
+  document.addEventListener('click',async e=>{const b=e.target.closest('button[data-id]');if(!b||(b.dataset.k==='msg'&&ROLE!=='admin')||!(await uiConfirm('確定要刪除嗎?',{danger:1})))return;
     run(deleteDoc(doc(db,b.dataset.k,b.dataset.id)))});
   document.addEventListener('click',e=>{
     const ed=e.target.closest('[data-ed]');
