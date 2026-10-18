@@ -344,7 +344,7 @@ $('#q').oninput=()=>{
   D.ann.forEach(o=>{if(has(o.title)||has(o.t))R.push(['news','公告',o.title||o.t])});
   D.evt.forEach(o=>{if(has(o.t))R.push(['cal','活動',o.t+'  '+o.d])});
   D.hw.forEach(o=>{if(has(o.t))R.push(['sched','作業',o.t])});
-  D.msg.forEach(o=>{if(has(o.m)||has(o.n))R.push(['chat','留言',o.n+':'+o.m])});
+  D.msg.forEach(o=>{if(has(o.m)||has(o.n))R.push(['chat','留言',(RB[o.role]?RB[o.role][0]+' ':'')+o.n+':'+o.m])});
   box.innerHTML=R.slice(0,8).map(r=>`<button data-go="${r[0]}"><small>${r[1]}</small>${esc(r[2])}</button>`).join('')||'<p class="empty" style="padding:10px 12px">找不到相關內容</p>';box.hidden=false;
 };
 const setUser=(name,role)=>{$('#un').textContent=name;$('#ur').textContent=role;$('#uav').textContent=[...name][0]||'我'};
@@ -433,7 +433,7 @@ function render(){
   cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
   const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
   if(isOpen)markSeen();
-  const lm=L[L.length-1];$('#dsub').textContent=lm?`${lm.n}:${lm.m}`:'還沒有訊息,說聲嗨吧!';
+  const lm=L[L.length-1];$('#dsub').textContent=lm?`${RB[lm.role]?RB[lm.role][0]+' ':''}${lm.n}:${lm.m}`:'還沒有訊息,說聲嗨吧!';
   const un=isOpen?0:D.msg.filter(o=>o.ts>chatSeen()&&!isMine(o)).length;$('#ub').textContent=un>99?'99+':un;$('#ub').hidden=!un;
   /* photos */
   const P=byNew(D.photos);
