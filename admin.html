@@ -139,6 +139,7 @@ select{font:inherit;color:var(--ink);background:var(--chip);border:1px solid tra
 @keyframes bo-fade{50%{opacity:.5}}
 @keyframes bo-pop{from{opacity:0;transform:translateY(4px) scale(.9)}}
 @media(prefers-reduced-motion:reduce){#boot *,#boot *::before{animation:none!important}#boot{transition:none}}
+body.t .own{display:none!important}
 </style>
 </head>
 <body>
@@ -254,7 +255,7 @@ setTimeout(fd,4000);
 <div class="panel pane on" id="p-home"><h2>總覽</h2><p class="sub">在這裡可以直接發布公告,或點任何一格進入對應的管理區。</p>
 <div class="cell"><h3 class="ch">發布公告</h3><form data-k="ann"><input name="title" placeholder="公告標題" required maxlength="80" aria-label="標題"><input name="t" placeholder="內容(可不填)" maxlength="160" aria-label="內容"><select name="tag" aria-label="類型"><option>一般</option><option>活動</option><option>置頂</option></select><button class="pri">發布</button></form></div>
 <div class="tiles" id="tiles"></div>
-<p class="hint" style="margin-top:18px"><b>怎麼用:</b>先在「學生帳號」建立座號、名稱、密碼,同學用座號加密碼登入班級網頁。「教師帳號」只有你(擁有者)看得到,老師可用帳號加密碼登入這個後台,權限和你一樣,只是不能管理教師帳號。</p></div>
+<p class="hint" style="margin-top:18px"><b>怎麼用:</b>先在「學生帳號」建立座號、名稱、密碼,同學用座號加密碼登入班級網頁。「教師帳號」只有你(擁有者)看得到,老師可用帳號加密碼登入這個後台,可管理公告、行事曆、作業、課表與相簿;學生帳號、留言、基本設定只能查看,也不能管理教師帳號。</p></div>
 
 <div class="panel pane" id="p-site"><h2>基本設定</h2><p class="sub">班級名稱與一句話介紹,會顯示在班級網頁首頁。</p>
 <div class="cell"><label class="fl" for="title">班級名稱</label><input id="title" placeholder="班級名稱" maxlength="20"><label class="fl" for="tag">一句話介紹</label><input id="tag" placeholder="一句話介紹" maxlength="80"></div>
@@ -271,14 +272,14 @@ setTimeout(fd,4000);
 <div class="cell"><h3 class="ch">所有照片</h3><div class="pics" id="pics"></div></div></div>
 
 <div class="panel pane" id="p-students"><h2>學生帳號 <em id="cs"></em></h2><p class="sub">同學用「座號 + 密碼」登入班級網頁。密碼只會在建立當下顯示一次。</p>
-<div class="cell"><h3 class="ch">新增單一學生</h3>
+<div class="cell own"><h3 class="ch">新增單一學生</h3>
 <form id="sf"><input name="no" type="number" min="1" max="99" placeholder="座號" required style="flex:0 1 90px" aria-label="座號"><input name="name" placeholder="名稱" required maxlength="12" aria-label="名稱"><input name="pw" id="spw" placeholder="密碼(至少 6 碼)" required minlength="6" maxlength="30" aria-label="密碼"><button type="button" id="rnd">隨機密碼</button><button class="pri">建立帳號</button></form></div>
-<div class="cell"><h3 class="ch">整班一次建立</h3>
+<div class="cell own"><h3 class="ch">整班一次建立</h3>
 <details><summary>展開貼上(每行:座號,名稱,密碼)</summary><textarea id="bulk" placeholder="1,王小明,abc123&#10;2,李小華,xyz789"></textarea><button class="pri" id="bulkgo" type="button">批次建立</button></details></div>
-<div class="hint" id="made" hidden></div>
+<div class="hint own" id="made" hidden></div>
 <div class="cell"><h3 class="ch">學生名單</h3><ul id="ls"></ul></div></div>
 
-<div class="panel pane" id="p-teachers"><h2>教師帳號 <em id="ct"></em></h2><p class="sub">老師用「帳號 + 密碼」登入後台,可管理所有內容與學生帳號,但不能管理教師帳號。</p>
+<div class="panel pane" id="p-teachers"><h2>教師帳號 <em id="ct"></em></h2><p class="sub">老師用「帳號 + 密碼」登入後台,可管理公告、行事曆、作業、課表與相簿,學生帳號、留言、基本設定只能查看,不能管理教師帳號。</p>
 <div class="cell"><h3 class="ch">新增教師</h3>
 <form id="tf"><input name="user" placeholder="登入帳號(英數字)" required pattern="[A-Za-z0-9_]{2,16}" maxlength="16" aria-label="登入帳號"><input name="name" placeholder="老師名稱" required maxlength="12" aria-label="老師名稱"><input name="pw" id="tpw" placeholder="密碼(至少 6 碼)" required minlength="6" maxlength="30" aria-label="密碼"><button type="button" id="trnd">隨機密碼</button><button class="pri">建立教師帳號</button></form></div>
 <div class="hint" id="tmade" hidden></div>
@@ -345,7 +346,7 @@ function draw0(k){
     const main=k==='msg'?`<b>${esc(o.n)}</b>${o.role==='admin'?' <small>🎇 管理員</small>':o.role==='teacher'?' <small>🐛 老師</small>':''}${o.no?` · 座號 ${esc(o.no)}`:''}<br>${typeof o.img==='string'&&o.img.startsWith('data:image/')?`<img src="${esc(o.img)}" alt="圖片" style="width:72px;height:72px;object-fit:cover;border-radius:8px;vertical-align:middle"> `:''}${esc(o.m)}`:k==='ann'?`${o.tag&&o.tag!=='一般'?`<b>[${esc(o.tag)}]</b> `:''}${esc(o.title||o.t)}${o.title&&o.t?`<br><small>${esc(o.t)}</small>`:''}`:esc(o.t);
     const sub=o.ts&&k!=='evt'&&k!=='hw'?new Date(o.ts).toLocaleString('zh-TW'):esc(o.d);
     const ck=k==='hw'?`<input type="checkbox" style="flex:none;width:20px;height:20px" data-tog="${o.id}" ${o.done?'checked':''} aria-label="已完成">`:'';
-    return `<li>${ck}<span class="t">${main}<small>${sub}${k==='hw'&&o.done?' · 已完成':''}</small></span>${k==='ann'?`<button class="ed" data-ed="${o.id}">編輯</button>`:''}<button class="x" data-k="${k}" data-id="${o.id}" aria-label="刪除">×</button></li>`}).join(''):'<li class="empty">還沒有內容</li>';
+    return `<li>${ck}<span class="t">${main}<small>${sub}${k==='hw'&&o.done?' · 已完成':''}</small></span>${k==='ann'?`<button class="ed" data-ed="${o.id}">編輯</button>`:''}${k==='msg'&&ROLE!=='admin'?'':`<button class="x" data-k="${k}" data-id="${o.id}" aria-label="刪除">×</button>`}</li>`}).join(''):'<li class="empty">還沒有內容</li>';
 }
 draw('sched');draw('times');draw('photos');
 
@@ -357,8 +358,9 @@ else{
   const sec=initializeApp(FIREBASE_CONFIG,'sec'),secAuth=getAuth(sec);
   const emsg=e=>e.code==='auth/weak-password'?'密碼至少 6 碼':e.code==='permission-denied'?'沒有權限(規則還沒更新?)':'失敗:'+(e.code||e.message);
   const drawRos=()=>{$('#cs').textContent=ROS.length?ROS.length+' 位':'';
-    $('#ls').innerHTML=[...ROS].sort((a,b)=>a.no-b.no).map(o=>`<li><span class="av2">${o.no}</span><span class="t"><b>${esc(o.name)}</b></span><button data-rs="${o.id}">重設密碼</button><button class="x" data-ds="${o.id}" aria-label="停用帳號">×</button></li>`).join('')||'<li class="empty">還沒有學生帳號</li>'};
+    $('#ls').innerHTML=[...ROS].sort((a,b)=>a.no-b.no).map(o=>`<li><span class="av2">${o.no}</span><span class="t"><b>${esc(o.name)}</b></span>${ROLE==='admin'?`<button data-rs="${o.id}">重設密碼</button><button class="x" data-ds="${o.id}" aria-label="停用帳號">×</button>`:''}</li>`).join('')||'<li class="empty">還沒有學生帳號</li>'};
   async function make(no,name,pw){
+    if(ROLE!=='admin')throw {code:'permission-denied'};
     const email=`s${no}-${Date.now().toString(36)}@class.invalid`;
     const c=await createUserWithEmailAndPassword(secAuth,email,pw),uid=c.user.uid;
     await signOut(secAuth);
@@ -402,7 +404,7 @@ else{
     toast(bad2.length?`成功 ${done.length} 筆,略過 ${bad2.length} 筆(格式錯誤、座號重複或密碼少於 6 碼)`:`已建立 ${done.length} 筆`);
     if(!bad2.length)$('#bulk').value=''};
   document.addEventListener('click',async e=>{
-    const rs=e.target.closest('[data-rs]'),ds=e.target.closest('[data-ds]');
+    const rs=e.target.closest('[data-rs]'),ds=e.target.closest('[data-ds]');if(ROLE!=='admin')return;
     if(rs){const r=ROS.find(x=>x.id===rs.dataset.rs);if(!r)return;const pw=prompt(`座號 ${r.no} ${r.name} 的新密碼(至少 6 碼)`,rnd());if(!pw)return;
       try{await make(r.no,r.name,pw);await deleteDoc(doc(db,'students',r.id));showMade([[r.no,r.name,pw]])}catch(err){toast(emsg(err))}}
     if(ds){const r=ROS.find(x=>x.id===ds.dataset.ds);if(!r||!confirm(`確定要停用座號 ${r.no} ${r.name} 的帳號嗎?`))return;
@@ -426,7 +428,12 @@ else{
       if((await getDoc(doc(db,'students',u.uid))).exists())throw {code:'permission-denied'};
       const tr=await getDoc(doc(db,'teachers',u.uid));
       if(tr.exists())ROLE='teacher';else{await getDocs(collection(db,'teachers'));ROLE='admin'}
-      $('#nt').hidden=ROLE!=='admin';go('home');refresh();
+      $('#nt').hidden=ROLE!=='admin';document.body.classList.toggle('t',ROLE==='teacher');
+      {const ro=ROLE!=='admin';['#title','#tag','#lclass','#ltext'].forEach(s=>$(s).disabled=ro);
+       $('#p-site .sub').textContent=ro?'只有擁有者可以修改基本設定,你目前只能查看。':'班級名稱與一句話介紹,會顯示在班級網頁首頁。';
+       $('#p-students .sub').textContent=ro?'這裡可以查看學生名單。新增、重設密碼與停用帳號只有擁有者可以操作。':'同學用「座號 + 密碼」登入班級網頁。密碼只會在建立當下顯示一次。';
+       $('#p-msg .sub').textContent=ro?'同學留的言。只有擁有者可以刪除,你目前只能查看。':DESC.msg}
+      go('home');refresh();
       show(true,ROLE==='admin'?'UID:'+u.uid:'老師・'+tr.data().name);
       start();BT.done('auth');
     }catch(e){BT.done('auth');if(e&&e.code==='permission-denied'){await signOut(auth);show(false);$('#err').textContent='此帳號沒有後台權限'}else{show(false);$('#err').textContent='連線不穩,請重新整理頁面(登入狀態還在)'}}
@@ -441,7 +448,7 @@ else{
     const fd=new FormData(f),o={};[...fd.keys()].forEach(n=>o[n]=fd.get(n).trim());
     if(k==='ann')o.ts=Date.now();if(k==='hw')o.done=false;
     run(addDoc(collection(db,k),o));f.reset()});
-  document.addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(!b||!confirm('確定要刪除嗎?'))return;
+  document.addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(!b||(b.dataset.k==='msg'&&ROLE!=='admin')||!confirm('確定要刪除嗎?'))return;
     run(deleteDoc(doc(db,b.dataset.k,b.dataset.id)))});
   document.addEventListener('click',e=>{
     const ed=e.target.closest('[data-ed]');
@@ -451,7 +458,7 @@ else{
     const fd=new FormData(f);
     try{await updateDoc(doc(db,'ann',id),{title:fd.get('title').trim(),t:fd.get('t').trim(),tag:fd.get('tag')});EDIT=null;draw0('ann');toast('已儲存')}catch(err){toast(emsg(err))}});
   document.addEventListener('change',e=>{const t=e.target.dataset&&e.target.dataset.tog;if(t)run(updateDoc(doc(db,'hw',t),{done:e.target.checked}))});
-  const saveSite=()=>run(setDoc(doc(db,'meta','site'),{title:$('#title').value.trim()||'我們班',tag:$('#tag').value.trim(),loadClass:$('#lclass').value.trim(),loadText:$('#ltext').value.trim()}));
+  const saveSite=()=>ROLE!=='admin'?0:run(setDoc(doc(db,'meta','site'),{title:$('#title').value.trim()||'我們班',tag:$('#tag').value.trim(),loadClass:$('#lclass').value.trim(),loadText:$('#ltext').value.trim()}));
   $('#title').onchange=saveSite;$('#tag').onchange=saveSite;$('#lclass').onchange=saveSite;$('#ltext').onchange=saveSite;
   $('#lpv').onclick=()=>{if(window.__boot)window.__boot.preview($('#lclass').value.trim()||$('#title').value.trim()||'我們班',$('#ltext').value.trim())};
   $('#tt').onchange=e=>{const p=e.target.dataset.p;if(!p)return;const t=S.times[p]||['',''];t[+e.target.dataset.i]=e.target.value;S.times[p]=t;run(setDoc(doc(db,'meta','times'),{t:S.times}))};
