@@ -29,6 +29,7 @@ nav{display:flex;flex-direction:column;gap:6px}
 nav button{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:12px;color:rgba(255,255,255,.78);font-weight:700;font-size:15px;text-align:left;transition:background .2s,color .2s}
 nav button:hover{background:rgba(255,255,255,.08);color:#fff}
 nav button[aria-selected=true]{background:linear-gradient(100deg,#2f6bff,#1d54e0);color:#fff;box-shadow:0 8px 20px -8px rgba(47,107,255,.8)}
+.nl-s{display:none}
 .sfoot{margin-top:auto;font-size:12px;color:rgba(255,255,255,.7);padding:0 8px}
 .mainc{min-width:0}
 .topbar{display:flex;align-items:center;gap:14px;padding:calc(14px + env(safe-area-inset-top,0px)) 28px 14px;background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
@@ -179,29 +180,27 @@ body.locked .app{display:none}
 .gerr{min-height:1.6em;margin:12px 0 0;font-size:14px;color:#c0392b}
 @media(max-width:1200px){.home{grid-template-columns:1fr}}
 @media(max-width:899px){
- .app{grid-template-columns:64px minmax(0,1fr)}
- .side{height:100vh;height:100dvh;padding:calc(14px + env(safe-area-inset-top,0px)) 6px calc(14px + env(safe-area-inset-bottom,0px));gap:18px;align-items:center;overflow-y:auto;scrollbar-width:none}
+ .app{grid-template-columns:58px minmax(0,1fr)}
+ .nl-f{display:none}.nl-s{display:inline}
+ .side{height:100vh;height:100dvh;padding:calc(14px + env(safe-area-inset-top,0px)) 5px calc(14px + env(safe-area-inset-bottom,0px));gap:16px;align-items:center;overflow-y:auto;scrollbar-width:none}
  .side::-webkit-scrollbar{display:none}
  .brand{padding:0;justify-content:center}.brand>div{display:none}
- .logo{width:40px;height:40px;font-size:19px;border-radius:12px}
+ .logo{width:38px;height:38px;font-size:18px;border-radius:12px}
  .sfoot{display:none}
  nav{width:100%;gap:4px}
- nav button{flex-direction:column;justify-content:center;gap:4px;padding:10px 2px;font-size:11px;line-height:1.25;text-align:center;border-radius:12px;overflow-wrap:anywhere}
- nav .ic{display:block;width:22px;height:22px}
- .topbar{padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;gap:8px}
+ nav button{flex-direction:column;justify-content:center;gap:3px;padding:10px 0;font-size:12px;line-height:1.25;text-align:center;border-radius:12px;white-space:nowrap}
+ nav .ic{display:block;width:21px;height:21px}
+ .topbar{padding:calc(10px + env(safe-area-inset-top,0px)) 10px 10px;gap:6px}
+ .ib{width:38px;height:38px}.uav{width:36px;height:36px}#uchip>.ic{display:none}
+ .search input{padding:10px 12px 10px 38px}.search .ic{left:13px}
  .un{display:none}
  #uchip{padding:2px}
- main{padding:16px 12px calc(84px + env(safe-area-inset-bottom,0px))}
- .home,.col,.two{gap:16px}
+ main{padding:14px 10px calc(84px + env(safe-area-inset-bottom,0px))}
+ .home,.col,.two{gap:14px}
  .card{padding:16px}
- .banner{padding:24px;min-height:160px}
+ .banner{padding:20px 22px;min-height:130px;border-radius:20px}
+ .banner p{font-size:14px}
  table{min-width:0}th,td{padding:8px 2px;font-size:12px}td{height:44px}tr>:first-child{width:44px}
- #dock{left:0;right:0;width:auto;border-radius:22px 22px 0 0;height:calc(62px + env(safe-area-inset-bottom,0px))}
- #dock.open{height:100vh;height:100dvh;border-radius:0;border:0}
- #dh{min-height:62px;padding-top:8px}
- #dock.open #dh{padding-top:calc(8px + env(safe-area-inset-top,0px))}
- #dh::before{content:"";position:absolute;top:6px;left:50%;width:40px;height:4px;border-radius:2px;background:var(--line);transform:translateX(-50%)}
- #dock.open #dh::before{top:calc(6px + env(safe-area-inset-top,0px))}
 }
 @media(max-width:700px){.two,.calpage{grid-template-columns:1fr}.banner .q{display:none}}
 @media(max-width:600px){
@@ -263,6 +262,14 @@ body.locked .app{display:none}
 .m.me .bb.st-admin,.m.me .bb.st-teacher{box-shadow:0 1px 1px rgba(0,0,0,.07)}
 .m.me .mc2{display:flex;flex-direction:column;align-items:flex-end;min-width:0;max-width:80%}
 .m.me .mc2 small{margin:0 2px 2px 0}
+@media(max-width:899px){
+ #dock{left:0;right:0;width:auto;border-radius:22px 22px 0 0;height:calc(62px + env(safe-area-inset-bottom,0px))}
+ #dock.open{height:100vh;height:100dvh;border-radius:0;border:0}
+ #dh{min-height:62px;padding-top:8px}
+ #dock.open #dh{padding-top:calc(8px + env(safe-area-inset-top,0px))}
+ #dh::before{content:"";position:absolute;top:6px;left:50%;width:40px;height:4px;border-radius:2px;background:var(--line);transform:translateX(-50%)}
+ #dock.open #dh::before{top:calc(6px + env(safe-area-inset-top,0px))}
+}
 
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:radial-gradient(140% 40% at 10% 106%,rgba(110,175,255,.7),transparent 70%),linear-gradient(160deg,#0a1840,#0c2a6c 60%,#123f95);--bo-ink:#fff;--bo-mute:rgba(255,255,255,.72);--bo-chip:rgba(255,255,255,.12);--bo-mkc:#f6e27a;position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
@@ -451,7 +458,8 @@ const now0=new Date();let CAL={y:now0.getFullYear(),m:now0.getMonth()};let me=nu
 
 /* ---------- static UI ---------- */
 const NAVS=[['ov','首頁','home'],['news','班級公告','ann'],['cal','行事曆','cal'],['sched','課表・作業','sched'],['gal','班級相簿','gal']];
-$('#nav').innerHTML=NAVS.map(([t,l,i],k)=>`<button role="tab" data-go="${t}" aria-selected="${k===0}">${ic(I[i])}${l}</button>`).join('');
+const SH={'班級公告':'公告','課表・作業':'課表','班級相簿':'相簿'};
+$('#nav').innerHTML=NAVS.map(([t,l,i],k)=>`<button role="tab" data-go="${t}" aria-selected="${k===0}">${ic(I[i])}<span class="nl-f">${l}</span><span class="nl-s">${SH[l]||l}</span></button>`).join('');
 const QT=[['news','班級公告','查看最新消息','ann','#3b82f6'],['gal','班級相簿','回顧美好時光','gal','#8b5cf6'],['cal','行事曆','查看重要日期','cal','#10b981'],['sched','課表・作業','查看課表與作業','sched','#f97316']];
 $('#quick').innerHTML=QT.map(([t,l,s,i,c])=>`<button class="qt" data-go="${t}" style="--tc:${c}"><span class="qi">${ic(I[i])}</span><b>${l}</b><small>${s}</small>${ic(I.go).replace('class="ic"','class="ic go"')}</button>`).join('');
 
@@ -576,6 +584,7 @@ function render(){
   put('#ov-pics',ch('班級相簿','gal','gal','查看全部')+(P.length?`<div class="thumbs">${P.slice(0,3).map(p=>`<img src="${esc(p.url)}" alt="班級照片" loading="lazy">`).join('')}</div>`:'<p class="empty">相簿還是空的</p>'));
   put('#pics',P.map(p=>`<img src="${esc(p.url)}" alt="班級照片" loading="lazy">`).join('')||'<p class="empty">相簿還是空的</p>');
 }
+{const sp=()=>{$('#q').placeholder=matchMedia('(max-width:899px)').matches?'搜尋…':'搜尋公告、活動、作業、留言…'};sp();matchMedia('(max-width:899px)').addEventListener('change',sp)}
 render();setInterval(render,60000);
 
 /* ---------- firebase ---------- */
