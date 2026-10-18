@@ -140,6 +140,9 @@ body.locked main,body.locked #nav{display:none}
 #gate form{margin:0}
 #gate input{text-align:center}
 .gerr{min-height:1.6em;margin:12px 0 0;font-size:14px;color:#c0392b}
+tr>:first-child{width:64px}
+th small{display:block;font-size:11px;font-weight:400;line-height:1.3;margin-top:2px;white-space:nowrap}
+td.now{box-shadow:inset 0 0 0 2px #d4af37;font-weight:700;background:rgba(212,175,55,.2)}
 </style>
 </head>
 <body class="locked">
@@ -207,7 +210,7 @@ const when=n=>n<0?'已過':n===0?'今天':n+' 天後';
 const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 const list=(ul,rows,empty)=>{$(ul).innerHTML=rows.length?rows.join(''):`<li class="empty">${empty}</li>`};
 const hue=n=>[...n].reduce((h,c)=>h+c.charCodeAt(0),0)*47%360;
-const D={title:'我們班',tag:'班級專屬網站,公告、課表、照片都在這裡。',ann:[],evt:[],hw:[],sched:{},photos:[],msg:[]};
+const D={title:'我們班',tag:'班級專屬網站,公告、課表、照片都在這裡。',ann:[],evt:[],hw:[],sched:{},times:{},photos:[],msg:[]};
 
 $('#theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('cls-theme',t)}catch(e){}};
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{
@@ -232,9 +235,12 @@ function rEvt(){$('#ce').textContent=D.evt.length?D.evt.length+' 項':'';
   list('#le',[...D.evt].sort((p,q)=>{const u=dleft(p.d)<0,v=dleft(q.d)<0;return u!==v?u-v:(u?(p.d<q.d?1:-1):(p.d<q.d?-1:1))}).map(o=>{const n=dleft(o.d),d=new Date(o.d+'T00:00:00');return `<li class="row ev ${n<0?'past':''}"><div class="date"><b>${d.getDate()}</b><span>${d.getMonth()+1}月</span></div><span class="t">${esc(o.t)}</span><span class="pill ${n>=0&&n<=3?'hot':''}">${when(n)}</span></li>`}),'目前沒有活動');rMeta()}
 function rHw(){const open=D.hw.filter(h=>!h.done).length;$('#ch').textContent=open?open+' 項未完成':'';
   list('#lh',[...D.hw].sort((p,q)=>(!!p.done-!!q.done)||(p.d<q.d?-1:1)).map(o=>{const n=dleft(o.d);return `<li class="row ${o.done?'done':''}"><span class="ck">${o.done?'✓':''}</span><span class="t"><span>${esc(o.t)}</span><small>${esc(o.d)}</small></span><span class="pill ${!o.done&&n<=1?'hot':''}">${when(n)}</span></li>`}),'目前沒有作業')}
-function rSched(){const Dn=['一','二','三','四','五'],td=new Date().getDay()-1;
+function rSched(){const Dn=['一','二','三','四','五'],now=new Date(),td=now.getDay()-1,hm=now.getHours()*60+now.getMinutes();
+  const tm=p=>{const t=D.times[p];return t&&t[0]&&t[1]?t:null};
+  const mins=x=>{const [a,b]=x.split(':');return a*60+ +b};
+  const cur=p=>{const t=tm(p);return !!t&&hm>=mins(t[0])&&hm<mins(t[1])};
   let h='<thead><tr><th></th>'+Dn.map((d,i)=>`<th class="${i===td?'today':''}">週${d}</th>`).join('')+'</tr></thead><tbody>';
-  for(let p=1;p<=7;p++)h+=`<tr><th>${p}</th>`+Dn.map((_,i)=>`<td class="${i===td?'today':''}">${esc(D.sched[i+'-'+p]||'')}</td>`).join('')+'</tr>';
+  for(let p=1;p<=8;p++){const t=tm(p);h+=`<tr><th>${p}${t?`<small>${esc(t[0])}<br>${esc(t[1])}</small>`:''}</th>`+Dn.map((_,i)=>`<td class="${i===td?'today':''} ${i===td&&cur(p)?'now':''}">${esc(D.sched[i+'-'+p]||'')}</td>`).join('')+'</tr>'}
   $('#tb').innerHTML=h+'</tbody>';rOv()}
 function rPics(){$('#cp').textContent=D.photos.length?D.photos.length+' 張':'';
   $('#pics').innerHTML=D.photos.length?byNew(D.photos).map(p=>`<figure class="ph"><img src="${esc(p.url)}" alt="班級照片" loading="lazy"></figure>`).join(''):'<p class="empty">相簿還是空的</p>';rMeta()}
@@ -246,7 +252,7 @@ function rOv(){
   put('#annbox',`<div class="ah"><span class="gtext">公　告</span><button class="more" data-go="news">全部 ›</button></div>`+(A[0]?`<p class="feat">${esc(A[0].t)}</p><div class="ts">${fmt(A[0].ts)}</div>`+(A.length>1?`<ul class="older">${A.slice(1,3).map(o=>`<li><span class="t">${esc(o.t)}</span><small>${fmt(o.ts)}</small></li>`).join('')}</ul>`:''):`<p class="feat" style="color:var(--mute)">目前沒有公告</p>`));
   const up=D.evt.filter(e=>dleft(e.d)>=0).sort((a,b)=>a.d<b.d?-1:1),n0=up[0];
   put('#ov-next',`<div class="lab">下一個活動</div>`+(n0?`<div class="big">${dleft(n0.d)===0?'今天':dleft(n0.d)}${dleft(n0.d)===0?'':'<i>天後</i>'}</div><p class="et">${esc(n0.t)}</p><small style="color:var(--mute)">${esc(n0.d)}</small>`:`<div class="big">—</div><p class="et">目前沒有待辦活動</p>`));
-  const subj=[];if(td>=0&&td<5)for(let p=1;p<=7;p++){const s=D.sched[td+'-'+p];if(s)subj.push(`<li class="row sm"><span class="n">${p}</span><span class="t">${esc(s)}</span></li>`)}
+  const subj=[];if(td>=0&&td<5)for(let p=1;p<=8;p++){const s=D.sched[td+'-'+p],t=D.times[p];if(s)subj.push(`<li class="row sm"><span class="n">${p}</span><span class="t">${esc(s)}</span>${t&&t[0]?`<small>${esc(t[0])}–${esc(t[1]||'')}</small>`:'<span></span>'}</li>`)}
   put('#ov-today',head('今日課表',td>=0&&td<5?wk[td]:'假日','sched')+`<ul>${subj.join('')||'<li class="empty">今天沒有課程</li>'}</ul>`);
   const open=D.hw.filter(h=>!h.done).sort((a,b)=>a.d<b.d?-1:1),tot=D.hw.length,done=tot-open.length;
   put('#ov-hw',head('作業',open.length?open.length+' 項未完成':'','sched')+`<ul>${open.slice(0,4).map(o=>{const n=dleft(o.d);return `<li class="row sm"><span class="ck"></span><span class="t">${esc(o.t)}</span><span class="pill ${n<=1?'hot':''}">${when(n)}</span></li>`}).join('')||`<li class="empty">${tot?'作業全部完成':'目前沒有作業'}</li>`}</ul>`+(tot?`<div class="prog"><i style="width:${done/tot*100}%"></i></div>`:''));
@@ -257,12 +263,13 @@ function rOv(){
 }
 const R={ann:rAnn,evt:rEvt,hw:rHw,photos:rPics,msg:rMsg};
 Object.keys(R).forEach(k=>{const f=R[k];R[k]=()=>{f();rOv()}});
+setInterval(rSched,60000);
 rSite();rMeta();rAnn();rEvt();rHw();rSched();rPics();rMsg();rOv();
 
 if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false}
 else{
   const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bad=()=>{};
-  let unsubs=[],me=null,last=0;
+  let unsubs=[],me=null,last=0,staffName='管理員';
   const stop=()=>{unsubs.forEach(f=>f());unsubs=[]};
   const lock=msg=>{stop();me=null;document.body.classList.add('locked');$('#out').hidden=true;$('#me').hidden=true;$('#gerr').textContent=msg||'';$('#lf').hidden=false};
   const start=()=>{
@@ -270,14 +277,15 @@ else{
     Object.keys(R).forEach(k=>unsubs.push(onSnapshot(collection(db,k),s=>{D[k]=s.docs.map(d=>({id:d.id,...d.data()}));R[k]()},bad)));
     unsubs.push(onSnapshot(doc(db,'meta','site'),s=>{const m=s.data()||{};if(m.title)D.title=m.title;if(m.tag)D.tag=m.tag;rSite()},bad));
     unsubs.push(onSnapshot(doc(db,'meta','sched'),s=>{D.sched=(s.data()||{}).cells||{};rSched()},bad));
-    $('#me').textContent=me?`座號 ${me.no}・${me.name}`:'管理員';$('#me').hidden=false;$('#out').hidden=false;
+    unsubs.push(onSnapshot(doc(db,'meta','times'),s=>{D.times=(s.data()||{}).t||{};rSched()},bad));
+    $('#me').textContent=me?`座號 ${me.no}・${me.name}`:staffName;$('#me').hidden=false;$('#out').hidden=false;
     $('#fm').hidden=!me;$('#fmnote').hidden=!!me;
   };
   onAuthStateChanged(auth,async u=>{
     if(!u){lock();return}
     try{
       const s=await getDoc(doc(db,'students',u.uid));me=s.exists()?s.data():null;
-      if(!me)await getDoc(doc(db,'meta','site'));
+      if(!me){await getDoc(doc(db,'meta','site'));staffName='管理員';try{const t=await getDoc(doc(db,'teachers',u.uid));if(t.exists())staffName='老師・'+t.data().name}catch(x){}}
       stop();start();
     }catch(e){await signOut(auth);lock('此帳號已停用或沒有權限')}
   });
