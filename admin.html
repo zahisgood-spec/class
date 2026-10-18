@@ -212,7 +212,7 @@ function draw0(k){
   $('#c-'+k).textContent=S[k].length?S[k].length+' 筆':'';
   const sorted=[...S[k]].sort((a,b)=>(b.ts||0)-(a.ts||0)||(a.d<b.d?-1:1));
   $('#l-'+k).innerHTML=sorted.length?sorted.map(o=>{
-    const main=k==='msg'?`<b>${esc(o.n)}</b>${o.no?` · 座號 ${esc(o.no)}`:''}<br>${esc(o.m)}`:k==='ann'?`${o.tag&&o.tag!=='一般'?`<b>[${esc(o.tag)}]</b> `:''}${esc(o.title||o.t)}${o.title&&o.t?`<br><small>${esc(o.t)}</small>`:''}`:esc(o.t);
+    const main=k==='msg'?`<b>${esc(o.n)}</b>${o.role==='admin'?' <small>🎇 管理員</small>':o.role==='teacher'?' <small>🐛 老師</small>':''}${o.no?` · 座號 ${esc(o.no)}`:''}<br>${esc(o.m)}`:k==='ann'?`${o.tag&&o.tag!=='一般'?`<b>[${esc(o.tag)}]</b> `:''}${esc(o.title||o.t)}${o.title&&o.t?`<br><small>${esc(o.t)}</small>`:''}`:esc(o.t);
     const sub=o.ts&&k!=='evt'&&k!=='hw'?new Date(o.ts).toLocaleString('zh-TW'):esc(o.d);
     const ck=k==='hw'?`<input type="checkbox" style="flex:none;width:20px;height:20px" data-tog="${o.id}" ${o.done?'checked':''} aria-label="已完成">`:'';
     return `<li>${ck}<span class="t">${main}<small>${sub}${k==='hw'&&o.done?' · 已完成':''}</small></span><button class="x" data-k="${k}" data-id="${o.id}" aria-label="刪除">×</button></li>`}).join(''):'<li class="empty">還沒有內容</li>';

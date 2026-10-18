@@ -219,6 +219,19 @@ body.locked .app{display:none}
 #ci{flex:1 1 auto;min-height:42px;max-height:110px;border-radius:21px;padding:10px 16px;resize:none;line-height:1.5;overflow-y:auto}
 .send{width:42px;height:42px;border-radius:50%;background:var(--pri);color:#fff;display:grid;place-items:center;flex:none}
 .send:hover{filter:brightness(1.1)}
+.rb{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;line-height:1;padding:3px 8px;border-radius:999px;margin-left:6px;vertical-align:middle;white-space:nowrap;font-style:normal}
+.rb-admin{background:linear-gradient(135deg,#fde68a,#fbcfe8);color:#7c2d12}
+.rb-teacher{background:#dcfce7;color:#14532d}
+[data-theme=dark] .rb-admin{background:linear-gradient(135deg,#5b3d0c,#5a1f43);color:#fde68a}
+[data-theme=dark] .rb-teacher{background:#14532d;color:#bbf7d0}
+.av.st-admin,.av.st-teacher{font-size:20px;box-shadow:0 0 0 2px var(--card),0 0 0 3.5px currentColor}
+.av.st-admin{background:linear-gradient(135deg,#fef3c7,#fbcfe8);color:#f59e0b}
+.av.st-teacher{background:#dcfce7;color:#22c55e}
+.bb.st-admin{box-shadow:0 0 0 1.5px #f5b942,0 1px 1px rgba(0,0,0,.07)}
+.bb.st-teacher{box-shadow:0 0 0 1.5px #4ade80,0 1px 1px rgba(0,0,0,.07)}
+.m.me .bb.st-admin,.m.me .bb.st-teacher{box-shadow:0 1px 1px rgba(0,0,0,.07)}
+.m.me .mc2{display:flex;flex-direction:column;align-items:flex-end;min-width:0;max-width:80%}
+.m.me .mc2 small{margin:0 2px 2px 0}
 @media(max-width:899px){
  #dock{left:0;right:0;width:auto;border-radius:22px 22px 0 0;height:calc(62px + env(safe-area-inset-bottom,0px))}
  #dock.open{height:84vh}
@@ -298,7 +311,7 @@ const put=(sel,h)=>{const el=$(sel);if(el.dataset.h!==h){el.dataset.h=h;el.inner
 const ic=p=>`<svg class="ic" viewBox="0 0 24 24">${p}</svg>`;
 const I={home:'<path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>',ann:'<path d="M3 10v4h3l7 4V6L6 10H3zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/>',cal:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',sched:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',gal:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/>',chat:'<path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/>',cap:'<path d="M2 9l10-5 10 5-10 5zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>',go:'<path d="M9 6l6 6-6 6"/>',pin:'<path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'};
 const D={title:'我們班',tag:'班級專屬網站,公告、課表、照片都在這裡。',ann:[],evt:[],hw:[],sched:{},times:{},photos:[],msg:[]};
-const now0=new Date();let CAL={y:now0.getFullYear(),m:now0.getMonth()};let me=null;
+const now0=new Date();let CAL={y:now0.getFullYear(),m:now0.getMonth()};let me=null,myUid=null;
 
 /* ---------- static UI ---------- */
 const NAVS=[['ov','首頁','home'],['news','班級公告','ann'],['cal','行事曆','cal'],['sched','課表・作業','sched'],['gal','班級相簿','gal']];
@@ -341,7 +354,7 @@ const dock=$('#dock'),dh=$('#dh'),ci=$('#ci'),mob=()=>matchMedia('(max-width:899
 const chatSeen=()=>{try{return +localStorage.getItem('cls-chat-seen')||0}catch(e){return 0}};
 const markSeen=()=>{try{localStorage.setItem('cls-chat-seen',Date.now())}catch(e){}};
 try{if(!localStorage.getItem('cls-chat-seen'))localStorage.setItem('cls-chat-seen',Date.now())}catch(e){}
-const isMine=o=>!!me&&o.n===me.name&&(o.no==null||o.no===me.no);
+const isMine=o=>me?(!o.role&&o.n===me.name&&(o.no==null||o.no===me.no)):(!!myUid&&o.uid===myUid);
 const toEnd=()=>{const b=$('#cbody');b.scrollTop=b.scrollHeight};
 function setOpen(o){
   dock.classList.toggle('open',o);dock.style.height='';$('#cmain').inert=!o;dh.setAttribute('aria-expanded',o);
@@ -363,7 +376,9 @@ const TAG={'置頂':'pin','活動':'act','一般':'gen'};
 const annSort=()=>[...D.ann].sort((a,b)=>((b.tag==='置頂')-(a.tag==='置頂'))||b.ts-a.ts);
 const annItem=(o,first)=>{const tg=o.tag||'一般',ti=o.title||o.t,bd=o.title?o.t:'';return `<li class="ai${first?' first':''}"><span class="tg t-${TAG[tg]||'gen'}">${esc(tg)}</span><div><b>${esc(ti)}</b>${bd?`<p>${esc(bd)}</p>`:''}</div><time>${md(o.ts)}</time></li>`};
 const ch=(t,i,g,l)=>`<div class="ch"><span class="chi">${ic(I[i])}</span><h3>${t}</h3><button class="lk" data-go="${g}">${l} ›</button></div>`;
-const avatar=n=>`<span class="av" style="background:hsl(${hue(n)} 55% 52%)">${esc([...String(n)][0]||'?')}</span>`;
+const RB={admin:['🎇','管理員'],teacher:['🐛','老師']};
+const rb=r=>RB[r]?`<span class="rb rb-${r}">${RB[r][0]} ${RB[r][1]}</span>`:'';
+const avatar=(n,r)=>RB[r]?`<span class="av st-${r}" title="${RB[r][1]}">${RB[r][0]}</span>`:`<span class="av" style="background:hsl(${hue(n)} 55% 52%)">${esc([...String(n)][0]||'?')}</span>`;
 const byNew=a=>[...a].sort((x,y)=>y.ts-x.ts);
 const tm=p=>{const t=D.times[p];return t&&t[0]&&t[1]?t:null};
 
@@ -407,13 +422,14 @@ function render(){
   put('#ov-today',ch('今日課程','sched','sched','查看課表')+`<ul>${cr.join('')||`<li class="empty">${td>=0&&td<5?'今天沒有課程':'今天是假日,好好休息!'}</li>`}</ul>`);
   /* chat */
   const M=byNew(D.msg);
-  put('#ov-chat',ch('班級聊天','chat','chat','開啟聊天室')+(M.slice(0,3).map(o=>`<div class="msgr">${avatar(o.n)}<div class="t"><b>${esc(o.n)}</b><small>${hm(o.ts)}</small><br>${esc(o.m)}</div></div>`).join('')||'<p class="empty">還沒有留言</p>'));
+  put('#ov-chat',ch('班級聊天','chat','chat','開啟聊天室')+(M.slice(0,3).map(o=>`<div class="msgr">${avatar(o.n,o.role)}<div class="t"><b>${esc(o.n)}</b>${rb(o.role)}<small>${hm(o.ts)}</small><br>${esc(o.m)}</div></div>`).join('')||'<p class="empty">還沒有留言</p>'));
   /* chat dock */
   const isOpen=dock.classList.contains('open'),cb=$('#cbody'),near=cb.scrollHeight-cb.scrollTop-cb.clientHeight<90;
   const L=[...D.msg].sort((a,b)=>a.ts-b.ts).slice(-150);let dk='',cm='';
   L.forEach(o=>{const d=new Date(o.ts);
     if(d.toDateString()!==dk){dk=d.toDateString();cm+=`<div class="ds"><span>${d.getMonth()+1}/${d.getDate()} 週${'日一二三四五六'[d.getDay()]}</span></div>`}
-    cm+=isMine(o)?`<div class="m me"><time>${hm(o.ts)}</time><div class="bb">${esc(o.m)}</div></div>`:`<div class="m">${avatar(o.n)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}</small><div class="mr"><div class="bb">${esc(o.m)}</div><time>${hm(o.ts)}</time></div></div></div>`});
+    const sc=RB[o.role]?' st-'+o.role:'';
+    cm+=isMine(o)?`<div class="m me"><time>${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}">${esc(o.m)}</div></div></div>`:`<div class="m">${avatar(o.n,o.role)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${esc(o.m)}</div><time>${hm(o.ts)}</time></div></div></div>`});
   cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
   const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
   if(isOpen)markSeen();
@@ -430,7 +446,7 @@ render();setInterval(render,60000);
 if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false;$('#cf').hidden=true;$('#cnote').hidden=false;$('#cnote').textContent='尚未連線,無法留言';setUser('訪客','未連線')}
 else{
   const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bad=()=>{};
-  let unsubs=[],last=0,staff={name:'管理員',role:'管理員'};
+  let unsubs=[],last=0,staff={name:'管理員',role:'管理員',key:'admin'};
   const stop=()=>{unsubs.forEach(f=>f());unsubs=[]};
   const lock=msg=>{stop();me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#lf').hidden=false};
   const start=()=>{
@@ -440,13 +456,14 @@ else{
     unsubs.push(onSnapshot(doc(db,'meta','sched'),s=>{D.sched=(s.data()||{}).cells||{};render()},bad));
     unsubs.push(onSnapshot(doc(db,'meta','times'),s=>{D.times=(s.data()||{}).t||{};render()},bad));
     if(me)setUser(me.name,'座號 '+me.no);else setUser(staff.name,staff.role);
-    $('#cf').hidden=!me;$('#cnote').hidden=!!me;render();
+    $('#cf').hidden=false;$('#cnote').hidden=true;render();
   };
   onAuthStateChanged(auth,async u=>{
-    if(!u){lock();return}
+    if(!u){myUid=null;lock();return}
+    myUid=u.uid;
     try{
       const s=await getDoc(doc(db,'students',u.uid));me=s.exists()?s.data():null;
-      if(!me){await getDoc(doc(db,'meta','site'));staff={name:'管理員',role:'管理員'};try{const t=await getDoc(doc(db,'teachers',u.uid));if(t.exists())staff={name:t.data().name,role:'老師'}}catch(x){}}
+      if(!me){await getDoc(doc(db,'meta','site'));staff={name:'管理員',role:'管理員',key:'admin'};try{const t=await getDoc(doc(db,'teachers',u.uid));if(t.exists())staff={name:t.data().name,role:'老師',key:'teacher'}}catch(x){}}
       stop();start();
     }catch(e){if(e&&e.code==='permission-denied'){await signOut(auth);lock('此帳號已停用或沒有權限')}else{stop();document.body.classList.add('locked');$('#lf').hidden=true;$('#gerr').textContent='連線不穩,請重新整理頁面(登入狀態還在)'}}
   });
@@ -459,9 +476,9 @@ else{
   try{$('#no').value=localStorage.getItem('cls-no')||''}catch(e){}
   $('#out').onclick=()=>{$('#umenu').hidden=true;signOut(auth)};
   const send=async e=>{e.preventDefault();
-    if(!me||Date.now()-last<1500)return;
+    if(Date.now()-last<1500)return;
     const t=$('#ci'),m=t.value.trim();if(!m)return;
-    try{await addDoc(collection(db,'msg'),{n:me.name,no:me.no,m,ts:Date.now()});last=Date.now();t.value='';t.style.height='';setTimeout(toEnd,150)}
+    try{await addDoc(collection(db,'msg'),me?{n:me.name,no:me.no,m,ts:Date.now()}:{n:staff.name,role:staff.key,uid:myUid,m,ts:Date.now()});last=Date.now();t.value='';t.style.height='';setTimeout(toEnd,150)}
     catch(err){alert('送出失敗,請稍後再試')}};
   $('#cf').onsubmit=send;
 }
