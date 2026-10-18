@@ -143,6 +143,8 @@ body.locked main,body.locked #nav{display:none}
 tr>:first-child{width:64px}
 th small{display:block;font-size:11px;font-weight:400;line-height:1.3;margin-top:2px;white-space:nowrap}
 td.now{box-shadow:inset 0 0 0 2px #d4af37;font-weight:700;background:rgba(212,175,55,.2)}
+.keep{flex-basis:100%;display:flex;gap:8px;align-items:center;justify-content:center;font-size:14px;color:var(--mute);cursor:pointer}
+.keep input{flex:none;width:18px;height:18px;accent-color:#d4af37}
 </style>
 </head>
 <body class="locked">
@@ -162,7 +164,7 @@ td.now{box-shadow:inset 0 0 0 2px #d4af37;font-weight:700;background:rgba(212,17
 <div id="gate"><div class="gold"><div class="in">
 <div class="gtext">班級登入</div>
 <h2 class="gt" id="gtitle"></h2>
-<form id="lf" hidden><input id="no" type="number" inputmode="numeric" min="1" max="99" placeholder="座號" required aria-label="座號"><input id="pw" type="password" placeholder="密碼" required autocomplete="current-password" aria-label="密碼"><button class="btn" style="flex-basis:100%">登入</button></form>
+<form id="lf" hidden><input id="no" type="number" inputmode="numeric" min="1" max="99" placeholder="座號" required aria-label="座號"><input id="pw" type="password" placeholder="密碼" required autocomplete="current-password" aria-label="密碼"><label class="keep"><input type="checkbox" id="keep" checked>保持登入(這台裝置)</label><button class="btn" style="flex-basis:100%">登入</button></form>
 <p class="gerr" id="gerr">載入中…</p>
 </div></div></div>
 
@@ -200,7 +202,7 @@ td.now{box-shadow:inset 0 0 0 2px #d4af37;font-weight:700;background:rgba(212,17
 
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import {getFirestore,collection,doc,onSnapshot,addDoc,getDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const FIREBASE_CONFIG={apiKey:"AIzaSyCjH-28OnHBKh8cFuL3rPkmxtmV7ixvAnU",authDomain:"class-9ab0a.firebaseapp.com",projectId:"class-9ab0a",storageBucket:"class-9ab0a.firebasestorage.app",messagingSenderId:"1061856226694",appId:"1:1061856226694:web:fa6467c7db7008df329007"};
 const $=s=>document.querySelector(s);
@@ -287,13 +289,15 @@ else{
       const s=await getDoc(doc(db,'students',u.uid));me=s.exists()?s.data():null;
       if(!me){await getDoc(doc(db,'meta','site'));staffName='管理員';try{const t=await getDoc(doc(db,'teachers',u.uid));if(t.exists())staffName='老師・'+t.data().name}catch(x){}}
       stop();start();
-    }catch(e){await signOut(auth);lock('此帳號已停用或沒有權限')}
+    }catch(e){if(e&&e.code==='permission-denied'){await signOut(auth);lock('此帳號已停用或沒有權限')}else{stop();document.body.classList.add('locked');$('#lf').hidden=true;$('#gerr').textContent='連線不穩,請重新整理頁面(登入狀態還在)'}}
   });
   $('#lf').onsubmit=async e=>{e.preventDefault();$('#gerr').textContent='';
     const no=String(parseInt($('#no').value,10));
     try{const m=await getDoc(doc(db,'login',no));if(!m.exists())throw 0;
-      await signInWithEmailAndPassword(auth,m.data().email,$('#pw').value);$('#pw').value=''}
+      await setPersistence(auth,$('#keep').checked?browserLocalPersistence:browserSessionPersistence);
+      await signInWithEmailAndPassword(auth,m.data().email,$('#pw').value);$('#pw').value='';try{localStorage.setItem('cls-no',no)}catch(x){}}
     catch(err){$('#gerr').textContent='座號或密碼錯誤'}};
+  try{$('#no').value=localStorage.getItem('cls-no')||''}catch(e){}
   $('#out').onclick=()=>signOut(auth);
   $('#fm').onsubmit=async e=>{e.preventDefault();
     if(!me)return;if(Date.now()-last<15000){alert('留言太快了,請稍等幾秒');return}

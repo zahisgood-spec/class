@@ -90,6 +90,8 @@ main,.top>div{max-width:1120px}
 .tile small{display:block;color:var(--mute)}
 .tile i{margin-top:auto;font-style:normal;font-size:13px;font-weight:700;color:var(--gt)}
 @media(max-width:860px){.shell{grid-template-columns:1fr}.snav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:9;flex-direction:row;overflow-x:auto;scrollbar-width:none;border-radius:14px;padding:8px}.snav h4{display:none}.snav button{width:auto;white-space:nowrap;gap:8px;padding:8px 14px}}
+.keep{flex-basis:100%;display:flex;gap:8px;align-items:center;font-size:14px;color:var(--mute);cursor:pointer}
+.keep input{flex:none;width:18px;height:18px;accent-color:#d4af37}
 </style>
 </head>
 <body>
@@ -100,7 +102,7 @@ main,.top>div{max-width:1120px}
 <button id="out" hidden>登出</button>
 </div></header>
 <main>
-<div class="panel" id="login"><h2>管理員登入</h2><form id="lf"><input id="em" type="text" placeholder="Email 或教師帳號" required autocomplete="username" aria-label="Email 或教師帳號"><input id="pw" type="password" placeholder="密碼" required autocomplete="current-password" aria-label="密碼"><button class="pri">登入</button></form><p class="err" id="err"></p><p class="hint" id="cfgnote" hidden>尚未設定 Firebase:請打開 admin.html,把設定貼到 FIREBASE_CONFIG。</p></div>
+<div class="panel" id="login"><h2>管理員登入</h2><form id="lf"><input id="em" type="text" placeholder="Email 或教師帳號" required autocomplete="username" aria-label="Email 或教師帳號"><input id="pw" type="password" placeholder="密碼" required autocomplete="current-password" aria-label="密碼"><label class="keep"><input type="checkbox" id="keep" checked>保持登入(這台裝置)</label><button class="pri">登入</button></form><p class="err" id="err"></p><p class="hint" id="cfgnote" hidden>尚未設定 Firebase:請打開 admin.html,把設定貼到 FIREBASE_CONFIG。</p></div>
 <div id="app" hidden>
 <div class="shell">
 <aside class="snav" id="snav" aria-label="後台分類">
@@ -121,7 +123,8 @@ main,.top>div{max-width:1120px}
 </aside>
 <div class="content">
 
-<div class="panel pane on" id="p-home"><h2>總覽</h2><p class="sub">點任何一格,進入對應的管理區。</p>
+<div class="panel pane on" id="p-home"><h2>總覽</h2><p class="sub">在這裡可以直接發布公告,或點任何一格進入對應的管理區。</p>
+<div class="cell"><h3 class="ch">發布公告</h3><form data-k="ann"><input name="t" placeholder="想對全班說什麼?" required maxlength="160" aria-label="公告內容"><button class="pri">發布</button></form></div>
 <div class="tiles" id="tiles"></div>
 <p class="hint" style="margin-top:18px"><b>怎麼用:</b>先在「學生帳號」建立座號、名稱、密碼,同學用座號加密碼登入班級網頁。「教師帳號」只有你(擁有者)看得到,老師可用帳號加密碼登入這個後台,權限和你一樣,只是不能管理教師帳號。</p></div>
 
@@ -160,7 +163,7 @@ main,.top>div{max-width:1120px}
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getFirestore,collection,doc,onSnapshot,addDoc,setDoc,deleteDoc,updateDoc,getDoc,getDocs} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword,setPersistence,browserLocalPersistence,browserSessionPersistence} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 const FIREBASE_CONFIG={apiKey:"AIzaSyCjH-28OnHBKh8cFuL3rPkmxtmV7ixvAnU",authDomain:"class-9ab0a.firebaseapp.com",projectId:"class-9ab0a",storageBucket:"class-9ab0a.firebasestorage.app",messagingSenderId:"1061856226694",appId:"1:1061856226694:web:fa6467c7db7008df329007"};
 const $=s=>document.querySelector(s);
 $('#theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('cls-theme',t)}catch(e){}};
@@ -180,7 +183,7 @@ const CFG=[
 ];
 const DESC={ann:'發布給全班看的公告,最新的一則會顯示在首頁。',evt:'新增考試、活動等日期,首頁會顯示倒數天數。',hw:'新增作業與截止日,勾選代表已完成。',msg:'同學留的言,可以刪除不適當的內容。'};
 $('#lists').innerHTML=CFG.map(([k,l,fs])=>`<div class="panel pane" id="p-${k}"><h2>${l} <em id="c-${k}"></em></h2><p class="sub">${DESC[k]}</p>
-${fs.length?`<div class="cell"><h3 class="ch">新增${l}</h3><form data-k="${k}">${fs.map(([n,p,t])=>`<input name="${n}" type="${t}" placeholder="${p}" required maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form></div>`:''}
+${fs.length?`<div class="cell"><h3 class="ch">${k==='ann'?'發布':'新增'}${l}</h3><form data-k="${k}">${fs.map(([n,p,t])=>`<input name="${n}" type="${t}" placeholder="${p}" required maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form></div>`:''}
 <div class="cell"><h3 class="ch">${k==='msg'?'全部留言':'已發布的'+l}</h3><ul id="l-${k}"></ul></div></div>`).join('');
 
 const go=p=>{document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));document.querySelectorAll('#snav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.pane===p));scrollTo({top:0})};
@@ -286,16 +289,17 @@ else{
     const show=(on,label)=>{$('#login').hidden=on;$('#app').hidden=!on;$('#out').hidden=!on;$('#who').hidden=!on;if(on)$('#who').textContent=label};
     if(!u){show(false);return}
     try{
-      if((await getDoc(doc(db,'students',u.uid))).exists())throw 0;
+      if((await getDoc(doc(db,'students',u.uid))).exists())throw {code:'permission-denied'};
       const tr=await getDoc(doc(db,'teachers',u.uid));
       if(tr.exists())ROLE='teacher';else{await getDocs(collection(db,'teachers'));ROLE='admin'}
       $('#nt').hidden=ROLE!=='admin';go('home');refresh();
       show(true,ROLE==='admin'?'UID:'+u.uid:'老師・'+tr.data().name);
       start();
-    }catch(e){await signOut(auth);show(false);$('#err').textContent='此帳號沒有後台權限'}
+    }catch(e){if(e&&e.code==='permission-denied'){await signOut(auth);show(false);$('#err').textContent='此帳號沒有後台權限'}else{show(false);$('#err').textContent='連線不穩,請重新整理頁面(登入狀態還在)'}}
   });
   $('#lf').onsubmit=async e=>{e.preventDefault();$('#err').textContent='';
-    try{const v=$('#em').value.trim();let email=v;if(!v.includes('@')){const m=await getDoc(doc(db,'login','t_'+v.toLowerCase()));if(!m.exists())throw 0;email=m.data().email}await signInWithEmailAndPassword(auth,email,$('#pw').value)}catch(err){$('#err').textContent='登入失敗,請檢查帳號密碼'}};
+    try{const v=$('#em').value.trim();let email=v;if(!v.includes('@')){const m=await getDoc(doc(db,'login','t_'+v.toLowerCase()));if(!m.exists())throw 0;email=m.data().email}await setPersistence(auth,$('#keep').checked?browserLocalPersistence:browserSessionPersistence);await signInWithEmailAndPassword(auth,email,$('#pw').value);try{localStorage.setItem('adm-user',v)}catch(x){}}catch(err){$('#err').textContent='登入失敗,請檢查帳號密碼'}};
+  try{$('#em').value=localStorage.getItem('adm-user')||''}catch(e){}
   $('#out').onclick=()=>signOut(auth);
   $('#who').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(auth.currentUser.uid).then(()=>toast('已複製 UID'))};
 
