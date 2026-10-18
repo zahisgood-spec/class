@@ -253,6 +253,16 @@ body.locked .app{display:none}
 #lb{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.85);display:grid;place-items:center;cursor:zoom-out}
 #lb[hidden]{display:none}
 #lb img{max-width:92vw;max-height:88vh;object-fit:contain;border-radius:8px}
+#cmenu{position:fixed;z-index:96;display:flex;background:#1f2937;color:#fff;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);overflow:hidden}
+#cmenu[hidden]{display:none}
+#cmenu button{padding:10px 18px;font-size:14px;font-weight:700;color:#fff;background:none}
+#cmenu button+button{border-left:1px solid rgba(255,255,255,.18)}
+#cmenu .dg{color:#fca5a5}
+#cedit{display:flex;align-items:center;gap:10px;padding:8px 16px;background:var(--card);border-top:1px solid var(--line);flex:none;font-size:13px;font-weight:700}
+#cedit[hidden]{display:none}
+#cedit span{flex:1}
+#cedit button{font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;background:rgba(0,0,0,.1);color:inherit}
+@media(hover:none){#cbody [data-mid]{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}}
 #ntf{position:fixed;left:0;right:0;top:calc(10px + env(safe-area-inset-top,0px));z-index:90;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding:0 12px}
 .nt{pointer-events:auto;display:flex;gap:10px;align-items:center;width:min(380px,100%);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:10px 14px;box-shadow:0 14px 40px -10px rgba(15,30,80,.45);cursor:pointer;text-align:left;animation:ntin .35s cubic-bezier(.2,.8,.2,1) both}
 .nt.out{animation:ntout .3s ease forwards}
@@ -476,7 +486,7 @@ setTimeout(fd,4000);
 <div id="dock"><div id="dh" role="button" tabindex="0" aria-expanded="false" aria-controls="cmain"><span class="chi"><svg class="ic" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/></svg></span><div class="dt"><b>班級聊天室</b><small id="dsub"></small></div><i class="ub" id="ub" hidden>0</i><svg class="ic chev" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></div>
 <div id="cmain" inert><div id="cbody" aria-live="polite"></div>
 <p id="chint" hidden></p>
-<div id="cpre" hidden><img alt="預覽"><span>圖片會以 1:1 置中裁切後傳送</span><button type="button" id="cpx">取消</button><button type="button" id="cps">傳送</button></div><form id="cf"><button type="button" class="att" id="cimg" aria-label="傳送圖片"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button><input type="file" id="cfile" accept="image/*" hidden><textarea id="ci" name="m" rows="1" maxlength="1000" placeholder="輸入訊息" aria-label="輸入訊息"></textarea><button class="send" aria-label="送出"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></form>
+<div id="cedit" hidden><span>✏️ 編輯訊息</span><button type="button" id="cex">取消</button></div><div id="cpre" hidden><img alt="預覽"><span>圖片會以 1:1 置中裁切後傳送</span><button type="button" id="cpx">取消</button><button type="button" id="cps">傳送</button></div><form id="cf"><button type="button" class="att" id="cimg" aria-label="傳送圖片"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button><input type="file" id="cfile" accept="image/*" hidden><textarea id="ci" name="m" rows="1" maxlength="1000" placeholder="輸入訊息" aria-label="輸入訊息"></textarea><button class="send" aria-label="送出"><svg class="ic" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg></button></form>
 <p class="empty" id="cnote" hidden style="padding:12px 16px;margin:0;background:var(--card)">管理員與老師請從後台管理留言。</p></div></div>
 <div id="lb" hidden><img alt="圖片"></div>
 <div id="ntf" aria-live="polite"></div>
@@ -486,7 +496,7 @@ setTimeout(fd,4000);
 const BT=window.__boot||{task(){},done(){},isClosed(){return true},begin(){},set(){}};
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,collection,doc,onSnapshot,addDoc,getDoc,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,collection,doc,onSnapshot,addDoc,getDoc,query,orderBy,limit,updateDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const FIREBASE_CONFIG={apiKey:"AIzaSyCjH-28OnHBKh8cFuL3rPkmxtmV7ixvAnU",authDomain:"class-9ab0a.firebaseapp.com",projectId:"class-9ab0a",storageBucket:"class-9ab0a.firebasestorage.app",messagingSenderId:"1061856226694",appId:"1:1061856226694:web:fa6467c7db7008df329007"};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -627,7 +637,7 @@ function render(){
   L.forEach(o=>{const d=new Date(o.ts);
     if(d.toDateString()!==dk){dk=d.toDateString();cm+=`<div class="ds"><span>${d.getMonth()+1}/${d.getDate()} 週${'日一二三四五六'[d.getDay()]}</span></div>`}
     const sc=(RB[o.role]?' st-'+o.role:'')+(isFile(o)?' fb':'')+(isImg(o)?' imgb':'');
-    cm+=isMine(o)?`<div class="m me"><time>${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}">${bubble(o)}</div></div></div>`:`<div class="m">${avatar(o.n,o.role)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${hm(o.ts)}</time></div></div></div>`});
+    cm+=isMine(o)?`<div class="m me"><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}" data-mid="${esc(o.id)}">${bubble(o)}</div></div></div>`:`<div class="m">${avatar(o.n,o.role)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time></div></div></div>`});
   cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
   const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
   if(isOpen)markSeen();
@@ -750,6 +760,39 @@ else{
     try{await addDoc(collection(db,'msg'),me?{n:me.name,no:me.no,m:'',img:PEND,ts:Date.now()}:{n:staff.name,role:staff.key,uid:myUid,m:'',img:PEND,ts:Date.now()});last=Date.now();clr();setTimeout(toEnd,150)}
     catch(err){alert('圖片送出失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}
     finally{b.disabled=false;b.textContent='傳送'}};}
+  /* ---------- 編輯 / 刪除自己的訊息 ---------- */
+  {const cb=$('#cbody'),mn=document.createElement('div'),bar=$('#cedit');mn.id='cmenu';mn.hidden=true;document.body.appendChild(mn);
+  let EDIT=null,lp=null,sx=0,sy=0,skip=false;
+  const closeMenu=()=>{mn.hidden=true};
+  const openMenu=el=>{const id=el.dataset.mid,o=D.msg.find(x=>x.id===id);if(!o)return;
+    mn.innerHTML=(isImg(o)?'':`<button type="button" data-a="edit" data-id="${esc(id)}">編輯</button>`)+`<button type="button" class="dg" data-a="del" data-id="${esc(id)}">刪除</button>`;
+    mn.hidden=false;const r=el.getBoundingClientRect(),w=mn.offsetWidth,h=mn.offsetHeight;
+    let top=r.top-h-8;if(top<8)top=r.bottom+8;top=Math.max(8,Math.min(top,innerHeight-h-8));
+    mn.style.top=top+'px';mn.style.left=Math.min(Math.max(8,r.right-w),innerWidth-w-8)+'px'};
+  const endEdit=()=>{EDIT=null;bar.hidden=true;ci.value='';ci.style.height='';$('#chint').hidden=true};
+  const startEdit=o=>{$('#cpx').click();EDIT={id:o.id,m:o.m};bar.hidden=false;ci.value=o.m;ci.style.height='auto';ci.style.height=Math.min(ci.scrollHeight,110)+'px';ci.focus();ci.setSelectionRange(ci.value.length,ci.value.length)};
+  $('#cex').onclick=endEdit;
+  mn.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;const id=b.dataset.id,o=D.msg.find(x=>x.id===id);closeMenu();if(!o)return;
+    if(b.dataset.a==='edit'){startEdit(o);return}
+    if(b.dataset.a==='del'){if(!confirm('要刪除這則訊息嗎?刪除後所有人都看不到。'))return;
+      try{if(EDIT&&EDIT.id===id)endEdit();await deleteDoc(doc(db,'msg',id))}catch(err){alert('刪除失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}}});
+  /* 送出時若在編輯模式 → 改為更新原訊息 */
+  const sendOrig=$('#cf').onsubmit;
+  $('#cf').onsubmit=async e=>{if(!EDIT)return sendOrig(e);e.preventDefault();
+    const m=ci.value.trim();if(!m)return;if(m===EDIT.m){endEdit();return}
+    try{await updateDoc(doc(db,'msg',EDIT.id),{m,edited:true});endEdit()}catch(err){alert('編輯失敗,請稍後再試(若一直失敗,請確認 Firestore 規則已更新)')}};
+  const cimg0=$('#cimg').onclick;$('#cimg').onclick=()=>{if(!EDIT)cimg0()};
+  /* 點擊(文字訊息)/ 長按或右鍵(圖片)開選單 */
+  cb.addEventListener('click',e=>{if(skip){skip=false;e.stopPropagation();e.preventDefault()}},true);
+  cb.addEventListener('click',e=>{const b=e.target.closest('[data-mid]');if(!b||e.target.closest('button')||b.querySelector('[data-img]'))return;openMenu(b)});
+  cb.addEventListener('contextmenu',e=>{const b=e.target.closest('[data-mid]');if(!b)return;e.preventDefault();openMenu(b)});
+  cb.addEventListener('pointerdown',e=>{skip=false;const b=e.target.closest('[data-mid]');if(!b||e.pointerType==='mouse')return;sx=e.clientX;sy=e.clientY;lp=setTimeout(()=>{lp=null;skip=true;openMenu(b)},500)});
+  const cancelLP=()=>{if(lp){clearTimeout(lp);lp=null}};
+  cb.addEventListener('pointermove',e=>{if(lp&&Math.hypot(e.clientX-sx,e.clientY-sy)>8)cancelLP()});
+  ['pointerup','pointercancel','pointerleave'].forEach(n=>cb.addEventListener(n,cancelLP));
+  cb.addEventListener('scroll',()=>{cancelLP();closeMenu()},{passive:true});
+  document.addEventListener('click',e=>{if(!mn.hidden&&!mn.contains(e.target)&&!e.target.closest('[data-mid]'))closeMenu()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();if(EDIT)endEdit()}});}
 }
 </script>
 </body>
