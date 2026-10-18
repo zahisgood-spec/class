@@ -54,6 +54,9 @@ td input{width:100%;text-align:center;border:0;background:transparent;padding:10
 [hidden]{display:none!important}
 #login{max-width:380px;margin:12vh auto 0}
 .err{color:#e5484d;font-size:14px;min-height:1.5em}
+.av2{flex:none;width:34px;height:34px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:900;font-size:13px}
+details{margin:0 0 14px}summary{cursor:pointer;color:var(--mute);font-size:14px;margin-bottom:10px}
+#made{white-space:pre-line}
 </style>
 </head>
 <body>
@@ -66,11 +69,17 @@ td input{width:100%;text-align:center;border:0;background:transparent;padding:10
 <main>
 <div class="panel" id="login"><h2>管理員登入</h2><form id="lf"><input id="em" type="email" placeholder="Email" required autocomplete="username" aria-label="Email"><input id="pw" type="password" placeholder="密碼" required autocomplete="current-password" aria-label="密碼"><button class="pri">登入</button></form><p class="err" id="err"></p><p class="hint" id="cfgnote" hidden>尚未設定 Firebase:請打開 admin.html,把設定貼到 FIREBASE_CONFIG。</p></div>
 <div id="app" hidden>
-<p class="hint"><b>怎麼用:</b>在這裡新增或修改內容,會即時同步到主頁。登入後上方會顯示你的 <b>UID</b>,把它貼進 Firestore 規則裡,只有你能修改內容。</p>
+<p class="hint"><b>怎麼用:</b>先在「學生帳號」建立每位同學的座號、名稱和密碼,把密碼告訴同學;同學要用座號加密碼登入才看得到班級網頁。內容會即時同步,你的 <b>UID</b> 要貼進 Firestore 規則。</p>
 
 <div class="panel"><h2>基本設定</h2>
 <div class="row"><input id="title" placeholder="班級名稱" maxlength="20" aria-label="班級名稱"></div>
 <div class="row"><input id="tag" placeholder="一句話介紹" maxlength="80" aria-label="一句話介紹"></div></div>
+
+<div class="panel"><h2>學生帳號 <em id="cs"></em></h2>
+<form id="sf"><input name="no" type="number" min="1" max="99" placeholder="座號" required style="flex:0 1 90px" aria-label="座號"><input name="name" placeholder="名稱" required maxlength="12" aria-label="名稱"><input name="pw" id="spw" placeholder="密碼(至少 6 碼)" required minlength="6" maxlength="30" aria-label="密碼"><button type="button" id="rnd">隨機密碼</button><button class="pri">建立帳號</button></form>
+<details><summary>一次貼上整班(每行:座號,名稱,密碼)</summary><textarea id="bulk" placeholder="1,王小明,abc123&#10;2,李小華,xyz789"></textarea><button class="pri" id="bulkgo" type="button">批次建立</button></details>
+<div class="hint" id="made" hidden></div>
+<ul id="ls"></ul></div>
 
 <div id="lists"></div>
 
@@ -86,7 +95,7 @@ td input{width:100%;text-align:center;border:0;background:transparent;padding:10
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getFirestore,collection,doc,onSnapshot,addDoc,setDoc,deleteDoc,updateDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
-import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged,createUserWithEmailAndPassword} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 const FIREBASE_CONFIG={apiKey:"AIzaSyCjH-28OnHBKh8cFuL3rPkmxtmV7ixvAnU",authDomain:"class-9ab0a.firebaseapp.com",projectId:"class-9ab0a",storageBucket:"class-9ab0a.firebasestorage.app",messagingSenderId:"1061856226694",appId:"1:1061856226694:web:fa6467c7db7008df329007"};
 const $=s=>document.querySelector(s);
 $('#theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('cls-theme',t)}catch(e){}};
@@ -117,7 +126,7 @@ function draw(k){
   $('#c-'+k).textContent=S[k].length?S[k].length+' 筆':'';
   const sorted=[...S[k]].sort((a,b)=>(b.ts||0)-(a.ts||0)||(a.d<b.d?-1:1));
   $('#l-'+k).innerHTML=sorted.length?sorted.map(o=>{
-    const main=k==='msg'?`<b>${esc(o.n)}</b><br>${esc(o.m)}`:esc(o.t);
+    const main=k==='msg'?`<b>${esc(o.n)}</b>${o.no?` · 座號 ${esc(o.no)}`:''}<br>${esc(o.m)}`:esc(o.t);
     const sub=o.ts&&k!=='evt'&&k!=='hw'?new Date(o.ts).toLocaleString('zh-TW'):esc(o.d);
     const ck=k==='hw'?`<input type="checkbox" style="flex:none;width:20px;height:20px" data-tog="${o.id}" ${o.done?'checked':''} aria-label="已完成">`:'';
     return `<li>${ck}<span class="t">${main}<small>${sub}${k==='hw'&&o.done?' · 已完成':''}</small></span><button class="x" data-k="${k}" data-id="${o.id}" aria-label="刪除">×</button></li>`}).join(''):'<li class="empty">還沒有內容</li>';
@@ -128,8 +137,43 @@ if(!FIREBASE_CONFIG.projectId){$('#cfgnote').hidden=false;$('#lf').hidden=true}
 else{
   const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bad=e=>toast('同步失敗:'+(e.code||e.message));
   const run=p=>Promise.resolve(p).catch(e=>toast(e.code==='permission-denied'?'沒有權限(UID 還沒加進規則?)':'操作失敗:'+(e.code||e.message)));
-  let unsub=[];
+  let unsub=[],ROS=[];
+  const sec=initializeApp(FIREBASE_CONFIG,'sec'),secAuth=getAuth(sec);
+  const emsg=e=>e.code==='auth/weak-password'?'密碼至少 6 碼':e.code==='permission-denied'?'沒有權限(規則還沒更新?)':'失敗:'+(e.code||e.message);
+  const drawRos=()=>{$('#cs').textContent=ROS.length?ROS.length+' 位':'';
+    $('#ls').innerHTML=[...ROS].sort((a,b)=>a.no-b.no).map(o=>`<li><span class="av2">${o.no}</span><span class="t"><b>${esc(o.name)}</b></span><button data-rs="${o.id}">重設密碼</button><button class="x" data-ds="${o.id}" aria-label="停用帳號">×</button></li>`).join('')||'<li class="empty">還沒有學生帳號</li>'};
+  async function make(no,name,pw){
+    const email=`s${no}-${Date.now().toString(36)}@class.invalid`;
+    const c=await createUserWithEmailAndPassword(secAuth,email,pw),uid=c.user.uid;
+    await signOut(secAuth);
+    await setDoc(doc(db,'students',uid),{no,name,email,ts:Date.now()});
+    await setDoc(doc(db,'login',String(no)),{email});
+    return uid;
+  }
+  const showMade=rows=>{const el=$('#made'),txt=rows.map(r=>`座號 ${r[0]}  ${r[1]}  密碼:${r[2]}`).join('\n');
+    el.hidden=false;el.innerHTML='<b>已建立,請現在記下密碼(之後不會再顯示):</b>\n'+esc(txt)+'\n<button id="cp2" type="button" style="margin-top:8px">複製</button>';
+    $('#cp2').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('已複製'))};
+  const rnd=()=>{const c='abcdefghjkmnpqrstuvwxyz23456789';return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('')};
+  $('#rnd').onclick=()=>{$('#spw').value=rnd()};
+  $('#sf').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target),no=parseInt(f.get('no'),10),name=f.get('name').trim(),pw=f.get('pw');
+    if(ROS.some(r=>r.no===no)){toast('座號已存在,請用「重設密碼」');return}
+    try{await make(no,name,pw);showMade([[no,name,pw]]);e.target.reset()}catch(err){toast(emsg(err))}};
+  $('#bulkgo').onclick=async()=>{
+    const lines=$('#bulk').value.split('\n').map(l=>l.trim()).filter(Boolean),done=[],bad2=[];
+    for(const l of lines){const [n,name,pw]=l.split(/[,，\t]/).map(x=>(x||'').trim()),no=parseInt(n,10);
+      if(!no||!name||!pw||pw.length<6||ROS.some(r=>r.no===no)||done.some(d=>d[0]===no)){bad2.push(l);continue}
+      try{await make(no,name,pw);done.push([no,name,pw])}catch(err){bad2.push(l);if(err.code==='permission-denied')break}}
+    if(done.length)showMade(done);
+    toast(bad2.length?`成功 ${done.length} 筆,略過 ${bad2.length} 筆(格式錯誤、座號重複或密碼少於 6 碼)`:`已建立 ${done.length} 筆`);
+    if(!bad2.length)$('#bulk').value=''};
+  document.addEventListener('click',async e=>{
+    const rs=e.target.closest('[data-rs]'),ds=e.target.closest('[data-ds]');
+    if(rs){const r=ROS.find(x=>x.id===rs.dataset.rs);if(!r)return;const pw=prompt(`座號 ${r.no} ${r.name} 的新密碼(至少 6 碼)`,rnd());if(!pw)return;
+      try{await make(r.no,r.name,pw);await deleteDoc(doc(db,'students',r.id));showMade([[r.no,r.name,pw]])}catch(err){toast(emsg(err))}}
+    if(ds){const r=ROS.find(x=>x.id===ds.dataset.ds);if(!r||!confirm(`確定要停用座號 ${r.no} ${r.name} 的帳號嗎?`))return;
+      run(deleteDoc(doc(db,'students',r.id)));run(deleteDoc(doc(db,'login',String(r.no))))}});
   const start=()=>{
+    unsub.push(onSnapshot(collection(db,'students'),s=>{ROS=s.docs.map(d=>({id:d.id,...d.data()}));drawRos()},bad));
     ['ann','evt','hw','msg','photos'].forEach(k=>unsub.push(onSnapshot(collection(db,k),s=>{S[k]=s.docs.map(d=>({id:d.id,...d.data()}));draw(k)},bad)));
     unsub.push(onSnapshot(doc(db,'meta','site'),s=>{const m=s.data()||{};if(document.activeElement!==$('#title'))$('#title').value=m.title||'我們班';if(document.activeElement!==$('#tag'))$('#tag').value=m.tag||''},bad));
     unsub.push(onSnapshot(doc(db,'meta','sched'),s=>{S.sched=(s.data()||{}).cells||{};if(!document.activeElement.closest('#tb'))draw('sched')},bad));
