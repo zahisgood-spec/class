@@ -357,6 +357,10 @@ body.locked .app{display:none}
 .stb.g{background:var(--chip);color:var(--ink)}
 .stb:disabled{opacity:.4;cursor:default}
 .st-h{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+#cbody .m>.av,#cbody .m>.avs{width:34px;height:34px;flex:none}
+#cbody .m>.av{font-size:15px}
+#cbody .m>.av.st-admin,#cbody .m>.av.st-teacher{font-size:17px}
+#cbody .m.g{margin-top:-6px}
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:radial-gradient(140% 40% at 10% 106%,rgba(110,175,255,.7),transparent 70%),linear-gradient(160deg,#0a1840,#0c2a6c 60%,#123f95);--bo-ink:#fff;--bo-mute:rgba(255,255,255,.72);--bo-chip:rgba(255,255,255,.12);--bo-mkc:#f6e27a;position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
 #boot.out{opacity:0;visibility:hidden;pointer-events:none}
@@ -691,11 +695,11 @@ function render(){
   put('#ov-chat',ch('班級聊天','chat','chat','開啟聊天室')+(M.slice(0,3).map(o=>`<div class="msgr">${avatar(o)}<div class="t"><b>${esc(o.n)}</b>${rb(o.role)}<small>${hm(o.ts)}</small><br>${esc(pv(o))}</div></div>`).join('')||'<p class="empty">還沒有留言</p>'));
   /* chat dock */
   const isOpen=dock.classList.contains('open'),cb=$('#cbody'),near=cb.scrollHeight-cb.scrollTop-cb.clientHeight<90;
-  const L=[...D.msg].sort((a,b)=>a.ts-b.ts).slice(-150);let dk='',cm='';
-  L.forEach(o=>{const d=new Date(o.ts);
+  const L=[...D.msg].sort((a,b)=>a.ts-b.ts).slice(-150),sk=o=>o.role?'r'+o.uid:'s'+o.n+'|'+o.no;let dk='',cm='';
+  L.forEach((o,ix)=>{const d=new Date(o.ts),pr=L[ix-1],grp=!!pr&&d.toDateString()===dk&&sk(pr)===sk(o)&&o.ts-pr.ts<300000;
     if(d.toDateString()!==dk){dk=d.toDateString();cm+=`<div class="ds"><span>${d.getMonth()+1}/${d.getDate()} 週${'日一二三四五六'[d.getDay()]}</span></div>`}
     const sc=(RB[o.role]?' st-'+o.role:'')+(isFile(o)?' fb':'')+(isImg(o)?' imgb':'');
-    cm+=isMine(o)?`<div class="m me"><button type="button" class="mdot" data-mdot="${esc(o.id)}" aria-label="更多選項" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg></button><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}" data-mid="${esc(o.id)}">${bubble(o)}</div></div></div>`:`<div class="m">${avatar(o)}<div class="mc"><small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small><div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time></div></div></div>`});
+    cm+=isMine(o)?`<div class="m me${grp?' g':''}"><button type="button" class="mdot" data-mdot="${esc(o.id)}" aria-label="更多選項" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg></button><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}" data-mid="${esc(o.id)}">${bubble(o)}</div></div></div>`:`<div class="m${grp?' g':''}">${grp?'<span class="avs"></span>':avatar(o)}<div class="mc">${grp?'':`<small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small>`}<div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time></div></div></div>`});
   cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
   const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
   if(isOpen)markSeen();
