@@ -361,6 +361,28 @@ body.locked .app{display:none}
 #cbody .m>.av{font-size:15px}
 #cbody .m>.av.st-admin,#cbody .m>.av.st-teacher{font-size:17px}
 #cbody .m.g{margin-top:-6px}
+.hwsum{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 14px;font-size:14px}
+.hwsum b{font-size:22px;font-weight:900;color:var(--pri);margin-right:2px}
+.hwsum .bar{flex:1 1 120px;height:8px;border-radius:99px;background:var(--chip);overflow:hidden}
+.hwsum .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#22c55e,#4ade80);transition:width .5s}
+.hwsum small{color:var(--mute);font-size:13px;white-space:nowrap}
+.hwl{display:flex;flex-direction:column;gap:10px;list-style:none;margin:0;padding:0}
+.hwg{font-size:12px;font-weight:700;color:var(--mute);letter-spacing:.08em;margin:8px 2px 0}
+.hwi{--c:var(--pri);position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:12px 14px 12px 18px;border-radius:16px;background:var(--card);border:1px solid var(--line);transition:transform .15s,box-shadow .15s}
+.hwi:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.hwi::before{content:"";position:absolute;left:6px;top:12px;bottom:12px;width:4px;border-radius:4px;background:var(--c)}
+.hwi.ok{--c:#3b82f6}.hwi.soon{--c:#f59e0b}.hwi.late{--c:#ef4444}.hwi.fin{--c:#22c55e}
+.hwd{width:48px;height:52px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;background:color-mix(in srgb,var(--c) 14%,var(--card));color:var(--c)}
+.hwd small{font-size:11px;font-weight:700}
+.hwd b{font-size:20px;font-weight:900}
+.hwt{min-width:0;overflow-wrap:anywhere}
+.hwt>span{display:block;font-weight:700;line-height:1.45}
+.hwt small{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+.hwp{font-size:12px;font-weight:700;white-space:nowrap;border-radius:999px;padding:4px 12px;background:color-mix(in srgb,var(--c) 15%,var(--card));color:var(--c)}
+.hwi.soon .hwp,.hwi.late .hwp{background:var(--c);color:#fff}
+.hwi.fin{opacity:.7}
+.hwi.fin .hwt>span{text-decoration:line-through;text-decoration-color:var(--mute);color:var(--mute)}
+@media(max-width:560px){.hwi{grid-template-columns:auto minmax(0,1fr);gap:10px 12px}.hwp{grid-column:2;justify-self:start}}
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:radial-gradient(140% 40% at 10% 106%,rgba(110,175,255,.7),transparent 70%),linear-gradient(160deg,#0a1840,#0c2a6c 60%,#123f95);--bo-ink:#fff;--bo-mute:rgba(255,255,255,.72);--bo-chip:rgba(255,255,255,.12);--bo-mkc:#f6e27a;position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
 #boot.out{opacity:0;visibility:hidden;pointer-events:none}
@@ -515,7 +537,7 @@ setTimeout(fd,4000);
 <section id="cal"><h2 class="pg">行事曆</h2><div class="calpage"><div class="card calbig" id="cal2"></div><div class="card"><div class="ch"><h3 id="letitle">所有活動</h3></div><ul id="le"></ul></div></div></section>
 <section id="sched"><h2 class="pg">課表・作業</h2><div class="stack">
 <div class="card"><div class="ch"><h3>每週課表</h3></div><div class="tw"><table id="tb"></table></div></div>
-<div class="card"><div class="ch"><h3>作業提醒</h3></div><ul id="lh"></ul></div></div></section>
+<div class="card"><div class="ch"><h3>作業提醒</h3></div><div id="hws"></div><ul id="lh" class="hwl"></ul></div></div></section>
 <section id="gal"><h2 class="pg">班級相簿</h2><div class="card"><div class="pics" id="pics"></div></div></section>
 
 </main>
@@ -559,6 +581,8 @@ const uiConfirm=(msg,o)=>ud({title:'確認',msg,...(o||{})});
 const uiPrompt=(msg,def)=>ud({title:'輸入',msg,input:1,def});
 const dleft=d=>Math.round((new Date(d+'T00:00:00')-new Date(new Date().toDateString()))/864e5);
 const when=n=>n<0?'已過':n===0?'今天':n+' 天後';
+const hwItem=o=>{const n=dleft(o.d),tm=/^\d{2}:\d{2}$/.test(o.tm||'')?o.tm:'',d=new Date(o.d+'T00:00:00'),ok=!isNaN(d),over=!o.done&&ok&&new Date()>new Date(o.d+'T'+(tm||'23:59')+':59'),cls=o.done?'fin':over?'late':n<=1?'soon':'ok',txt=o.done?'已完成':over?(n<0?'已逾期 '+(-n)+' 天':'已逾期'):n===0?'今天'+(tm?' '+tm:'')+' 截止':n===1?'明天'+(tm?' '+tm:'')+' 截止':n+' 天後';
+  return `<li class="hwi ${cls}"><span class="hwd">${o.done?'<b>✓</b>':ok?`<small>${d.getMonth()+1}月</small><b>${d.getDate()}</b>`:'<b>–</b>'}</span><span class="hwt"><span>${esc(o.t)}</span><small>${ok?'週'+'日一二三四五六'[d.getDay()]+' · '+esc(o.d):esc(o.d)}${tm?' · '+tm+' 前繳交':''}</small></span><span class="hwp">${txt}</span></li>`};
 const p2=n=>String(n).padStart(2,'0');
 const md=ts=>{const d=new Date(ts);return p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 const hm=ts=>{const d=new Date(ts);return p2(d.getHours())+':'+p2(d.getMinutes())};
@@ -677,9 +701,11 @@ function render(){
   put('#ov-cal',calCard());put('#cal2',calCard());
   /* homework */
   const open=D.hw.filter(h=>!h.done).sort((a,b)=>a.d<b.d?-1:1);
-  put('#lh',[...D.hw].sort((p,q)=>(!!p.done-!!q.done)||(p.d<q.d?-1:1)).map(o=>{const n=dleft(o.d);return `<li class="row ${o.done?'done':''}"><span class="ck">${o.done?'✓':''}</span><span class="t"><span>${esc(o.t)}</span><small>${esc(o.d)}</small></span><span class="pill ${!o.done&&n<=1?'hot':''}">${when(n)}</span></li>`}).join('')||'<li class="empty">目前沒有作業</li>');
-  const dueNow=open.filter(h=>dleft(h.d)<=1);
-  put('#ov-hw',ch('今日作業','sched','sched','查看全部')+`<ul>${dueNow.length?dueNow.map(o=>{const n=dleft(o.d);return `<li class="row"><span class="ck"></span><span class="t"><span>${esc(o.t)}</span><small>${esc(o.d)}</small></span><span class="pill ${n<=0?'hot':''}">${n<0?'已逾期':n===0?'今天截止':'明天截止'}</span></li>`}).join(''):`<li class="empty">${open[0]?`今天沒有要交的作業,下一個:${esc(open[0].t)}(${when(dleft(open[0].d))})`:'目前沒有作業'}</li>`}</ul>`);
+  const hs=[...D.hw].sort((p,q)=>(!!p.done-!!q.done)||(p.d<q.d?-1:1)),hdn=hs.filter(h=>h.done).length,hop=hs.length-hdn;
+  put('#hws',hs.length?`<div class="hwsum"><span><b>${hop}</b> 項未完成</span><span class="bar"><i style="width:${Math.round(hdn/hs.length*100)}%"></i></span><small>${hdn} / ${hs.length} 已完成</small></div>`:'');
+  put('#lh',hs.map((o,k)=>(o.done&&hop&&(k===0||!hs[k-1].done)?'<li class="hwg">已完成</li>':'')+hwItem(o)).join('')||'<li class="empty">目前沒有作業</li>');
+  const td0=new Date().toDateString(),dueNow=open.filter(h=>dleft(h.d)<=1||(h.ts&&new Date(h.ts).toDateString()===td0));
+  put('#ov-hw',ch('今日作業','sched','sched','查看全部')+`<ul class="hwl">${dueNow.length?dueNow.map(hwItem).join(''):`<li class="empty">${open[0]?`今天沒有要交的作業,下一個:${esc(open[0].t)}(${when(dleft(open[0].d))})`:'目前沒有作業'}</li>`}</ul>`);
   const o0=open[0],e0=up[0];
   put('#ov-rem',`<span class="ri">${ic(I.cap)}</span><span><b>本週小提醒</b><small>${o0?`作業「${esc(o0.t)}」${dleft(o0.d)<=0?'今天':'在 '+when(dleft(o0.d))}截止,記得完成喔!`:e0?`${esc(e0.t)}:${when(dleft(e0.d))}。`:'目前沒有待辦事項,好好休息!'}</small></span>${ic(I.go)}`);
   /* schedule */
