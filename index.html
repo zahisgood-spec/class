@@ -13,6 +13,7 @@
 <link rel="icon" type="image/png" href="icons/class-192.png">
 <link rel="apple-touch-icon" href="icons/class-180.png">
 <script>if('serviceWorker' in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})</script>
+<script>window.__ip=null;addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__ip=e;dispatchEvent(new Event('pwa-ready'))});addEventListener('appinstalled',function(){window.__ip=null})</script>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('cls-theme')||'light'}catch(e){}</script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
@@ -390,6 +391,13 @@ body.locked .app{display:none}
 @media(max-width:560px){.hwi{grid-template-columns:auto minmax(0,1fr);gap:10px 12px}.hwp{grid-column:2;justify-self:start}}
 @media(min-width:900px){#menub,#scrim{display:none}}
 @media(prefers-reduced-motion:reduce){.side,#scrim{transition:none!important}}
+#pwab{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(100deg,#1d54e0,#2f6bff);color:#fff;font-size:14px;line-height:1.4}
+#pwab[hidden]{display:none}
+#pwab img{width:32px;height:32px;border-radius:9px;flex:none}
+#pwab span{flex:1;min-width:0}
+#pwab .pi{flex:none;background:#fff;color:#1d54e0;font:900 14px "Noto Sans TC",system-ui,sans-serif;border-radius:999px;padding:8px 18px;border:0;cursor:pointer}
+#pwab .px{flex:none;width:28px;height:28px;border-radius:50%;color:rgba(255,255,255,.85);font-size:20px;line-height:1;background:none;border:0;cursor:pointer}
+#pwab .px:hover{background:rgba(255,255,255,.15)}
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:radial-gradient(140% 40% at 10% 106%,rgba(110,175,255,.7),transparent 70%),linear-gradient(160deg,#0a1840,#0c2a6c 60%,#123f95);--bo-ink:#fff;--bo-mute:rgba(255,255,255,.72);--bo-chip:rgba(255,255,255,.12);--bo-mkc:#f6e27a;position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
 #boot.out{opacity:0;visibility:hidden;pointer-events:none}
@@ -518,6 +526,7 @@ setTimeout(fd,4000);
 </aside>
 <div id="scrim"></div>
 <div class="mainc">
+<div id="pwab" hidden><img src="icons/class-192.png" alt=""><span>把「班級網站」安裝成 app,下次從桌面一鍵開啟</span><button type="button" class="pi">安裝</button><button type="button" class="px" aria-label="先不用">×</button></div>
 <header class="topbar">
 <button class="ib" id="menub" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="side"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <div class="search"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" placeholder="搜尋公告、活動、作業、留言…" autocomplete="off" aria-label="搜尋"><div id="qres" hidden></div></div>
@@ -573,7 +582,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const ud=o=>new Promise(res=>{
   const prev=document.activeElement,el=document.createElement('div');
   el.className='ud';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
-  el.innerHTML=`<div class="ud-box"><h3 class="ud-t">${esc(o.title)}</h3><p class="ud-m">${esc(o.msg)}</p>${o.input?`<input class="ud-i" type="text" value="${esc(o.def||'')}" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="${esc(o.msg)}">`:''}<div class="ud-b"><button type="button" class="ud-ok${o.danger?' dg':''}">${esc(o.ok||'確定')}</button>${o.cancel===false?'':'<button type="button" class="ud-c">取消</button>'}</div></div>`;
+  el.innerHTML=`<div class="ud-box"><h3 class="ud-t">${esc(o.title)}</h3><p class="ud-m">${esc(o.msg)}</p>${o.input?`<input class="ud-i" type="text" value="${esc(o.def||'')}" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="${esc(o.msg)}">`:''}<div class="ud-b"><button type="button" class="ud-ok${o.danger?' dg':''}">${esc(o.ok||'確定')}</button>${o.cancel===false?'':`<button type="button" class="ud-c">${esc(o.no||'取消')}</button>`}</div></div>`;
   const inp=el.querySelector('.ud-i'),okb=el.querySelector('.ud-ok');
   const done=v=>{el.remove();try{prev&&prev.focus&&prev.focus({preventScroll:true})}catch(x){}res(v)};
   const yes=()=>done(o.input?inp.value.trim():true),no=()=>done(o.input?null:false);
@@ -588,6 +597,26 @@ const ud=o=>new Promise(res=>{
 const uiAlert=msg=>ud({title:'提示',msg,cancel:false});
 const uiConfirm=(msg,o)=>ud({title:'確認',msg,...(o||{})});
 const uiPrompt=(msg,def)=>ud({title:'輸入',msg,input:1,def});
+/* ---------- 安裝成 app ---------- */
+const PWA={n:'班級網站',k:'class'};
+const pwaApp=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: window-controls-overlay)').matches||navigator.standalone===true;
+const pwaIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const pwaLS=(k,v)=>{try{if(v===undefined)return +localStorage.getItem(PWA.k+'-'+k)||0;localStorage.setItem(PWA.k+'-'+k,v)}catch(e){return 0}};
+let pwaIn=false,pwaAsked=false,pwaGone=false;
+const pwaPaint=()=>{const b=document.getElementById('pwab');if(b)b.hidden=!(pwaIn&&!pwaGone&&!pwaApp()&&Date.now()-pwaLS('hide')>6048e5)};
+const pwaHelp=()=>uiAlert(pwaIOS()?'請點瀏覽器下方的「分享」按鈕,再選「加入主畫面」,桌面就會出現「'+PWA.n+'」。':'請點瀏覽器右上角的選單,選「安裝應用程式」或「加到主畫面」,桌面就會出現「'+PWA.n+'」。');
+const pwaInstall=async()=>{const ip=window.__ip;if(!ip){pwaHelp();return}
+  window.__ip=null;try{ip.prompt();const r=await ip.userChoice;if(r&&r.outcome==='accepted')pwaGone=true}catch(e){}pwaPaint()};
+const pwaAsk=async()=>{if(pwaAsked||!pwaIn||pwaGone||pwaApp())return;
+  if(!window.__ip&&!pwaIOS())return;
+  if(Date.now()-pwaLS('no')<6048e5)return;
+  pwaAsked=true;
+  const yes=await ud({title:'安裝 app',msg:'要把「'+PWA.n+'」安裝成 app 嗎?\n之後可以從桌面一鍵開啟,不用再輸入網址。',ok:'安裝',no:'暫時不要'});
+  if(yes)pwaInstall();else pwaLS('no',Date.now())};
+const pwaState=on=>{pwaIn=on;if(!on)pwaAsked=false;pwaPaint();if(on)setTimeout(pwaAsk,1200)};
+addEventListener('pwa-ready',()=>{pwaPaint();pwaAsk()});
+addEventListener('appinstalled',()=>{pwaGone=true;pwaPaint()});
+document.addEventListener('click',e=>{if(e.target.closest('#pwab .pi'))pwaInstall();else if(e.target.closest('#pwab .px')){pwaLS('hide',Date.now());pwaPaint()}});
 const dleft=d=>Math.round((new Date(d+'T00:00:00')-new Date(new Date().toDateString()))/864e5);
 const when=n=>n<0?'已過':n===0?'今天':n+' 天後';
 const hwItem=o=>{const n=dleft(o.d),tm=/^\d{2}:\d{2}$/.test(o.tm||'')?o.tm:'',d=new Date(o.d+'T00:00:00'),ok=!isNaN(d),over=!o.done&&ok&&new Date()>new Date(o.d+'T'+(tm||'23:59')+':59'),cls=o.done?'fin':over?'late':n<=1?'soon':'ok',txt=o.done?'已完成':over?(n<0?'已逾期 '+(-n)+' 天':'已逾期'):n===0?'今天'+(tm?' '+tm:'')+' 截止':n===1?'明天'+(tm?' '+tm:'')+' 截止':n+' 天後';
@@ -801,7 +830,7 @@ else{
   let unsubs=[],last=0,msgReady=false,staff={name:'管理員',role:'管理員',key:'admin'};
   const stop=()=>{unsubs.forEach(f=>f());unsubs=[];msgReady=false;D.av={};meO=null};
   const msgChg=s=>{if(!msgReady){msgReady=true;return}s.docChanges().forEach(c=>{if(c.type!=='added')return;const o=c.doc.data();if(c.doc.metadata.hasPendingWrites||isMine(o)||Date.now()-(o.ts||0)>60000)return;notifyMsg({id:c.doc.id,...o})})};
-  const lock=msg=>{stop();me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#gforms').hidden=false};
+  const lock=msg=>{stop();pwaState(false);me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#gforms').hidden=false};
   const start=()=>{
     document.body.classList.remove('locked');
     [['ann','公告'],['evt','行事曆'],['hw','作業'],['photos','相簿'],['msg','留言'],['site','班級設定'],['sched','課表'],['times','上課時間']].forEach(([k,l])=>BT.task(k,l,1));
@@ -812,7 +841,7 @@ else{
     meO=me?{n:me.name,no:me.no}:{n:staff.name,role:staff.key,uid:myUid};
     unsubs.push(onSnapshot(collection(db,'avatars'),s=>{D.av={};s.docs.forEach(d=>{const v=d.data().img;if(typeof v==='string')D.av[d.id]=v});paintMe();render()},()=>{}));
     if(me)setUser(me.name,'座號 '+me.no);else setUser(staff.name,staff.role);
-    $('#cf').hidden=false;$('#cnote').hidden=true;render();
+    $('#cf').hidden=false;$('#cnote').hidden=true;render();pwaState(true);
   };
   onAuthStateChanged(auth,async u=>{
     if(!u){myUid=null;lock();BT.done('auth');return}

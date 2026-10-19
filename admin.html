@@ -13,6 +13,7 @@
 <link rel="icon" type="image/png" href="icons/admin-192.png">
 <link rel="apple-touch-icon" href="icons/admin-180.png">
 <script>if('serviceWorker' in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})</script>
+<script>window.__ip=null;addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__ip=e;dispatchEvent(new Event('pwa-ready'))});addEventListener('appinstalled',function(){window.__ip=null})</script>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem("cls-theme")||"light"}catch(e){}</script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -142,6 +143,13 @@ select{font:inherit;color:var(--ink);background:var(--chip);border:1px solid tra
 @keyframes ud-in{from{opacity:0;transform:translateY(8px) scale(.96)}}
 @media(prefers-reduced-motion:reduce){.ud,.ud-box{animation:none}}
 .ud-ok{background:linear-gradient(100deg,#d4af37,#f6e27a);color:#2a2000}
+#pwab{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(100deg,#d4af37,#f6e27a);color:#2a2000;font-size:14px;line-height:1.4}
+#pwab[hidden]{display:none}
+#pwab img{width:32px;height:32px;border-radius:9px;flex:none}
+#pwab span{flex:1;min-width:0}
+#pwab .pi{flex:none;background:#2a2000;color:#f6e27a;font:900 14px "Noto Sans TC",system-ui,sans-serif;border-radius:999px;padding:8px 18px;border:0;cursor:pointer}
+#pwab .px{flex:none;width:28px;height:28px;border-radius:50%;color:rgba(42,32,0,.75);font-size:20px;line-height:1;background:none;border:0;cursor:pointer}
+#pwab .px:hover{background:rgba(42,32,0,.12)}
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:var(--page);--bo-ink:var(--ink);--bo-mute:var(--mute);--bo-chip:var(--chip);--bo-mkc:var(--gt);position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
 #boot.out{opacity:0;visibility:hidden;pointer-events:none}
@@ -252,6 +260,7 @@ try{(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()
 setTimeout(fd,4000);
 })();
 </script>
+<div id="pwab" hidden><img src="icons/admin-192.png" alt=""><span>把「班級後台」安裝成 app,下次從桌面一鍵開啟</span><button type="button" class="pi">安裝</button><button type="button" class="px" aria-label="先不用">×</button></div>
 <header class="top"><div>
 <span class="logo">班級後台<small>管理員專用</small></span>
 <button id="theme" aria-label="切換亮色與暗色">切換主題</button>
@@ -331,7 +340,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const ud=o=>new Promise(res=>{
   const prev=document.activeElement,el=document.createElement('div');
   el.className='ud';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
-  el.innerHTML=`<div class="ud-box"><h3 class="ud-t">${esc(o.title)}</h3><p class="ud-m">${esc(o.msg)}</p>${o.input?`<input class="ud-i" type="text" value="${esc(o.def||'')}" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="${esc(o.msg)}">`:''}<div class="ud-b"><button type="button" class="ud-ok${o.danger?' dg':''}">${esc(o.ok||'確定')}</button>${o.cancel===false?'':'<button type="button" class="ud-c">取消</button>'}</div></div>`;
+  el.innerHTML=`<div class="ud-box"><h3 class="ud-t">${esc(o.title)}</h3><p class="ud-m">${esc(o.msg)}</p>${o.input?`<input class="ud-i" type="text" value="${esc(o.def||'')}" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="${esc(o.msg)}">`:''}<div class="ud-b"><button type="button" class="ud-ok${o.danger?' dg':''}">${esc(o.ok||'確定')}</button>${o.cancel===false?'':`<button type="button" class="ud-c">${esc(o.no||'取消')}</button>`}</div></div>`;
   const inp=el.querySelector('.ud-i'),okb=el.querySelector('.ud-ok');
   const done=v=>{el.remove();try{prev&&prev.focus&&prev.focus({preventScroll:true})}catch(x){}res(v)};
   const yes=()=>done(o.input?inp.value.trim():true),no=()=>done(o.input?null:false);
@@ -346,6 +355,26 @@ const ud=o=>new Promise(res=>{
 const uiAlert=msg=>ud({title:'提示',msg,cancel:false});
 const uiConfirm=(msg,o)=>ud({title:'確認',msg,...(o||{})});
 const uiPrompt=(msg,def)=>ud({title:'輸入',msg,input:1,def});
+/* ---------- 安裝成 app ---------- */
+const PWA={n:'班級後台',k:'admin'};
+const pwaApp=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: window-controls-overlay)').matches||navigator.standalone===true;
+const pwaIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const pwaLS=(k,v)=>{try{if(v===undefined)return +localStorage.getItem(PWA.k+'-'+k)||0;localStorage.setItem(PWA.k+'-'+k,v)}catch(e){return 0}};
+let pwaIn=false,pwaAsked=false,pwaGone=false;
+const pwaPaint=()=>{const b=document.getElementById('pwab');if(b)b.hidden=!(pwaIn&&!pwaGone&&!pwaApp()&&Date.now()-pwaLS('hide')>6048e5)};
+const pwaHelp=()=>uiAlert(pwaIOS()?'請點瀏覽器下方的「分享」按鈕,再選「加入主畫面」,桌面就會出現「'+PWA.n+'」。':'請點瀏覽器右上角的選單,選「安裝應用程式」或「加到主畫面」,桌面就會出現「'+PWA.n+'」。');
+const pwaInstall=async()=>{const ip=window.__ip;if(!ip){pwaHelp();return}
+  window.__ip=null;try{ip.prompt();const r=await ip.userChoice;if(r&&r.outcome==='accepted')pwaGone=true}catch(e){}pwaPaint()};
+const pwaAsk=async()=>{if(pwaAsked||!pwaIn||pwaGone||pwaApp())return;
+  if(!window.__ip&&!pwaIOS())return;
+  if(Date.now()-pwaLS('no')<6048e5)return;
+  pwaAsked=true;
+  const yes=await ud({title:'安裝 app',msg:'要把「'+PWA.n+'」安裝成 app 嗎?\n之後可以從桌面一鍵開啟,不用再輸入網址。',ok:'安裝',no:'暫時不要'});
+  if(yes)pwaInstall();else pwaLS('no',Date.now())};
+const pwaState=on=>{pwaIn=on;if(!on)pwaAsked=false;pwaPaint();if(on)setTimeout(pwaAsk,1200)};
+addEventListener('pwa-ready',()=>{pwaPaint();pwaAsk()});
+addEventListener('appinstalled',()=>{pwaGone=true;pwaPaint()});
+document.addEventListener('click',e=>{if(e.target.closest('#pwab .pi'))pwaInstall();else if(e.target.closest('#pwab .px')){pwaLS('hide',Date.now());pwaPaint()}});
 const dleft=d=>Math.round((new Date(d+'T00:00:00')-new Date(new Date().toDateString()))/864e5);
 const when=n=>n<0?'已過':n===0?'今天':n+' 天後';
 const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -471,7 +500,7 @@ else{
   };
   onAuthStateChanged(auth,async u=>{
     unsub.forEach(f=>f());unsub=[];
-    const show=(on,label)=>{$('#login').hidden=on;$('#app').hidden=!on;$('#out').hidden=!on;$('#who').hidden=!on;if(on)$('#who').textContent=label};
+    const show=(on,label)=>{$('#login').hidden=on;$('#app').hidden=!on;$('#out').hidden=!on;$('#who').hidden=!on;if(on)$('#who').textContent=label;pwaState(on)};
     if(!u){show(false);BT.done('auth');return}
     if(BT.isClosed())BT.begin();
     try{
