@@ -54,6 +54,8 @@ td input{width:100%;text-align:center;border:0;background:transparent;padding:10
 [hidden]{display:none!important}
 #login{max-width:380px;margin:12vh auto 0}
 .err{color:#e5484d;font-size:14px;min-height:1.5em}
+.fl{display:flex;flex-direction:column;gap:4px;flex:1 1 150px;font-size:12px;font-weight:700;color:var(--mute)}
+.fl input{width:100%}
 .av2.img{overflow:hidden;background:var(--chip)}
 .av2 img{width:100%;height:100%;object-fit:cover;display:block}
 .av2{flex:none;width:34px;height:34px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:900;font-size:13px}
@@ -350,9 +352,9 @@ const CFG=[
  ['hw','作業',[['t','作業內容','text'],['d','','date']]],
  ['msg','留言',[]]
 ];
-const DESC={ann:'發布給全班看的公告,最新的一則會顯示在首頁。',evt:'新增考試、活動等日期,首頁會顯示倒數天數。',hw:'新增作業與截止日,勾選代表已完成。',msg:'同學留的言,可以刪除不適當的內容。'};
+const DESC={ann:'發布給全班看的公告,最新的一則會顯示在首頁。',evt:'新增考試、活動等日期,首頁會顯示倒數天數。',hw:'新增今天出的作業,可以設定繳交的日期與時間(時間不填就是當天都可以交),勾選代表已完成。',msg:'同學留的言,可以刪除不適當的內容。'};
 $('#lists').innerHTML=CFG.map(([k,l,fs])=>`<div class="panel pane" id="p-${k}"><h2>${l} <em id="c-${k}"></em></h2><p class="sub">${DESC[k]}</p>
-${fs.length?`<div class="cell"><h3 class="ch">${k==='ann'?'發布':'新增'}${l}</h3><form data-k="${k}">${fs.map(([n,p,t])=>t==='select'?`<select name="${n}" aria-label="類型"><option>一般</option><option>活動</option><option>置頂</option></select>`:`<input name="${n}" type="${t}" placeholder="${p}" ${n==='t'&&k==='ann'?'':'required'} maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form></div>`:''}
+${fs.length?`<div class="cell"><h3 class="ch">${k==='ann'?'發布':k==='hw'?'新增今日':'新增'}${l}</h3>${k==='hw'?`<form data-k="hw"><input name="t" type="text" placeholder="作業內容" required maxlength="120" aria-label="作業內容"><label class="fl">繳交日期<input name="d" type="date" required value="${(()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')})()}"></label><label class="fl">繳交時間(可不填)<input name="tm" type="time"></label><button class="pri">新增</button></form>`:`<form data-k="${k}">${fs.map(([n,p,t])=>t==='select'?`<select name="${n}" aria-label="類型"><option>一般</option><option>活動</option><option>置頂</option></select>`:`<input name="${n}" type="${t}" placeholder="${p}" ${n==='t'&&k==='ann'?'':'required'} maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form>`}</div>`:''}
 <div class="cell"><h3 class="ch">${k==='msg'?'全部留言':'已發布的'+l}</h3><ul id="l-${k}"></ul></div></div>`).join('');
 
 const go=p=>{document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));document.querySelectorAll('#snav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.pane===p));scrollTo({top:0})};
@@ -382,7 +384,7 @@ function draw0(k){
   $('#l-'+k).innerHTML=sorted.length?sorted.map(o=>{
     if(k==='ann'&&EDIT===o.id){const tg=o.tag||'一般',ti=o.title||o.t,bd=o.title?o.t:'';return `<li class="edli"><form data-edit="${o.id}"><input name="title" value="${esc(ti)}" required maxlength="80" aria-label="標題"><input name="t" value="${esc(bd)}" maxlength="160" placeholder="內容(可不填)" aria-label="內容"><select name="tag" aria-label="類型">${['一般','活動','置頂'].map(x=>`<option${x===tg?' selected':''}>${x}</option>`).join('')}</select><button class="pri">儲存</button><button type="button" data-edc>取消</button></form></li>`}
     const main=k==='msg'?`<b>${esc(o.n)}</b>${o.role==='admin'?' <small>🎇 管理員</small>':o.role==='teacher'?' <small>🐛 老師</small>':''}${o.no?` · 座號 ${esc(o.no)}`:''}<br>${typeof o.img==='string'&&o.img.startsWith('data:image/')?`<img src="${esc(o.img)}" alt="圖片" style="width:72px;height:72px;object-fit:cover;border-radius:8px;vertical-align:middle"> `:''}${esc(o.m)}`:k==='ann'?`${o.tag&&o.tag!=='一般'?`<b>[${esc(o.tag)}]</b> `:''}${esc(o.title||o.t)}${o.title&&o.t?`<br><small>${esc(o.t)}</small>`:''}`:esc(o.t);
-    const sub=o.ts&&k!=='evt'&&k!=='hw'?new Date(o.ts).toLocaleString('zh-TW'):esc(o.d);
+    const sub=k==='hw'?`繳交 ${esc(o.d)}${o.tm?' '+esc(o.tm):''}${o.ts?' · '+new Date(o.ts).toLocaleDateString('zh-TW')+' 發佈':''}`:o.ts&&k!=='evt'?new Date(o.ts).toLocaleString('zh-TW'):esc(o.d);
     const ck=k==='hw'?`<input type="checkbox" style="flex:none;width:20px;height:20px" data-tog="${o.id}" ${o.done?'checked':''} aria-label="已完成">`:k==='msg'?avh(o.role?(o.uid?'u'+o.uid:''):(o.no!=null?'s'+o.no:''),[...String(o.n||'?')][0]):'';
     return `<li>${ck}<span class="t">${main}<small>${sub}${k==='hw'&&o.done?' · 已完成':''}</small></span>${k==='ann'?`<button class="ed" data-ed="${o.id}">編輯</button>`:''}${k==='msg'&&ROLE!=='admin'?'':`<button class="x" data-k="${k}" data-id="${o.id}" aria-label="刪除">×</button>`}</li>`}).join(''):'<li class="empty">還沒有內容</li>';
 }
@@ -485,7 +487,7 @@ else{
 
   document.addEventListener('submit',e=>{const f=e.target,k=f.dataset.k;if(!k)return;e.preventDefault();
     const fd=new FormData(f),o={};[...fd.keys()].forEach(n=>o[n]=fd.get(n).trim());
-    if(k==='ann')o.ts=Date.now();if(k==='hw')o.done=false;
+    if(k==='ann')o.ts=Date.now();if(k==='hw'){o.done=false;o.ts=Date.now();if(!o.tm)delete o.tm}
     run(addDoc(collection(db,k),o));f.reset()});
   document.addEventListener('click',async e=>{const b=e.target.closest('button[data-id]');if(!b||(b.dataset.k==='msg'&&ROLE!=='admin')||!(await uiConfirm('確定要刪除嗎?',{danger:1})))return;
     run(deleteDoc(doc(db,b.dataset.k,b.dataset.id)))});
