@@ -435,6 +435,61 @@ body.locked .app{display:none}
 @keyframes bo-fade{50%{opacity:.5}}
 @keyframes bo-pop{from{opacity:0;transform:translateY(4px) scale(.9)}}
 @media(prefers-reduced-motion:reduce){#boot *,#boot *::before{animation:none!important}#boot{transition:none}}
+/* ---------- 新手教學 ---------- */
+#tour{position:fixed;inset:0;z-index:180;display:none}
+#tour.on{display:block}
+#tour.cn{background:rgba(10,18,40,.62);backdrop-filter:blur(2px)}
+#tour .tr{position:fixed;border-radius:16px;box-shadow:0 0 0 100vmax rgba(10,18,40,.62),0 0 0 3px var(--pri);pointer-events:none;transition:top .28s ease,left .28s ease,width .28s ease,height .28s ease}
+#tour.cn .tr{display:none}
+#tour .tc{position:fixed;width:min(340px,calc(100vw - 24px));background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:22px;padding:22px 22px 18px;box-shadow:0 24px 60px -12px rgba(0,0,0,.5);animation:tc-in .22s ease}
+#tour.cn .tc{width:min(400px,calc(100vw - 32px));padding:30px 28px 22px;text-align:center}
+@keyframes tc-in{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+#tour .ti{font-size:30px;line-height:1;margin-bottom:10px}
+#tour.cn .ti{font-size:46px;margin-bottom:14px}
+#tour .tt{margin:0 0 6px;font:900 18px/1.4 "Noto Serif TC",serif;overflow-wrap:anywhere}
+#tour.cn .tt{font-size:22px}
+#tour .tm{margin:0;font-size:14.5px;line-height:1.75;color:var(--mute);overflow-wrap:anywhere}
+#tour .tf{display:flex;flex-direction:column;align-items:stretch;gap:14px;margin-top:18px}
+#tour .td{display:flex;gap:6px;justify-content:center}
+#tour .td i{width:7px;height:7px;border-radius:50%;background:var(--line);transition:background .2s,width .2s}
+#tour .td i.on{width:20px;border-radius:4px;background:var(--pri)}
+#tour .tb{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+#tour.cn .tb{justify-content:center}
+#tour .tb button{font:700 14px "Noto Sans TC",system-ui,sans-serif;border-radius:999px;padding:9px 20px;white-space:nowrap;flex:none;transition:filter .15s}
+#tour .tb button:hover{filter:brightness(1.08)}
+#tour .tk{color:var(--mute);padding:9px 10px!important}
+#tour .tp{background:var(--chip);color:var(--ink)}
+#tour .tn{background:var(--pri);color:#fff}
+#helpb{margin-bottom:0}
+@media(prefers-reduced-motion:reduce){#tour .tc{animation:none}}
+
+/* ---------- 互動教學 ---------- */
+#tour.ia{pointer-events:none}
+#tour.ia .tc{pointer-events:auto}
+#tour.ia .tr{animation:tr-pl 1.2s ease-in-out infinite}
+@keyframes tr-pl{50%{box-shadow:0 0 0 100vmax rgba(10,18,40,.62),0 0 0 3px var(--pri),0 0 0 10px rgba(91,140,255,.45)}}
+#tour .tr.bad{animation:tr-bad .35s}
+@keyframes tr-bad{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+#tour .tc.shk{animation:tc-shk .35s}
+@keyframes tc-shk{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#tour .th{margin:12px 0 0;padding:9px 12px;border-radius:12px;background:var(--chip);color:var(--pri);font-weight:700;font-size:13.5px;line-height:1.5;animation:th-b 1.1s ease-in-out infinite}
+@keyframes th-b{50%{transform:translateY(-3px)}}
+#tour .tsn{position:absolute;top:12px;right:12px;width:34px;height:34px;border-radius:50%;background:var(--chip);font-size:16px;line-height:1;display:grid;place-items:center}
+#tour .tsc{position:absolute;top:19px;right:54px;font:700 13px "Noto Sans TC",sans-serif;color:var(--mute)}
+#tour .tq{display:grid;gap:8px;margin-top:14px;text-align:left}
+#tour .qo{font:700 14px/1.5 "Noto Sans TC",system-ui,sans-serif;text-align:left;padding:11px 14px;border-radius:14px;background:var(--chip);color:var(--ink);border:2px solid transparent;transition:border-color .15s,background .15s,transform .1s}
+#tour .qo:hover:not(:disabled){border-color:var(--pri)}
+#tour .qo:active:not(:disabled){transform:scale(.98)}
+#tour .qo:disabled{cursor:not-allowed}
+#tour .qo.ok{background:#dcfce7;color:#14532d;border-color:#22c55e;animation:qpop .4s}
+#tour .qo.no{background:#fee2e2;color:#7f1d1d;border-color:#ef4444;opacity:.75}
+[data-theme=dark] #tour .qo.ok{background:#14532d;color:#bbf7d0}
+[data-theme=dark] #tour .qo.no{background:#4c1414;color:#fecaca}
+@keyframes qpop{50%{transform:scale(1.04)}}
+#tour .tn.gh{background:var(--chip);color:var(--mute)}
+#tour .cf{position:fixed;top:-16px;width:9px;height:14px;border-radius:2px;pointer-events:none;animation:cf-f 2s ease-in forwards}
+@keyframes cf-f{to{transform:translate3d(var(--dx),108vh,0) rotate(var(--r))}}
+@media(prefers-reduced-motion:reduce){#tour .tr,#tour .th,#tour .cf,#tour .qo.ok{animation:none!important}}
 </style>
 </head>
 <body class="locked">
@@ -533,7 +588,7 @@ setTimeout(fd,4000);
 <aside class="side" id="side">
 <div class="brand"><span class="logo" id="mk">我</span><div><b id="logo"></b><small id="slogan"></small></div></div>
 <nav id="nav" role="tablist"></nav>
-<nav class="nset"><button id="setb" type="button" aria-haspopup="dialog"></button></nav>
+<nav class="nset"><button id="helpb" type="button" aria-haspopup="dialog"></button><button id="setb" type="button" aria-haspopup="dialog"></button></nav>
 <div class="sfoot" id="sfoot"></div>
 </aside>
 <div id="scrim"></div>
@@ -649,6 +704,7 @@ const SH={'班級公告':'公告','課表・作業':'課表','班級相簿':'相
 $('#nav').innerHTML=NAVS.map(([t,l,i],k)=>`<button role="tab" data-go="${t}" aria-selected="${k===0}">${ic(I[i])}<span class="nl-f">${l}</span><span class="nl-s">${SH[l]||l}</span></button>`).join('');
 const GEAR='<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/>';
 $('#setb').innerHTML=ic(GEAR)+'<span class="nl-f">設定</span><span class="nl-s">設定</span>';
+$('#helpb').innerHTML=ic('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 015 1c0 1.8-2.5 2.2-2.5 3.8M12 17.2h.01"/>')+'<span class="nl-f">互動教學</span><span class="nl-s">教學</span>';
 const QT=[['news','班級公告','查看最新消息','ann','#3b82f6'],['gal','班級相簿','回顧美好時光','gal','#8b5cf6'],['sched','課表・作業','查看課表與作業','sched','#f97316'],['cal','行事曆','查看重要日期','cal','#10b981']];
 $('#quick').innerHTML=QT.map(([t,l,s,i,c])=>`<button class="qt" data-go="${t}" style="--tc:${c}"><span class="qi">${ic(I[i])}</span><b>${l}</b><small>${s}</small>${ic(I.go).replace('class="ic"','class="ic go"')}</button>`).join('');
 
@@ -835,14 +891,228 @@ function notifyMsg(o){
   }
 }
 
+/* ---------- 音效(Web Audio 即時合成,不需要音檔) ---------- */
+const SFX=(()=>{
+  let ac=null,on=true;
+  try{on=localStorage.getItem('cls-sfx')!=='0'}catch(e){}
+  const ctx=()=>{if(!ac){try{ac=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}return ac};
+  ['pointerdown','keydown','touchstart'].forEach(n=>addEventListener(n,()=>{const a=ctx();if(a&&a.state==='suspended')a.resume().catch(()=>{})},{capture:true,passive:true}));
+  const tone=(f,t,d,type,v,to)=>{
+    if(!on)return;const a=ctx();if(!a)return;
+    const run=()=>{const o=a.createOscillator(),g=a.createGain(),s=a.currentTime+t;
+      o.type=type||'sine';o.frequency.setValueAtTime(f,s);if(to)o.frequency.exponentialRampToValueAtTime(to,s+d);
+      g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(v||.1,s+.012);g.gain.exponentialRampToValueAtTime(.0001,s+d);
+      o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d+.03)};
+    if(a.state==='running'){run();return}
+    if(navigator.userActivation&&!navigator.userActivation.isActive)return;
+    a.resume().then(run).catch(()=>{})};
+  const seq=(fs,gap,d,type,v)=>fs.forEach((f,i)=>tone(f,i*gap,d,type,v));
+  return{
+    get on(){return on},
+    set(v){on=!!v;try{localStorage.setItem('cls-sfx',v?'1':'0')}catch(e){}},
+    tap(){tone(700,0,.05,'triangle',.09)},
+    pop(){tone(320,0,.1,'sine',.07,760)},
+    next(){seq([523,784],.07,.1,'sine',.1)},
+    back(){seq([494,330],.07,.1,'sine',.09)},
+    ok(){seq([523,659,784],.075,.16,'triangle',.12)},
+    bad(){tone(240,0,.2,'sawtooth',.06,120)},
+    win(){seq([523,659,784,1047,784,1047,1319],.09,.2,'triangle',.12)}
+  };
+})();
+
+/* ---------- 互動教學(登入後第一次自動顯示;之後從左側選單「互動教學」重玩) ---------- */
+const TOUR=(()=>{
+  const mob=()=>matchMedia('(max-width:899px)').matches;
+  const KEY=u=>'cls-tour-'+u;
+  const wasSeen=u=>{try{return !!localStorage.getItem(KEY(u))}catch(e){return false}};
+  const mark=u=>{try{localStorage.setItem(KEY(u),'1')}catch(e){}};
+  const QZ=[
+    {q:'想看這週要交的作業,要點左邊選單的哪一個?',o:['班級相簿','課表・作業','行事曆'],a:1},
+    {q:'晚上覺得螢幕太亮,要按哪個按鈕?',o:['🔔 鈴鐺','🌗 亮暗切換','🔍 搜尋'],a:1},
+    {q:'想跟全班聊天,要點哪裡?',o:['畫面底部的班級聊天室','左側的設定','右上角的鈴鐺'],a:0}
+  ];
+  const STEPS=()=>[
+    {c:1,i:'👋',t:'歡迎來到 '+D.title+'!',m:'這不是看圖說明,是真的動手玩!\n跟著提示點一點,完成每一關拿星星 ⭐\n想再玩,隨時點左側選單的「互動教學」。'},
+    {s:'#nav',side:1,act:'click',hit:'#nav button',i:'🧭',t:'第 1 關:切換頁面',m:'左側選單可以切換首頁、公告、相簿、課表・作業、行事曆。',h:'👆 點任何一個選單按鈕試試!'},
+    {s:'.search',act:'input',hit:'#q',undo:'q',i:'🔍',t:'第 2 關:搜尋',m:'想找公告、活動、作業或留言,直接搜尋。',h:'⌨️ 在搜尋框打幾個字看看!'},
+    {s:'#bell',act:'click',hit:'#bell',i:'🔔',t:'第 3 關:新公告提醒',m:'有新公告時,鈴鐺上會出現紅色數字。',h:'👆 點一下鈴鐺,直接跳到公告!'},
+    {s:'#theme',act:'click',hit:'#theme',i:'🌗',t:'第 4 關:亮色 / 暗色',m:'晚上看比較不刺眼。',h:'👆 按一下,換個顏色!'},
+    {s:'#theme',act:'click',hit:'#theme',i:'🔄',t:'再按一次',m:'不喜歡的話,再按一次就切回來了。',h:'👆 再按一次切回來!'},
+    {s:'#dh',act:'click',hit:'#dh',undo:'chat',i:'💬',t:'第 5 關:班級聊天室',m:'全班的聊天室在畫面底部,可以傳文字,也可以傳圖片。',h:'👆 點一下展開聊天室!'},
+    {s:'#uchip',act:'click',hit:'#uchip',undo:'menu',i:'🙋',t:'第 6 關:你的帳號',m:'這裡顯示目前登入的是誰,點開可以登出。',h:'👆 點開來看看!'},
+    {s:'#setb',side:1,i:'⚙️',t:'設定',m:'在這裡可以更換頭像、修改登入密碼。'},
+    {s:'#helpb',side:1,i:'❓',t:'互動教學',m:'忘記怎麼用?點這裡就能重玩一次。'},
+    
+    {c:1,fin:1,i:'🎉',t:'全部過關!',m:()=>'你拿到 '+stars+' / '+maxStars()+' 顆 ⭐\n現在就開始使用吧!'}
+  ];
+  const UNDO={
+    q:()=>{$('#q').value='';$('#qres').hidden=true},
+    chat:()=>{if(dock.classList.contains('open'))setOpen(false)},
+    menu:()=>{$('#umenu').hidden=true}
+  };
+  let root,ring,card,list=[],k=0,uid=null,prevFocus=null,timer=0,polling=false,token=0,busy=false,stars=0,theme0='light',themeTouched=false,page0='';
+  const shown=new Set();
+  const maxStars=()=>list.filter(x=>x.act||x.quiz!=null).length;
+  const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+  const paintStars=()=>{card.querySelector('.tsc').textContent=stars?'⭐ '+stars:''};
+  const wrong=()=>{SFX.bad();ring.classList.remove('bad');void ring.offsetWidth;ring.classList.add('bad');card.classList.remove('shk');void card.offsetWidth;card.classList.add('shk')};
+  const confetti=()=>{const C=['#2f6bff','#22c55e','#f59e0b','#ef4444','#a855f7','#06b6d4'];
+    for(let i=0;i<46;i++){const e=document.createElement('i');e.className='cf';e.style.left=Math.random()*100+'vw';e.style.background=C[i%C.length];
+      e.style.setProperty('--dx',(Math.random()*160-80)+'px');e.style.setProperty('--r',(Math.random()*720-360)+'deg');
+      e.style.animationDelay=Math.random()*.4+'s';e.style.animationDuration=(1.4+Math.random()*1.1)+'s';root.appendChild(e);setTimeout(()=>e.remove(),3400)}};
+  const complete=d=>{
+    if(busy)return;busy=true;const my=token;stars++;paintStars();SFX.ok();
+    const h=card.querySelector('.th');h.hidden=false;h.textContent='✅ 太棒了!';
+    setTimeout(()=>{if(token===my&&root.classList.contains('on'))show(k+1,1)},d)};
+  const build=()=>{
+    root=document.createElement('div');root.id='tour';root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','互動教學');
+    root.innerHTML='<div class="tr"></div><div class="tc"><span class="tsc"></span><button type="button" class="tsn" aria-label="音效開關"></button><div class="ti" aria-hidden="true"></div><h3 class="tt"></h3><p class="tm"></p><p class="th" hidden></p><div class="tq" hidden></div><div class="tf"><div class="td"></div><div class="tb"><button type="button" class="tk">略過</button><button type="button" class="tp">上一步</button><button type="button" class="tn">下一步</button></div></div></div>';
+    document.body.appendChild(root);
+    ring=root.querySelector('.tr');card=root.querySelector('.tc');
+    ring.addEventListener('animationend',e=>{if(e.animationName==='tr-bad')ring.classList.remove('bad')});
+    card.addEventListener('animationend',e=>{if(e.animationName==='tc-shk')card.classList.remove('shk')});
+    const sn=root.querySelector('.tsn'),tn=root.querySelector('.tn');
+    const paintSn=()=>{sn.textContent=SFX.on?'🔊':'🔇';sn.setAttribute('aria-pressed',SFX.on)};paintSn();
+    sn.onclick=()=>{SFX.set(!SFX.on);paintSn();SFX.tap()};
+    root.querySelector('.tk').onclick=()=>{SFX.back();close()};
+    root.querySelector('.tp').onclick=()=>{SFX.back();show(k-1,-1)};
+    tn.onclick=()=>{if(k>=list.length-1){SFX.ok();close()}else{SFX.next();show(k+1,1)}};
+    root.addEventListener('mousedown',e=>{e.stopPropagation()});
+    addEventListener('resize',()=>{if(root.classList.contains('on'))place()});
+    /* 互動關卡:只允許操作被圈起來的地方,點錯會有提示音 */
+    const cur=()=>root.classList.contains('on')&&root.classList.contains('ia')?list[k]:null;
+    const allowed=(e,s)=>{const t=e.target;return !!(t&&t.closest&&(card.contains(t)||t.closest(s.hit)))};
+    let lastBad=0;
+    document.addEventListener('pointerdown',e=>{const s=cur();if(!s||allowed(e,s))return;e.preventDefault();e.stopPropagation();lastBad=Date.now();wrong()},true);
+    document.addEventListener('click',e=>{const s=cur();if(!s)return;
+      if(!allowed(e,s)){e.preventDefault();e.stopPropagation();if(Date.now()-lastBad>500)wrong();return}
+      if(s.act==='click'&&e.target.closest(s.hit)&&!card.contains(e.target)){if(e.target.closest('#theme'))themeTouched=true;complete(650)}
+    },true);
+    $('#q').addEventListener('input',()=>{const s=cur();if(s&&s.act==='input'&&$('#q').value.trim())complete(1100)});
+    document.addEventListener('keydown',e=>{
+      if(!root.classList.contains('on'))return;
+      const typing=/^(INPUT|TEXTAREA)$/.test((document.activeElement||{}).tagName||'');
+      if(e.key==='Escape'){e.preventDefault();close()}
+      else if(e.key==='ArrowRight'&&!typing){e.preventDefault();if(!tn.hidden)tn.click()}
+      else if(e.key==='ArrowLeft'&&!typing&&k>0){e.preventDefault();SFX.back();show(k-1,-1)}
+      else if(e.key==='Tab'){const f=[...card.querySelectorAll('button')].filter(b=>!b.hidden&&!b.disabled);if(!f.length)return;const a=document.activeElement,i=f.indexOf(a);
+        if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&(i===-1||i===f.length-1)){e.preventDefault();f[0].focus()}}
+    },true);
+  };
+  const vis=el=>{if(!el)return null;const r=el.getBoundingClientRect();return r.width>0&&r.height>0?r:null};
+  const place=()=>{
+    const s=list[k],vw=innerWidth,vh=innerHeight,M=12;
+    const r=s.s?vis($(s.s)):null;
+    root.classList.toggle('cn',!r);
+    const cw=card.offsetWidth,ch=card.offsetHeight;
+    if(!r){card.style.left=Math.max(M,(vw-cw)/2)+'px';card.style.top=Math.max(M,(vh-ch)/2)+'px';return}
+    const P=8,x=r.left-P,y=r.top-P,w=r.width+P*2,h=r.height+P*2;
+    ring.style.left=x+'px';ring.style.top=y+'px';ring.style.width=w+'px';ring.style.height=h+'px';
+    const G=16,cl=v=>Math.min(Math.max(v,M),Math.max(M,vw-cw-M)),ct=v=>Math.min(Math.max(v,M),Math.max(M,vh-ch-M));
+    const opts={
+      right:()=>x+w+G+cw<=vw-M?[x+w+G,ct(y+h/2-ch/2)]:null,
+      left:()=>x-G-cw>=M?[x-G-cw,ct(y+h/2-ch/2)]:null,
+      bottom:()=>y+h+G+ch<=vh-M?[cl(x+w/2-cw/2),y+h+G]:null,
+      top:()=>y-G-ch>=M?[cl(x+w/2-cw/2),y-G-ch]:null
+    };
+    const order=s.side?['right','bottom','top','left']:(y>vh/2?['top','bottom','left','right']:['bottom','top','right','left']);
+    let pos=null;for(const o of order){pos=opts[o]();if(pos)break}
+    if(!pos)pos=[cl((vw-cw)/2),(y+h/2>vh/2)?M:Math.max(M,vh-ch-M)];
+    card.style.left=pos[0]+'px';card.style.top=pos[1]+'px';
+  };
+  const drawerSet=o=>{if(!mob())return false;const open=$('#side').classList.contains('open');if(open===o)return false;drawer(o);return true};
+  function show(i,dir){
+    if(i<0)i=0;
+    const ps=list[k];if(ps&&ps.undo&&root.classList.contains('on'))UNDO[ps.undo]();
+    const my=++token;busy=false;
+    let s=list[i];
+    // 找不到的目標(例如被隱藏的元素)就跳過
+    while(s&&s.s&&!s.side&&!vis($(s.s))&&i>0&&i<list.length-1){i+=dir||1;s=list[i]}
+    k=i;s=list[k];
+    const changed=drawerSet(!!s.side);
+    const go2=()=>{
+      if(my!==token)return;
+      card.style.animation='none';void card.offsetWidth;card.style.animation='';
+      const q=card.querySelector('.tq'),h=card.querySelector('.th'),n=root.querySelector('.tn'),m=card.querySelector('.tm');
+      const qz=s.quiz!=null?QZ[s.quiz]:null;
+      const act=!!s.act&&!!(s.s&&vis($(s.s)));
+      root.classList.toggle('ia',act);
+      card.querySelector('.ti').textContent=qz?'🧠':(s.i||'');
+      card.querySelector('.tt').textContent=qz?'小測驗 '+(s.quiz+1)+' / '+QZ.length:s.t;
+      m.textContent=qz?qz.q:(typeof s.m==='function'?s.m():s.m);m.style.whiteSpace='pre-line';
+      h.hidden=!act;h.textContent=act?s.h:'';
+      q.hidden=!qz;q.innerHTML='';
+      if(qz){let tries=0;
+        shuf([...qz.o.keys()]).forEach(j=>{const b=document.createElement('button');b.type='button';b.className='qo';b.textContent=qz.o[j];
+          b.onclick=()=>{if(busy)return;
+            if(j===qz.a){busy=true;b.classList.add('ok');q.querySelectorAll('.qo').forEach(x=>{if(x!==b)x.disabled=true});
+              if(tries===0){stars++;paintStars()}SFX.ok();
+              setTimeout(()=>{if(token===my&&root.classList.contains('on'))show(k+1,1)},850)}
+            else{tries++;b.classList.add('no');b.disabled=true;wrong();h.hidden=false;h.textContent='再想想看~'}};
+          q.appendChild(b)})}
+      card.querySelector('.td').innerHTML=list.map((_,j)=>'<i'+(j===k?' class="on"':'')+'></i>').join('');
+      paintStars();
+      const last=k===list.length-1;
+      root.querySelector('.tk').hidden=last;
+      root.querySelector('.tp').hidden=k===0;
+      n.hidden=!!qz;n.classList.toggle('gh',act);
+      n.textContent=k===0?'開始導覽':last?'開始使用':act?'跳過這步':(s.s?'知道了':'下一步');
+      place();
+      if(qz)q.querySelector('button').focus({preventScroll:true});
+      else if(!act)n.focus({preventScroll:true});
+      else if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+      if(s.fin){SFX.win();confetti()}else SFX.pop();
+    };
+    changed?setTimeout(go2,290):go2();
+  }
+  function open(manual){
+    if(!root)build();
+    if(root.classList.contains('on'))return;
+    clearTimeout(timer);
+    prevFocus=document.activeElement;
+    theme0=document.documentElement.dataset.theme;themeTouched=false;page0=$('#mw').dataset.v||'';
+    list=STEPS();k=0;stars=0;busy=false;
+    root.classList.add('on');
+    show(0,1);
+  }
+  function close(){
+    if(!root||!root.classList.contains('on'))return;
+    token++;busy=false;
+    const s=list[k];if(s&&s.undo)UNDO[s.undo]();
+    root.classList.remove('on','ia');
+    root.querySelectorAll('.cf').forEach(e=>e.remove());
+    if(themeTouched&&document.documentElement.dataset.theme!==theme0)$('#theme').onclick();
+    themeTouched=false;
+    try{if(page0&&$('#mw').dataset.v!==page0)go(page0)}catch(e){}
+    if(uid)mark(uid);
+    drawerSet(false);
+    try{prevFocus&&prevFocus.focus&&prevFocus.focus({preventScroll:true})}catch(e){}
+  }
+  /* 登入後等載入畫面收起、畫面就緒再自動開始(每個帳號在每台裝置只自動顯示一次) */
+  function auto(u){
+    uid=u;
+    if(!u||shown.has(u)||wasSeen(u)||polling)return;
+    polling=true;let n=0;
+    const tick=()=>{
+      n++;
+      if(document.body.classList.contains('locked')||n>100){polling=false;return}
+      if(!BT.isClosed()){timer=setTimeout(tick,300);return}
+      polling=false;shown.add(u);timer=setTimeout(()=>open(false),700);
+    };
+    tick();
+  }
+  return {open,close,auto,setUid:u=>{uid=u}};
+})();
+$('#helpb').onclick=()=>TOUR.open(true);
+
 /* ---------- firebase ---------- */
-if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false;$('#cf').hidden=true;$('#cnote').hidden=false;$('#cnote').textContent='尚未連線,無法留言';setUser('訪客','未連線');$('#setb').parentElement.hidden=true;BT.done('auth')}
+if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false;$('#cf').hidden=true;$('#cnote').hidden=false;$('#cnote').textContent='尚未連線,無法留言';setUser('訪客','未連線');$('#setb').hidden=true;BT.done('auth')}
 else{
   const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bd=id=>()=>BT.done(id);
   let unsubs=[],last=0,msgReady=false,staff={name:'管理員',role:'管理員',key:'admin'};
   const stop=()=>{unsubs.forEach(f=>f());unsubs=[];msgReady=false;D.av={};meO=null};
   const msgChg=s=>{if(!msgReady){msgReady=true;return}s.docChanges().forEach(c=>{if(c.type!=='added')return;const o=c.doc.data();if(c.doc.metadata.hasPendingWrites||isMine(o)||Date.now()-(o.ts||0)>60000)return;notifyMsg({id:c.doc.id,...o})})};
-  const lock=msg=>{stop();pwaState(false);me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#gforms').hidden=false};
+  const lock=msg=>{TOUR.close();stop();pwaState(false);me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#gforms').hidden=false};
   const start=()=>{
     document.body.classList.remove('locked');
     [['ann','公告'],['evt','行事曆'],['hw','作業'],['photos','相簿'],['msg','留言'],['site','班級設定'],['sched','課表'],['times','上課時間']].forEach(([k,l])=>BT.task(k,l,1));
@@ -853,7 +1123,7 @@ else{
     meO=me?{n:me.name,no:me.no}:{n:staff.name,role:staff.key,uid:myUid};
     unsubs.push(onSnapshot(collection(db,'avatars'),s=>{D.av={};s.docs.forEach(d=>{const v=d.data().img;if(typeof v==='string')D.av[d.id]=v});paintMe();render()},()=>{}));
     if(me)setUser(me.name,'座號 '+me.no);else setUser(staff.name,staff.role);
-    $('#cf').hidden=false;$('#cnote').hidden=true;render();pwaState(true);
+    $('#cf').hidden=false;$('#cnote').hidden=true;render();pwaState(true);TOUR.auto(myUid);
   };
   onAuthStateChanged(auth,async u=>{
     if(!u){myUid=null;lock();BT.done('auth');return}
