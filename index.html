@@ -181,16 +181,12 @@ body.locked .app{display:none}
 .gerr{min-height:1.6em;margin:12px 0 0;font-size:14px;color:#c0392b}
 @media(max-width:1200px){.home{grid-template-columns:1fr}}
 @media(max-width:899px){
- .app{grid-template-columns:58px minmax(0,1fr)}
- .nl-f{display:none}.nl-s{display:inline}
- .side{height:100vh;height:100dvh;padding:calc(14px + env(safe-area-inset-top,0px)) 5px calc(14px + env(safe-area-inset-bottom,0px));gap:16px;align-items:center;overflow-y:auto;scrollbar-width:none}
- .side::-webkit-scrollbar{display:none}
- .brand{padding:0;justify-content:center}.brand>div{display:none}
- .logo{width:38px;height:38px;font-size:18px;border-radius:12px}
- .sfoot{display:none}
- nav{width:100%;gap:4px}
- nav button{flex-direction:column;justify-content:center;gap:3px;padding:10px 0;font-size:12px;line-height:1.25;text-align:center;border-radius:12px;white-space:nowrap}
- nav .ic{display:block;width:21px;height:21px}
+ .app{grid-template-columns:minmax(0,1fr)}
+ .side{position:fixed;left:0;top:0;bottom:0;width:min(280px,82vw);height:100vh;height:100dvh;z-index:70;padding:calc(26px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px));overflow-y:auto;transform:translateX(-104%);visibility:hidden;transition:transform .25s ease,visibility 0s linear .25s}
+ .side.open{transform:none;visibility:visible;transition:transform .25s ease;box-shadow:14px 0 44px rgba(0,0,0,.45)}
+ #scrim{display:block;position:fixed;inset:0;z-index:65;background:rgba(10,18,40,.5);opacity:0;pointer-events:none;transition:opacity .25s}
+ #scrim.on{opacity:1;pointer-events:auto}
+ #menub{display:grid}
  .topbar{padding:calc(10px + env(safe-area-inset-top,0px)) 10px 10px;gap:6px}
  .ib{width:38px;height:38px}.uav{width:36px;height:36px}#uchip>.ic{display:none}
  .search input{padding:10px 12px 10px 38px}.search .ic{left:13px}
@@ -383,6 +379,8 @@ body.locked .app{display:none}
 .hwi.fin{opacity:.7}
 .hwi.fin .hwt>span{text-decoration:line-through;text-decoration-color:var(--mute);color:var(--mute)}
 @media(max-width:560px){.hwi{grid-template-columns:auto minmax(0,1fr);gap:10px 12px}.hwp{grid-column:2;justify-self:start}}
+@media(min-width:900px){#menub,#scrim{display:none}}
+@media(prefers-reduced-motion:reduce){.side,#scrim{transition:none!important}}
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:radial-gradient(140% 40% at 10% 106%,rgba(110,175,255,.7),transparent 70%),linear-gradient(160deg,#0a1840,#0c2a6c 60%,#123f95);--bo-ink:#fff;--bo-mute:rgba(255,255,255,.72);--bo-chip:rgba(255,255,255,.12);--bo-mkc:#f6e27a;position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
 #boot.out{opacity:0;visibility:hidden;pointer-events:none}
@@ -503,14 +501,16 @@ setTimeout(fd,4000);
 </div></div></div>
 
 <div class="app">
-<aside class="side">
+<aside class="side" id="side">
 <div class="brand"><span class="logo" id="mk">我</span><div><b id="logo"></b><small id="slogan"></small></div></div>
 <nav id="nav" role="tablist"></nav>
 <nav class="nset"><button id="setb" type="button" aria-haspopup="dialog"></button></nav>
 <div class="sfoot" id="sfoot"></div>
 </aside>
+<div id="scrim"></div>
 <div class="mainc">
 <header class="topbar">
+<button class="ib" id="menub" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="side"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <div class="search"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" placeholder="搜尋公告、活動、作業、留言…" autocomplete="off" aria-label="搜尋"><div id="qres" hidden></div></div>
 <button class="ib" id="bell" aria-label="新公告"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0"/></svg><i id="bn" hidden>0</i></button>
 <button class="ib" id="theme" aria-label="切換亮色與暗色"><svg class="ic tl" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg><svg class="ic td" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
@@ -631,6 +631,12 @@ $('#q').oninput=()=>{
   box.innerHTML=R.slice(0,8).map(r=>`<button data-go="${r[0]}"><small>${r[1]}</small>${esc(r[2])}</button>`).join('')||'<p class="empty" style="padding:10px 12px">找不到相關內容</p>';box.hidden=false;
 };
 const paintMe=()=>{const n=$('#un').textContent,im=meO&&D.av[avKey(meO)];if(im)$('#uav').innerHTML=`<img src="${esc(im)}" alt="">`;else $('#uav').textContent=[...n][0]||'我'};
+const drawer=o=>{$('#side').classList.toggle('open',o);$('#scrim').classList.toggle('on',o);$('#menub').setAttribute('aria-expanded',o);$('#menub').setAttribute('aria-label',o?'關閉選單':'開啟選單')};
+$('#menub').onclick=()=>drawer(!$('#side').classList.contains('open'));
+$('#scrim').onclick=()=>drawer(false);
+document.addEventListener('click',e=>{if(e.target.closest('#side button'))drawer(false)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#side').classList.contains('open'))drawer(false)});
+matchMedia('(min-width:900px)').addEventListener('change',e=>{if(e.matches)drawer(false)});
 const setUser=(name,role)=>{$('#un').textContent=name;$('#ur').textContent=role;paintMe()};
 
 /* ---------- chat dock ---------- */
