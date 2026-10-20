@@ -4,28 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>班級後台</title>
-<meta name="theme-color" content="#0a1840">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="後台">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>if('serviceWorker' in navigator)addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})</script>
-<script>(function(){try{
-var K='admin',CH='管',C1='#0e3078',C2='#071438',INK='#f6e27a';
-function ic(sz,sc,rd){var c=document.createElement('canvas');c.width=c.height=sz;var x=c.getContext('2d');
-if(rd){x.beginPath();if(x.roundRect)x.roundRect(0,0,sz,sz,sz*.22);else x.rect(0,0,sz,sz);x.clip()}
-var g=x.createLinearGradient(0,0,sz,sz);g.addColorStop(0,C1);g.addColorStop(1,C2);x.fillStyle=g;x.fillRect(0,0,sz,sz);
-x.fillStyle=INK;x.textAlign='center';x.textBaseline='middle';x.font='900 '+Math.round(sz*sc)+'px "Noto Serif TC","Noto Serif CJK TC","PMingLiU","Songti TC",serif';
-x.fillText(CH,sz/2,sz/2+sz*.03);return c.toDataURL('image/png')}
-var u=function(p){return new URL(p,location.href).href},d=document.head;
-function lk(rel,href,extra){var l=document.createElement('link');l.rel=rel;l.href=href;if(extra)l.type=extra;d.appendChild(l)}
-window.__icon=ic(96,.62,true);
-lk('icon',ic(192,.62,true),'image/png');lk('apple-touch-icon',ic(180,.56,false));
-var m={id:u('admin.html'),name:'班級後台',short_name:'後台',description:'班級網站的管理後台',start_url:u('admin.html'),scope:u('admin.html'),display:'standalone',background_color:'#0a1840',theme_color:'#0a1840',lang:'zh-TW',
-icons:[{src:ic(192,.62,true),sizes:'192x192',type:'image/png',purpose:'any'},{src:ic(512,.62,true),sizes:'512x512',type:'image/png',purpose:'any'},{src:ic(512,.46,false),sizes:'512x512',type:'image/png',purpose:'maskable'}]};
-lk('manifest',URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'})))
-}catch(e){}})()</script>
-<script>window.__ip=null;addEventListener('beforeinstallprompt',function(e){e.preventDefault();window.__ip=e;dispatchEvent(new Event('pwa-ready'))});addEventListener('appinstalled',function(){window.__ip=null})</script>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem("cls-theme")||"light"}catch(e){}</script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -76,10 +54,6 @@ td input{width:100%;text-align:center;border:0;background:transparent;padding:10
 [hidden]{display:none!important}
 #login{max-width:380px;margin:12vh auto 0}
 .err{color:#e5484d;font-size:14px;min-height:1.5em}
-.fl{display:flex;flex-direction:column;gap:4px;flex:1 1 150px;font-size:12px;font-weight:700;color:var(--mute)}
-.fl input{width:100%}
-.av2.img{overflow:hidden;background:var(--chip)}
-.av2 img{width:100%;height:100%;object-fit:cover;display:block}
 .av2{flex:none;width:34px;height:34px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:900;font-size:13px}
 details{margin:0 0 14px}summary{cursor:pointer;color:var(--mute);font-size:14px;margin-bottom:10px}
 #made{white-space:pre-line}
@@ -155,13 +129,6 @@ select{font:inherit;color:var(--ink);background:var(--chip);border:1px solid tra
 @keyframes ud-in{from{opacity:0;transform:translateY(8px) scale(.96)}}
 @media(prefers-reduced-motion:reduce){.ud,.ud-box{animation:none}}
 .ud-ok{background:linear-gradient(100deg,#d4af37,#f6e27a);color:#2a2000}
-#pwab{display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(100deg,#d4af37,#f6e27a);color:#2a2000;font-size:14px;line-height:1.4}
-#pwab[hidden]{display:none}
-#pwab img{width:32px;height:32px;border-radius:9px;flex:none}
-#pwab span{flex:1;min-width:0}
-#pwab .pi{flex:none;background:#2a2000;color:#f6e27a;font:900 14px "Noto Sans TC",system-ui,sans-serif;border-radius:999px;padding:8px 18px;border:0;cursor:pointer}
-#pwab .px{flex:none;width:28px;height:28px;border-radius:50%;color:rgba(42,32,0,.75);font-size:20px;line-height:1;background:none;border:0;cursor:pointer}
-#pwab .px:hover{background:rgba(42,32,0,.12)}
 /* ---------- boot / loading screen ---------- */
 #boot{--bo-bg:var(--page);--bo-ink:var(--ink);--bo-mute:var(--mute);--bo-chip:var(--chip);--bo-mkc:var(--gt);position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:24px;background:var(--bo-bg);color:var(--bo-ink);font-family:"Noto Sans TC",system-ui,sans-serif;transition:opacity .5s ease,visibility .5s}
 #boot.out{opacity:0;visibility:hidden;pointer-events:none}
@@ -188,6 +155,75 @@ select{font:inherit;color:var(--ink);background:var(--chip);border:1px solid tra
 @keyframes bo-pop{from{opacity:0;transform:translateY(4px) scale(.9)}}
 @media(prefers-reduced-motion:reduce){#boot *,#boot *::before{animation:none!important}#boot{transition:none}}
 body.t .own{display:none!important}
+
+/* ===== 後台高質感升級：金色流動邊框 / 玻璃質感 / 柔光 ===== */
+@property --gold-a{syntax:'<angle>';initial-value:0deg;inherits:false}
+:root{--gold-conic:conic-gradient(from var(--gold-a),#8a6410 0%,#d4af37 10%,#fff3b0 18%,#f6d365 26%,#b8860b 38%,#7a5710 50%,#c9a227 62%,#fff0a8 72%,#e6b84a 82%,#a97c13 92%,#8a6410 100%);
+ --gold-line:linear-gradient(135deg,rgba(212,175,55,.75),rgba(212,175,55,.12) 38%,rgba(246,226,122,.5) 62%,rgba(212,175,55,.18));
+ --sh:0 1px 0 rgba(255,255,255,.6) inset,0 10px 30px -18px rgba(120,85,10,.45)}
+[data-theme=dark]{--sh:0 1px 0 rgba(255,255,255,.06) inset,0 14px 34px -18px rgba(0,0,0,.8)}
+body{background:radial-gradient(900px 520px at 8% -8%,rgba(212,175,55,.16),transparent 60%),radial-gradient(760px 480px at 100% 0,rgba(246,226,122,.12),transparent 60%),radial-gradient(900px 600px at 50% 120%,rgba(184,134,11,.10),transparent 60%),var(--page);background-attachment:fixed}
+[data-theme=dark] body{background:radial-gradient(900px 520px at 8% -8%,rgba(212,175,55,.14),transparent 60%),radial-gradient(760px 480px at 100% 0,rgba(246,226,122,.07),transparent 60%),radial-gradient(900px 600px at 50% 120%,rgba(184,134,11,.10),transparent 60%),var(--page);background-attachment:fixed}
+/* 頂欄：玻璃 + 金色細線 */
+.top{background:color-mix(in srgb,var(--page) 72%,transparent);-webkit-backdrop-filter:saturate(1.6) blur(16px);backdrop-filter:saturate(1.6) blur(16px);border-bottom:0}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(212,175,55,.8),rgba(255,243,176,.9),rgba(212,175,55,.8),transparent);background-size:200% 100%;animation:goldLine 6s linear infinite}
+@keyframes goldLine{to{background-position:200% 0}}
+.logo{background:linear-gradient(100deg,#8a6410,#d4af37 35%,#fff0a8 50%,#d4af37 65%,#8a6410);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:goldText 6s linear infinite;letter-spacing:.02em}
+.logo small{-webkit-text-fill-color:var(--gt);background:var(--chip);border:1px solid rgba(212,175,55,.45)}
+@keyframes goldText{to{background-position:-220% 0}}
+/* 通用：金色邊框層 */
+.tile,.cell,.snav,#login{position:relative;border-color:transparent;box-shadow:var(--sh)}
+.cell::before,.snav::before,#login::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;background:var(--gold-line);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask-composite:exclude;opacity:.85;transition:opacity .3s}
+.cell:hover::before{opacity:1}
+/* 數據磚：流動金邊 */
+.tile::after,#login::after,.snav::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;pointer-events:none;z-index:3;background:var(--gold-conic);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask-composite:exclude;animation:goldFlow 6s linear infinite;filter:drop-shadow(0 0 3px rgba(246,211,101,.5));transition:filter .3s}
+#login::after{animation-duration:7s}
+.snav::after{opacity:.7;animation-duration:9s}
+.tile:nth-child(2n)::after{animation-delay:-1.5s}.tile:nth-child(3n)::after{animation-delay:-3s}.tile:nth-child(5n)::after{animation-delay:-4.5s}
+.tile{overflow:hidden;background:linear-gradient(160deg,color-mix(in srgb,#d4af37 7%,var(--card)),var(--card) 60%);transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
+.tile:hover{transform:translateY(-4px);border-color:transparent;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 22px 36px -16px rgba(212,160,30,.55)}
+.tile:hover::after{animation-duration:2.4s;filter:drop-shadow(0 0 8px rgba(255,214,102,.9))}
+.tile b{background:linear-gradient(120deg,var(--ink) 30%,var(--gt));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.tile .tl{letter-spacing:.06em}
+@keyframes goldFlow{to{--gold-a:360deg}}
+/* 內容卡 */
+.cell{background:linear-gradient(180deg,color-mix(in srgb,var(--card) 100%,#fff 0%),color-mix(in srgb,var(--card) 96%,#d4af37 4%));border-radius:20px;transition:box-shadow .3s,transform .25s}
+.cell:hover{box-shadow:var(--sh),0 18px 36px -22px rgba(212,160,30,.45)}
+.ch::before{width:4px;height:15px;box-shadow:0 0 8px rgba(246,211,101,.7)}
+.pane>h2{background:linear-gradient(100deg,var(--ink) 40%,var(--gt));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.02em}
+.pane>h2 em{-webkit-text-fill-color:var(--mute)}
+.pane.on{animation:paneIn .35s cubic-bezier(.2,.8,.2,1)}
+@keyframes paneIn{from{opacity:0;transform:translateY(8px)}}
+/* 側欄選單 */
+.snav{background:color-mix(in srgb,var(--card) 82%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-radius:22px}
+.snav button{transition:background .2s,transform .2s,color .2s;position:relative}
+.snav button:hover{transform:translateX(3px)}
+.snav button[aria-selected=true]{background:linear-gradient(100deg,#c9a227,#f6e27a 55%,#e6c04d);box-shadow:0 8px 18px -8px rgba(201,162,39,.8),inset 0 1px 0 rgba(255,255,255,.6);transform:none}
+.snav button[aria-selected=true]::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);background-size:250% 100%;animation:goldSheen 3.2s ease-in-out infinite;pointer-events:none}
+@keyframes goldSheen{from{background-position:130% 0}to{background-position:-30% 0}}
+/* 表單元件 */
+input,textarea,select{background:color-mix(in srgb,var(--chip) 100%,transparent);border:1px solid var(--line);transition:border-color .2s,box-shadow .2s,background .2s}
+input:hover,textarea:hover,select:hover{border-color:rgba(212,175,55,.5)}
+input:focus,textarea:focus,select:focus{outline:0;border-color:#d4af37;background:var(--card);box-shadow:0 0 0 3px rgba(212,175,55,.22),0 6px 16px -8px rgba(212,160,30,.5)}
+td input:focus{box-shadow:inset 0 0 0 2px rgba(212,175,55,.6);border-radius:6px}
+button{transition:transform .2s,box-shadow .25s,background .2s,filter .2s}
+.pri,.ud-ok{position:relative;overflow:hidden;background:linear-gradient(100deg,#c9a227,#f6e27a 55%,#e6c04d);box-shadow:0 8px 18px -8px rgba(201,162,39,.85),inset 0 1px 0 rgba(255,255,255,.6)}
+.pri::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.6) 50%,transparent 65%);background-size:250% 100%;background-position:130% 0;pointer-events:none}
+.pri:hover::after{animation:goldSheen .9s ease forwards}
+.pri:hover{background:linear-gradient(100deg,#c9a227,#f6e27a 55%,#e6c04d);transform:translateY(-1px) scale(1.03);box-shadow:0 12px 22px -8px rgba(201,162,39,.95),inset 0 1px 0 rgba(255,255,255,.7)}
+.pri:active{transform:scale(.97)}
+li{transition:background .2s,transform .2s}
+li:hover{transform:translateX(2px)}
+.tw{border-radius:14px;box-shadow:var(--sh)}
+th{background:linear-gradient(180deg,rgba(212,175,55,.12),transparent)}
+.hint{border:1px solid rgba(212,175,55,.3);background:linear-gradient(135deg,rgba(212,175,55,.12),var(--chip))}
+.av2{background:linear-gradient(135deg,rgba(212,175,55,.35),var(--chip));box-shadow:0 0 0 1.5px rgba(212,175,55,.55)}
+.pw img{transition:transform .3s,box-shadow .3s}.pw:hover img{transform:scale(1.03);box-shadow:0 14px 26px -14px rgba(120,85,10,.6)}
+.ud-box{border:1px solid rgba(212,175,55,.45);box-shadow:0 24px 60px -12px rgba(0,0,0,.45),0 0 0 1px rgba(255,243,176,.15) inset,0 0 40px -14px rgba(212,175,55,.5)}
+#toast{background:linear-gradient(100deg,#2a2000,#4a3a08);color:#fff0a8;border:1px solid rgba(246,211,101,.6);box-shadow:0 12px 28px -10px rgba(212,160,30,.7)}
+::selection{background:rgba(212,175,55,.35)}
+@media(max-width:860px){.snav::after{display:none}.snav{border-color:rgba(212,175,55,.45)}.snav button:hover{transform:none}.tile:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.tile::after,#login::after,.snav::after,.top::after,.logo,.snav button[aria-selected=true]::after,.pane.on,.pri:hover::after{animation:none!important}}
 </style>
 </head>
 <body>
@@ -272,7 +308,6 @@ try{(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()
 setTimeout(fd,4000);
 })();
 </script>
-<div id="pwab" hidden><img alt=""><span>把「班級後台」安裝成 app,下次從桌面一鍵開啟</span><button type="button" class="pi">安裝</button><button type="button" class="px" aria-label="先不用">×</button></div>
 <header class="top"><div>
 <span class="logo">班級後台<small>管理員專用</small></span>
 <button id="theme" aria-label="切換亮色與暗色">切換主題</button>
@@ -352,7 +387,7 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const ud=o=>new Promise(res=>{
   const prev=document.activeElement,el=document.createElement('div');
   el.className='ud';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
-  el.innerHTML=`<div class="ud-box"><h3 class="ud-t">${esc(o.title)}</h3><p class="ud-m">${esc(o.msg)}</p>${o.input?`<input class="ud-i" type="text" value="${esc(o.def||'')}" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="${esc(o.msg)}">`:''}<div class="ud-b"><button type="button" class="ud-ok${o.danger?' dg':''}">${esc(o.ok||'確定')}</button>${o.cancel===false?'':`<button type="button" class="ud-c">${esc(o.no||'取消')}</button>`}</div></div>`;
+  el.innerHTML=`<div class="ud-box"><h3 class="ud-t">${esc(o.title)}</h3><p class="ud-m">${esc(o.msg)}</p>${o.input?`<input class="ud-i" type="text" value="${esc(o.def||'')}" autocomplete="off" autocapitalize="none" spellcheck="false" aria-label="${esc(o.msg)}">`:''}<div class="ud-b"><button type="button" class="ud-ok${o.danger?' dg':''}">${esc(o.ok||'確定')}</button>${o.cancel===false?'':'<button type="button" class="ud-c">取消</button>'}</div></div>`;
   const inp=el.querySelector('.ud-i'),okb=el.querySelector('.ud-ok');
   const done=v=>{el.remove();try{prev&&prev.focus&&prev.focus({preventScroll:true})}catch(x){}res(v)};
   const yes=()=>done(o.input?inp.value.trim():true),no=()=>done(o.input?null:false);
@@ -367,34 +402,12 @@ const ud=o=>new Promise(res=>{
 const uiAlert=msg=>ud({title:'提示',msg,cancel:false});
 const uiConfirm=(msg,o)=>ud({title:'確認',msg,...(o||{})});
 const uiPrompt=(msg,def)=>ud({title:'輸入',msg,input:1,def});
-/* ---------- 安裝成 app ---------- */
-const PWA={n:'班級後台',k:'admin'};
-const pwaApp=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: window-controls-overlay)').matches||navigator.standalone===true;
-const pwaIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-const pwaLS=(k,v)=>{try{if(v===undefined)return +localStorage.getItem(PWA.k+'-'+k)||0;localStorage.setItem(PWA.k+'-'+k,v)}catch(e){return 0}};
-let pwaIn=false,pwaAsked=false,pwaGone=false;
-const pwaPaint=()=>{const b=document.getElementById('pwab');if(b){const im=b.querySelector('img');if(im&&!im.getAttribute('src')&&window.__icon)im.src=window.__icon}if(b)b.hidden=!(pwaIn&&!pwaGone&&!pwaApp()&&Date.now()-pwaLS('hide')>6048e5)};
-const pwaHelp=()=>uiAlert(pwaIOS()?'請點瀏覽器下方的「分享」按鈕,再選「加入主畫面」,桌面就會出現「'+PWA.n+'」。':'請點瀏覽器右上角的選單,選「安裝應用程式」或「加到主畫面」,桌面就會出現「'+PWA.n+'」。');
-const pwaInstall=async()=>{const ip=window.__ip;if(!ip){pwaHelp();return}
-  window.__ip=null;try{ip.prompt();const r=await ip.userChoice;if(r&&r.outcome==='accepted')pwaGone=true}catch(e){}pwaPaint()};
-const pwaAsk=async()=>{if(pwaAsked||!pwaIn||pwaGone||pwaApp())return;
-  if(!window.__ip&&!pwaIOS())return;
-  if(Date.now()-pwaLS('no')<6048e5)return;
-  pwaAsked=true;
-  const yes=await ud({title:'安裝 app',msg:'要把「'+PWA.n+'」安裝成 app 嗎?\n之後可以從桌面一鍵開啟,不用再輸入網址。',ok:'安裝',no:'暫時不要'});
-  if(yes)pwaInstall();else pwaLS('no',Date.now())};
-const pwaState=on=>{pwaIn=on;if(!on)pwaAsked=false;pwaPaint();if(on)setTimeout(pwaAsk,1200)};
-addEventListener('pwa-ready',()=>{pwaPaint();pwaAsk()});
-addEventListener('appinstalled',()=>{pwaGone=true;pwaPaint()});
-document.addEventListener('click',e=>{if(e.target.closest('#pwab .pi'))pwaInstall();else if(e.target.closest('#pwab .px')){pwaLS('hide',Date.now());pwaPaint()}});
 const dleft=d=>Math.round((new Date(d+'T00:00:00')-new Date(new Date().toDateString()))/864e5);
 const when=n=>n<0?'已過':n===0?'今天':n+' 天後';
 const fmt=ts=>new Date(ts).toLocaleString('zh-TW',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
 const list=(ul,rows,empty)=>{$(ul).innerHTML=rows.length?rows.join(''):`<li class="empty">${empty}</li>`};
 const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',3000)};
 const S={ann:[],evt:[],hw:[],msg:[],photos:[],sched:{},times:{}};
-let AV={};
-const avh=(key,txt)=>AV[key]?`<span class="av2 img"><img src="${esc(AV[key])}" alt=""></span>`:`<span class="av2">${esc(txt)}</span>`;
 let ROS=[],ROT=[],ROLE='',EDIT=null;
 const CFG=[
  ['ann','公告',[['title','標題','text'],['t','內容(可不填)','text'],['tag','','select']]],
@@ -402,9 +415,9 @@ const CFG=[
  ['hw','作業',[['t','作業內容','text'],['d','','date']]],
  ['msg','留言',[]]
 ];
-const DESC={ann:'發布給全班看的公告,最新的一則會顯示在首頁。',evt:'新增考試、活動等日期,首頁會顯示倒數天數。',hw:'新增今天出的作業,可以設定繳交的日期與時間(時間不填就是當天都可以交),勾選代表已完成。',msg:'同學留的言,可以刪除不適當的內容。'};
+const DESC={ann:'發布給全班看的公告,最新的一則會顯示在首頁。',evt:'新增考試、活動等日期,首頁會顯示倒數天數。',hw:'新增作業與截止日,勾選代表已完成。',msg:'同學留的言,可以刪除不適當的內容。'};
 $('#lists').innerHTML=CFG.map(([k,l,fs])=>`<div class="panel pane" id="p-${k}"><h2>${l} <em id="c-${k}"></em></h2><p class="sub">${DESC[k]}</p>
-${fs.length?`<div class="cell"><h3 class="ch">${k==='ann'?'發布':k==='hw'?'新增今日':'新增'}${l}</h3>${k==='hw'?`<form data-k="hw"><input name="t" type="text" placeholder="作業內容" required maxlength="120" aria-label="作業內容"><label class="fl">繳交日期<input name="d" type="date" required value="${(()=>{const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0')})()}"></label><label class="fl">繳交時間(可不填)<input name="tm" type="time"></label><button class="pri">新增</button></form>`:`<form data-k="${k}">${fs.map(([n,p,t])=>t==='select'?`<select name="${n}" aria-label="類型"><option>一般</option><option>活動</option><option>置頂</option></select>`:`<input name="${n}" type="${t}" placeholder="${p}" ${n==='t'&&k==='ann'?'':'required'} maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form>`}</div>`:''}
+${fs.length?`<div class="cell"><h3 class="ch">${k==='ann'?'發布':'新增'}${l}</h3><form data-k="${k}">${fs.map(([n,p,t])=>t==='select'?`<select name="${n}" aria-label="類型"><option>一般</option><option>活動</option><option>置頂</option></select>`:`<input name="${n}" type="${t}" placeholder="${p}" ${n==='t'&&k==='ann'?'':'required'} maxlength="120" aria-label="${p||'日期'}">`).join('')}<button class="pri">新增</button></form></div>`:''}
 <div class="cell"><h3 class="ch">${k==='msg'?'全部留言':'已發布的'+l}</h3><ul id="l-${k}"></ul></div></div>`).join('');
 
 const go=p=>{document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));document.querySelectorAll('#snav button').forEach(b=>b.setAttribute('aria-selected',b.dataset.pane===p));scrollTo({top:0})};
@@ -434,8 +447,8 @@ function draw0(k){
   $('#l-'+k).innerHTML=sorted.length?sorted.map(o=>{
     if(k==='ann'&&EDIT===o.id){const tg=o.tag||'一般',ti=o.title||o.t,bd=o.title?o.t:'';return `<li class="edli"><form data-edit="${o.id}"><input name="title" value="${esc(ti)}" required maxlength="80" aria-label="標題"><input name="t" value="${esc(bd)}" maxlength="160" placeholder="內容(可不填)" aria-label="內容"><select name="tag" aria-label="類型">${['一般','活動','置頂'].map(x=>`<option${x===tg?' selected':''}>${x}</option>`).join('')}</select><button class="pri">儲存</button><button type="button" data-edc>取消</button></form></li>`}
     const main=k==='msg'?`<b>${esc(o.n)}</b>${o.role==='admin'?' <small>🎇 管理員</small>':o.role==='teacher'?' <small>🐛 老師</small>':''}${o.no?` · 座號 ${esc(o.no)}`:''}<br>${typeof o.img==='string'&&o.img.startsWith('data:image/')?`<img src="${esc(o.img)}" alt="圖片" style="width:72px;height:72px;object-fit:cover;border-radius:8px;vertical-align:middle"> `:''}${esc(o.m)}`:k==='ann'?`${o.tag&&o.tag!=='一般'?`<b>[${esc(o.tag)}]</b> `:''}${esc(o.title||o.t)}${o.title&&o.t?`<br><small>${esc(o.t)}</small>`:''}`:esc(o.t);
-    const sub=k==='hw'?`繳交 ${esc(o.d)}${o.tm?' '+esc(o.tm):''}${o.ts?' · '+new Date(o.ts).toLocaleDateString('zh-TW')+' 發佈':''}`:o.ts&&k!=='evt'?new Date(o.ts).toLocaleString('zh-TW'):esc(o.d);
-    const ck=k==='hw'?`<input type="checkbox" style="flex:none;width:20px;height:20px" data-tog="${o.id}" ${o.done?'checked':''} aria-label="已完成">`:k==='msg'?avh(o.role?(o.uid?'u'+o.uid:''):(o.no!=null?'s'+o.no:''),[...String(o.n||'?')][0]):'';
+    const sub=o.ts&&k!=='evt'&&k!=='hw'?new Date(o.ts).toLocaleString('zh-TW'):esc(o.d);
+    const ck=k==='hw'?`<input type="checkbox" style="flex:none;width:20px;height:20px" data-tog="${o.id}" ${o.done?'checked':''} aria-label="已完成">`:'';
     return `<li>${ck}<span class="t">${main}<small>${sub}${k==='hw'&&o.done?' · 已完成':''}</small></span>${k==='ann'?`<button class="ed" data-ed="${o.id}">編輯</button>`:''}${k==='msg'&&ROLE!=='admin'?'':`<button class="x" data-k="${k}" data-id="${o.id}" aria-label="刪除">×</button>`}</li>`}).join(''):'<li class="empty">還沒有內容</li>';
 }
 draw('sched');draw('times');draw('photos');
@@ -448,7 +461,7 @@ else{
   const sec=initializeApp(FIREBASE_CONFIG,'sec'),secAuth=getAuth(sec);
   const emsg=e=>e.code==='auth/weak-password'?'密碼至少 6 碼':e.code==='permission-denied'?'沒有權限(規則還沒更新?)':'失敗:'+(e.code||e.message);
   const drawRos=()=>{$('#cs').textContent=ROS.length?ROS.length+' 位':'';
-    $('#ls').innerHTML=[...ROS].sort((a,b)=>a.no-b.no).map(o=>`<li>${avh('s'+o.no,o.no)}<span class="t"><b>${esc(o.name)}</b></span>${ROLE==='admin'?`<button data-rs="${o.id}">重設密碼</button><button class="x" data-ds="${o.id}" aria-label="停用帳號">×</button>`:''}</li>`).join('')||'<li class="empty">還沒有學生帳號</li>'};
+    $('#ls').innerHTML=[...ROS].sort((a,b)=>a.no-b.no).map(o=>`<li><span class="av2">${o.no}</span><span class="t"><b>${esc(o.name)}</b></span>${ROLE==='admin'?`<button data-rs="${o.id}">重設密碼</button><button class="x" data-ds="${o.id}" aria-label="停用帳號">×</button>`:''}</li>`).join('')||'<li class="empty">還沒有學生帳號</li>'};
   async function make(no,name,pw){
     if(ROLE!=='admin')throw {code:'permission-denied'};
     const email=`s${no}-${Date.now().toString(36)}@class.invalid`;
@@ -462,7 +475,7 @@ else{
     el.hidden=false;el.innerHTML='<b>已建立,請現在記下密碼(之後不會再顯示):</b>\n'+esc(txt)+'\n<button id="cp2" type="button" style="margin-top:8px">複製</button>';
     $('#cp2').onclick=()=>navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('已複製'))};
   const rnd=()=>{const c='abcdefghjkmnpqrstuvwxyz23456789';return Array.from({length:6},()=>c[Math.floor(Math.random()*c.length)]).join('')};
-  const drawTea=()=>{$('#lt').innerHTML=[...ROT].sort((a,b)=>a.username<b.username?-1:1).map(o=>`<li>${avh('u'+o.id,'師')}<span class="t"><b>${esc(o.name)}</b><small>帳號:${esc(o.username)}</small></span><button data-rt="${o.id}">重設密碼</button><button class="x" data-dt="${o.id}" aria-label="停用教師帳號">×</button></li>`).join('')||'<li class="empty">還沒有教師帳號</li>'};
+  const drawTea=()=>{$('#lt').innerHTML=[...ROT].sort((a,b)=>a.username<b.username?-1:1).map(o=>`<li><span class="av2">師</span><span class="t"><b>${esc(o.name)}</b><small>帳號:${esc(o.username)}</small></span><button data-rt="${o.id}">重設密碼</button><button class="x" data-dt="${o.id}" aria-label="停用教師帳號">×</button></li>`).join('')||'<li class="empty">還沒有教師帳號</li>'};
   async function makeT(user,name,pw){
     const email=`t-${user}-${Date.now().toString(36)}@class.invalid`;
     const c=await createUserWithEmailAndPassword(secAuth,email,pw),uid=c.user.uid;
@@ -504,7 +517,6 @@ else{
     [['ann','公告'],['evt','行事曆'],['hw','作業'],['msg','留言'],['photos','相簿'],['students','學生帳號'],['site','班級設定'],['sched','課表'],['times','上課時間']].concat(ROLE==='admin'?[['teachers','教師帳號']]:[]).forEach(([k,l])=>BT.task(k,l,1));
     if(ROLE==='admin')unsub.push(onSnapshot(collection(db,'teachers'),s=>{ROT=s.docs.map(d=>({id:d.id,...d.data()}));drawTea();refresh();BT.done('teachers')},bd('teachers')));
     unsub.push(onSnapshot(doc(db,'meta','times'),s=>{S.times=(s.data()||{}).t||{};if(!document.activeElement.closest('#tt'))draw('times');BT.done('times')},bd('times')));
-    unsub.push(onSnapshot(collection(db,'avatars'),s=>{AV={};s.docs.forEach(d=>{const v=d.data().img;if(typeof v==='string')AV[d.id]=v});draw('msg');drawRos();if(ROLE==='admin')drawTea()},()=>{}));
     unsub.push(onSnapshot(collection(db,'students'),s=>{ROS=s.docs.map(d=>({id:d.id,...d.data()}));drawRos();refresh();BT.done('students')},bd('students')));
     ['ann','evt','hw','msg','photos'].forEach(k=>unsub.push(onSnapshot(collection(db,k),s=>{S[k]=s.docs.map(d=>({id:d.id,...d.data()}));if(k==='ann'&&EDIT){refresh()}else draw(k);BT.done(k)},bd(k))));
     unsub.push(onSnapshot(doc(db,'meta','site'),s=>{const m=s.data()||{};if(document.activeElement!==$('#title'))$('#title').value=m.title||'我們班';if(document.activeElement!==$('#tag'))$('#tag').value=m.tag||'';if(document.activeElement!==$('#lclass'))$('#lclass').value=m.loadClass||'';if(document.activeElement!==$('#ltext'))$('#ltext').value=m.loadText||'';try{localStorage.setItem('cls-boot',JSON.stringify({c:m.loadClass||m.title||'',t:m.loadText||''}))}catch(x){}BT.set(m.loadClass||m.title,m.loadText);refresh();BT.done('site')},bd('site')));
@@ -512,7 +524,7 @@ else{
   };
   onAuthStateChanged(auth,async u=>{
     unsub.forEach(f=>f());unsub=[];
-    const show=(on,label)=>{$('#login').hidden=on;$('#app').hidden=!on;$('#out').hidden=!on;$('#who').hidden=!on;if(on)$('#who').textContent=label;pwaState(on)};
+    const show=(on,label)=>{$('#login').hidden=on;$('#app').hidden=!on;$('#out').hidden=!on;$('#who').hidden=!on;if(on)$('#who').textContent=label};
     if(!u){show(false);BT.done('auth');return}
     if(BT.isClosed())BT.begin();
     try{
@@ -537,7 +549,7 @@ else{
 
   document.addEventListener('submit',e=>{const f=e.target,k=f.dataset.k;if(!k)return;e.preventDefault();
     const fd=new FormData(f),o={};[...fd.keys()].forEach(n=>o[n]=fd.get(n).trim());
-    if(k==='ann')o.ts=Date.now();if(k==='hw'){o.done=false;o.ts=Date.now();if(!o.tm)delete o.tm}
+    if(k==='ann')o.ts=Date.now();if(k==='hw')o.done=false;
     run(addDoc(collection(db,k),o));f.reset()});
   document.addEventListener('click',async e=>{const b=e.target.closest('button[data-id]');if(!b||(b.dataset.k==='msg'&&ROLE!=='admin')||!(await uiConfirm('確定要刪除嗎?',{danger:1})))return;
     run(deleteDoc(doc(db,b.dataset.k,b.dataset.id)))});
