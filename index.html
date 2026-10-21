@@ -888,6 +888,14 @@ html.lite[data-theme=dark]{background:#0b1220}
 .lite #fx3d,.lite #fxbar{display:none!important}
 .lite .banner canvas.b3d{will-change:auto}
 .lite body::before{animation:none!important;inset:0!important;will-change:auto}
+
+/* ===== 手機左上角「首頁」按鈕 ===== */
+.homeb{display:none;color:#8a6410;background:linear-gradient(135deg,#fff6cf,#f6e27a);box-shadow:0 2px 0 rgba(138,100,16,.35),inset 0 1px 0 rgba(255,255,255,.7)!important}
+.homeb .ic{stroke:#6b4d08}
+.homeb:active{transform:scale(.92)}
+[data-theme=dark] .homeb{background:linear-gradient(135deg,#7a5606,#d4af37);box-shadow:0 2px 0 rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.25)!important}
+[data-theme=dark] .homeb .ic{stroke:#fff6cf}
+@media(max-width:899px){.homeb{display:grid}}
 </style>
 </head>
 <body class="locked">
@@ -994,6 +1002,7 @@ setTimeout(fd,window.__lite?1200:4000);
 <div class="mainc">
 <div id="pwab" hidden><img alt=""><span>把「班級網站」安裝成 app,下次從桌面一鍵開啟</span><button type="button" class="pi">安裝</button><button type="button" class="px" aria-label="先不用">×</button></div>
 <header class="topbar">
+<button class="ib homeb" id="homeb" type="button" data-go="ov" aria-label="回首頁"><svg class="ic" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg></button>
 <button class="ib" id="menub" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="side"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
 <div class="search"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="q" placeholder="搜尋公告、活動、作業、留言…" autocomplete="off" aria-label="搜尋"><div id="qres" hidden></div></div>
 <button class="ib" id="bell" aria-label="新公告"><svg class="ic" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8M10 20a2 2 0 004 0"/></svg><i id="bn" hidden>0</i></button>
