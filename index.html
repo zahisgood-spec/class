@@ -896,6 +896,12 @@ html.lite[data-theme=dark]{background:#0b1220}
 [data-theme=dark] .homeb{background:linear-gradient(135deg,#7a5606,#d4af37);box-shadow:0 2px 0 rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.25)!important}
 [data-theme=dark] .homeb .ic{stroke:#fff6cf}
 @media(max-width:899px){.homeb{display:grid}}
+
+/* ===== 左邊選單「下載 App」===== */
+#navdl[hidden]{display:none}
+#navdl{margin-top:10px;position:relative;color:#fff3b0;background:linear-gradient(100deg,rgba(201,162,39,.28),rgba(246,226,122,.16));border:1px solid rgba(246,226,122,.45)}
+#navdl .ic{stroke:#f6e27a}
+#navdl:hover{background:linear-gradient(100deg,rgba(201,162,39,.45),rgba(246,226,122,.25));color:#fff}
 </style>
 </head>
 <body class="locked">
@@ -1078,7 +1084,7 @@ const pwaApp=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(
 const pwaIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const pwaLS=(k,v)=>{try{if(v===undefined)return +localStorage.getItem(PWA.k+'-'+k)||0;localStorage.setItem(PWA.k+'-'+k,v)}catch(e){return 0}};
 let pwaIn=false,pwaAsked=false,pwaGone=false;
-const pwaPaint=()=>{const b=document.getElementById('pwab');if(b){const im=b.querySelector('img');if(im&&!im.getAttribute('src')&&window.__icon)im.src=window.__icon}if(b)b.hidden=!(pwaIn&&!pwaGone&&!pwaApp()&&Date.now()-pwaLS('hide')>6048e5)};
+const pwaPaint=()=>{const b=document.getElementById('pwab');if(b){const im=b.querySelector('img');if(im&&!im.getAttribute('src')&&window.__icon)im.src=window.__icon}if(b)b.hidden=!(pwaIn&&!pwaGone&&!pwaApp()&&Date.now()-pwaLS('hide')>6048e5);const d=document.getElementById('navdl');if(d)d.hidden=pwaGone||pwaApp()};
 const pwaHelp=()=>uiAlert(pwaIOS()?'請點瀏覽器下方的「分享」按鈕,再選「加入主畫面」,桌面就會出現「'+PWA.n+'」。':'請點瀏覽器右上角的選單,選「安裝應用程式」或「加到主畫面」,桌面就會出現「'+PWA.n+'」。');
 const pwaInstall=async()=>{const ip=window.__ip;if(!ip){pwaHelp();return}
   window.__ip=null;try{ip.prompt();const r=await ip.userChoice;if(r&&r.outcome==='accepted')pwaGone=true}catch(e){}pwaPaint()};
@@ -1109,7 +1115,8 @@ const now0=new Date();let CAL={y:now0.getFullYear(),m:now0.getMonth()};let me=nu
 /* ---------- static UI ---------- */
 const NAVS=[['ov','首頁','home'],['news','班級公告','ann'],['gal','班級相簿','gal'],['sched','課表・作業','sched'],['cal','行事曆','cal']];
 const SH={'班級公告':'公告','課表・作業':'課表','班級相簿':'相簿'};
-$('#nav').innerHTML=NAVS.map(([t,l,i],k)=>`<button role="tab" data-go="${t}" aria-selected="${k===0}">${ic(I[i])}<span class="nl-f">${l}</span><span class="nl-s">${SH[l]||l}</span></button>`).join('');
+$('#nav').innerHTML=NAVS.map(([t,l,i],k)=>`<button role="tab" data-go="${t}" aria-selected="${k===0}">${ic(I[i])}<span class="nl-f">${l}</span><span class="nl-s">${SH[l]||l}</span></button>`).join('')+`<button type="button" id="navdl" aria-label="下載 App">${ic('<path d="M12 3v12M7 11l5 5 5-5M5 21h14"/>')}<span class="nl-f">下載 App</span><span class="nl-s">下載</span></button>`;
+$('#navdl').addEventListener('click',()=>pwaInstall());
 const GEAR='<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/>';
 $('#setb').innerHTML=ic(GEAR)+'<span class="nl-f">設定</span><span class="nl-s">設定</span>';
 $('#helpb').innerHTML=ic('<circle cx="12" cy="12" r="9"/><path d="M9.5 9.2a2.6 2.6 0 015 1c0 1.8-2.5 2.2-2.5 3.8M12 17.2h.01"/>')+'<span class="nl-f">互動教學</span><span class="nl-s">教學</span>';
