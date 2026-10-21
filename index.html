@@ -877,6 +877,17 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea,select{bo
 .lite #boot .bo-logo::before,.lite #boot .bo-logo::after{display:none!important}
 .lite #boot .bo-mk{transform:none!important;position:absolute;inset:0;background:linear-gradient(135deg,#f6e27a,#b8860b);box-shadow:0 0 0 3px rgba(246,226,122,.35)}
 .lite #boot.out{animation:bo-bgout .4s ease-in forwards}
+
+/* ===== 手機:去掉所有會造成黑閃的全螢幕圖層效果 ===== */
+html.lite{background:#eef3ff}
+html.lite[data-theme=dark]{background:#0b1220}
+.lite #boot{background:#0a1840!important}
+.lite #boot.out{animation:none!important;opacity:0;visibility:hidden;transition:none!important}
+.lite #boot,.lite #boot *{will-change:auto!important}
+.lite .qt::after{animation:none!important}
+.lite #fx3d,.lite #fxbar{display:none!important}
+.lite .banner canvas.b3d{will-change:auto}
+.lite body::before{animation:none!important;inset:0!important;will-change:auto}
 </style>
 </head>
 <body class="locked">
@@ -913,7 +924,7 @@ function tick(){
   g('bo-fill').style.width=cur+'%';g('bo-pct').textContent=Math.round(cur)+'%';
   if(fin&&cur>=99.9){
     clearInterval(iv);iv=0;
-    timers.push(setTimeout(function(){el.classList.add('out');timers.push(setTimeout(function(){el.style.display='none';closed=true},window.__lite?500:1400))},200));
+    timers.push(setTimeout(function(){el.classList.add('out');timers.push(setTimeout(function(){el.style.display='none';closed=true},window.__lite?150:1400))},200));
   }
 }
 function start(){
@@ -1880,7 +1891,7 @@ else{
   requestAnimationFrame(loop);
 }
 };
-if(window.__lite&&window.__bootOn){var tr=0;(function w(){if(window.__bootOn()&&tr++<80)return setTimeout(w,250);go()})()}else go();
+if(!window.__lite)go();
 })();
 </script>
 
