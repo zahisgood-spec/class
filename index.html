@@ -866,6 +866,17 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea,select{bo
 .lite #cbody .m{content-visibility:auto;contain-intrinsic-size:auto 56px}
 
 .lite #cbody .m{content-visibility:auto;contain-intrinsic-size:auto 56px}
+
+/* ===== 手機載入畫面簡化版 ===== */
+.lite #boot{position:fixed;inset:0;height:100vh;height:100dvh;overflow:hidden}
+.lite #boot::before,.lite #boot::after,.lite .bo-fx,.lite .bo-warp,.lite .bo-r,.lite .bo-coin,.lite .bo-sh{display:none!important}
+.lite #boot .bo-in{perspective:none!important;transform:none!important}
+.lite #boot .bo-in *,.lite #boot .bo-in *::before,.lite #boot .bo-in *::after{animation:none!important;filter:none!important;text-shadow:none!important}
+.lite #boot .bo-sp{animation:bo-spin .8s linear infinite!important}
+.lite #boot .bo-logo{transform:none!important;transform-style:flat!important;width:96px;height:96px}
+.lite #boot .bo-logo::before,.lite #boot .bo-logo::after{display:none!important}
+.lite #boot .bo-mk{transform:none!important;position:absolute;inset:0;background:linear-gradient(135deg,#f6e27a,#b8860b);box-shadow:0 0 0 3px rgba(246,226,122,.35)}
+.lite #boot.out{animation:bo-bgout .4s ease-in forwards}
 </style>
 </head>
 <body class="locked">
@@ -902,7 +913,7 @@ function tick(){
   g('bo-fill').style.width=cur+'%';g('bo-pct').textContent=Math.round(cur)+'%';
   if(fin&&cur>=99.9){
     clearInterval(iv);iv=0;
-    timers.push(setTimeout(function(){el.classList.add('out');timers.push(setTimeout(function(){el.style.display='none';closed=true},1400))},200));
+    timers.push(setTimeout(function(){el.classList.add('out');timers.push(setTimeout(function(){el.style.display='none';closed=true},window.__lite?500:1400))},200));
   }
 }
 function start(){
@@ -912,12 +923,12 @@ function start(){
   g('bo-fill').style.width='0';g('bo-pct').textContent='0%';
   if(iv)clearInterval(iv);iv=setInterval(tick,60);
   timers.push(setTimeout(function(){if(!fin)g('bo-slow').hidden=false},8000));
-  timers.push(setTimeout(function(){if(!fin)B.force()},25000));
+  timers.push(setTimeout(function(){if(!fin)B.force()},window.__lite?9000:25000));
 }
 function allDone(){for(var i=0;i<T.length;i++)if(!T[i].done)return false;return T.length>0}
 function check(){
   if(fin||!allDone())return;
-  var wait=Math.max(0,2800-(Date.now()-t0));
+  var wait=Math.max(0,(window.__lite?700:2800)-(Date.now()-t0));
   timers.push(setTimeout(function(){if(allDone())fin=true},wait));
 }
 var B=window.__boot={
@@ -947,7 +958,7 @@ var B=window.__boot={
 start();B.task('auth','驗證身分');B.task('font','字型');
 var fd=function(){B.done('font')};
 try{(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(fd)}catch(e){fd()}
-setTimeout(fd,4000);
+setTimeout(fd,window.__lite?1200:4000);
 })();
 </script>
 <div id="gate"><div class="gold"><div class="in">
@@ -1760,6 +1771,7 @@ document.addEventListener('pointerdown',function(e){
 
 <script id="fx3d-js">
 (function(){
+var go=function(){
 var RM=matchMedia('(prefers-reduced-motion:reduce)').matches,root=document.documentElement;
 var c=document.createElement('canvas');c.id='fx3d';document.body.insertBefore(c,document.body.firstChild);
 var VS='attribute vec2 a;void main(){gl_Position=vec4(a,0.,1.);}';
@@ -1867,13 +1879,15 @@ else{
   addEventListener('pointerdown',function(e){clk=[e.clientX/w,1-e.clientY/h,(performance.now()-t0)/1000]});
   requestAnimationFrame(loop);
 }
+};
+if(window.__lite&&window.__bootOn){var tr=0;(function w(){if(window.__bootOn()&&tr++<80)return setTimeout(w,250);go()})()}else go();
 })();
 </script>
 
 <script id="fxboot-js">
 (function(){
 var bt=document.getElementById('boot'),mk=document.getElementById('bo-mk'),lg=bt&&bt.querySelector('.bo-logo');
-if(!bt||!mk||!lg||lg.querySelector('.bo-coin'))return;
+if(window.__lite||!bt||!mk||!lg||lg.querySelector('.bo-coin'))return;
 function E(t,cl){var e=document.createElement(t);e.className=cl;return e}
 var coin=E('div','bo-coin'),i,e;
 for(i=-6;i<=6.1;i+=1.5){e=E('b','bo-eg');e.style.transform='translateZ('+i+'px)';coin.appendChild(e)}
@@ -1889,7 +1903,7 @@ bt.addEventListener('pointermove',function(ev){bt.style.setProperty('--bx',(ev.c
 
 <script id="warp-js">
 (function(){
-var bt=document.getElementById('boot'),lg=bt&&bt.querySelector('.bo-logo');if(!bt)return;
+var bt=document.getElementById('boot'),lg=bt&&bt.querySelector('.bo-logo');if(!bt||window.__lite)return;
 if(lg)['bo-r1','bo-r2','bo-r3'].forEach(function(k){var e=document.createElement('b');e.className='bo-r '+k;lg.appendChild(e)});
 var RM=matchMedia('(prefers-reduced-motion:reduce)').matches;if(RM)return;
 var c=document.createElement('canvas');c.className='bo-warp';bt.insertBefore(c,bt.firstChild);
