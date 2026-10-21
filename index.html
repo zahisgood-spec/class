@@ -863,6 +863,9 @@ input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea,select{bo
 .lite .qt:hover::after{filter:none}
 .lite .card,.lite .qt{transition:none}
 @media(prefers-reduced-motion:no-preference){.lite #boot .bo-name{animation-duration:8s}}
+.lite #cbody .m{content-visibility:auto;contain-intrinsic-size:auto 56px}
+
+.lite #cbody .m{content-visibility:auto;contain-intrinsic-size:auto 56px}
 </style>
 </head>
 <body class="locked">
@@ -1015,7 +1018,7 @@ setTimeout(fd,4000);
 const BT=window.__boot||{task(){},done(){},isClosed(){return true},begin(){},set(){}};
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut,setPersistence,browserLocalPersistence,browserSessionPersistence,EmailAuthProvider,reauthenticateWithCredential,updatePassword} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,collection,doc,onSnapshot,addDoc,getDoc,query,orderBy,limit,updateDoc,deleteDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,onSnapshot,addDoc,getDoc,query,orderBy,limit,updateDoc,deleteDoc,setDoc} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 const FIREBASE_CONFIG={apiKey:"AIzaSyCjH-28OnHBKh8cFuL3rPkmxtmV7ixvAnU",authDomain:"class-9ab0a.firebaseapp.com",projectId:"class-9ab0a",storageBucket:"class-9ab0a.firebasestorage.app",messagingSenderId:"1061856226694",appId:"1:1061856226694:web:fa6467c7db7008df329007"};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1066,7 +1069,7 @@ const p2=n=>String(n).padStart(2,'0');
 const md=ts=>{const d=new Date(ts);return p2(d.getMonth()+1)+'-'+p2(d.getDate())};
 const hm=ts=>{const d=new Date(ts);return p2(d.getHours())+':'+p2(d.getMinutes())};
 const hue=n=>[...String(n)].reduce((h,c)=>h+c.charCodeAt(0),0)*47%360;
-const put=(sel,h)=>{const el=$(sel);if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}};
+const put=(sel,h)=>{const el=$(sel);if(el.__h!==h){el.__h=h;el.innerHTML=h}};
 const ic=p=>`<svg class="ic" viewBox="0 0 24 24">${p}</svg>`;
 const I={home:'<path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/>',ann:'<path d="M3 10v4h3l7 4V6L6 10H3zM16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/>',cal:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',sched:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>',gal:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/>',chat:'<path d="M21 12a8 8 0 01-11.6 7.1L3 21l1.9-5.4A8 8 0 1121 12z"/>',cap:'<path d="M2 9l10-5 10 5-10 5zM6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/>',go:'<path d="M9 6l6 6-6 6"/>',pin:'<path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'};
 const D={title:'我們班',tag:'班級專屬網站,公告、課表、照片都在這裡。',ann:[],evt:[],hw:[],sched:{},times:{},photos:[],msg:[],av:{}};
@@ -1151,7 +1154,7 @@ const fname=o=>{const d=new Date(o.ts);return `長訊息-${p2(d.getMonth()+1)}${
 const EXP=new Set(),DL=new Map();
 const dlBtn=id=>{const s=DL.get(id);if(!s)return `<button type="button" data-dl="${esc(id)}">下載</button>`;if(s.st==='busy')return `<button type="button" class="dl busy" disabled><i class="sp"></i>下載中…<b class="bar" style="animation-delay:-${Date.now()-s.t0}ms"></b></button>`;return `<button type="button" class="dl ok" disabled>✓ 已下載</button>`};
 const fileCard=o=>`<div class="fc"><div class="fh"><span class="fi">📄</span><div class="fm"><b>${esc(fname(o))}</b><small>${clen(o.m)} 字・文字檔</small></div></div>${EXP.has(o.id)?`<div class="fx">${esc(o.m)}</div>`:`<div class="fp">${esc([...String(o.m)].slice(0,28).join(''))}…</div>`}<div class="fa"><button type="button" data-ex="${esc(o.id)}">${EXP.has(o.id)?'收合':'查看'}</button>${dlBtn(o.id)}</div></div>`;
-const bubble=o=>isImg(o)?`<img data-img="1" src="${esc(o.img)}" alt="圖片" width="200" height="200" decoding="async">`:isFile(o)?fileCard(o):esc(o.m);
+const bubble=o=>isImg(o)?`<img data-img="1" src="${esc(o.img)}" alt="圖片" width="200" height="200" decoding="async" loading="lazy">`:isFile(o)?fileCard(o):esc(o.m);
 const RB={admin:['🎇','管理員'],teacher:['🐛','老師']};
 const rb=r=>RB[r]?`<span class="rb rb-${r}">${RB[r][0]} ${RB[r][1]}</span>`:'';
 const avKey=o=>o.role?(o.uid?'u'+o.uid:''):(o.no!=null?'s'+o.no:'');
@@ -1219,7 +1222,7 @@ function renderNow(){
     const sc=(RB[o.role]?' st-'+o.role:'')+(isFile(o)?' fb':'')+(isImg(o)?' imgb':'');
     cm+=isMine(o)?`<div class="m me${grp?' g':''}"><button type="button" class="mdot" data-mdot="${esc(o.id)}" aria-label="更多選項" aria-haspopup="true"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg></button><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time><div class="mc2">${RB[o.role]?`<small>${rb(o.role)}</small>`:''}<div class="bb${sc}" data-mid="${esc(o.id)}">${bubble(o)}</div></div></div>`:`<div class="m${grp?' g':''}">${grp?'<span class="avs"></span>':avatar(o)}<div class="mc">${grp?'':`<small>${esc(o.n)}${o.no?' · '+esc(o.no)+'號':''}${rb(o.role)}</small>`}<div class="mr"><div class="bb${sc}">${bubble(o)}</div><time>${o.edited?'已編輯 ':''}${hm(o.ts)}</time></div></div></div>`});
   cm=cm||'<div class="ds"><span>還沒有訊息,說聲嗨吧!</span></div>';
-  const chg=cb.dataset.h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
+  const chg=cb.__h!==cm;put('#cbody',cm);if(chg&&near)cb.scrollTop=cb.scrollHeight;
   if(isOpen)markSeen();
   const lm=L[L.length-1];$('#dsub').textContent=lm?`${RB[lm.role]?RB[lm.role][0]+' ':''}${lm.n}:${pv(lm)}`:'還沒有訊息,說聲嗨吧!';
   const un=isOpen?0:D.msg.filter(o=>o.ts>chatSeen()&&!isMine(o)).length;$('#ub').textContent=un>99?'99+':un;$('#ub').hidden=!un;document.title=(un?'('+(un>99?'99+':un)+') ':'')+D.title;
@@ -1488,15 +1491,16 @@ $('#helpb').onclick=()=>TOUR.open(true);
 /* ---------- firebase ---------- */
 if(!FIREBASE_CONFIG.projectId){document.body.classList.remove('locked');$('#note').hidden=false;$('#cf').hidden=true;$('#cnote').hidden=false;$('#cnote').textContent='尚未連線,無法留言';setUser('訪客','未連線');$('#setb').hidden=true;BT.done('auth')}
 else{
-  const app=initializeApp(FIREBASE_CONFIG),db=getFirestore(app),auth=getAuth(app),bd=id=>()=>BT.done(id);
+  const app=initializeApp(FIREBASE_CONFIG),db=(()=>{try{return initializeFirestore(app,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(e){return getFirestore(app)}})(),auth=getAuth(app),bd=id=>()=>BT.done(id);
   let unsubs=[],last=0,msgReady=false,staff={name:'管理員',role:'管理員',key:'admin'};
   const stop=()=>{unsubs.forEach(f=>f());unsubs=[];msgReady=false;D.av={};meO=null};
   const msgChg=s=>{if(!msgReady){msgReady=true;return}s.docChanges().forEach(c=>{if(c.type!=='added')return;const o=c.doc.data();if(c.doc.metadata.hasPendingWrites||isMine(o)||Date.now()-(o.ts||0)>60000)return;notifyMsg({id:c.doc.id,...o})})};
   const lock=msg=>{TOUR.close();stop();pwaState(false);me=null;document.body.classList.add('locked');$('#gerr').textContent=msg||'';$('#gforms').hidden=false};
   const start=()=>{
     document.body.classList.remove('locked');
-    [['ann','公告'],['evt','行事曆'],['hw','作業'],['photos','相簿'],['msg','留言'],['site','班級設定'],['sched','課表'],['times','上課時間']].forEach(([k,l])=>BT.task(k,l,1));
-    ['ann','evt','hw','photos','msg'].forEach(k=>unsubs.push(onSnapshot(k==='msg'?query(collection(db,'msg'),orderBy('ts','desc'),limit(200)):collection(db,k),s=>{if(k==='msg')msgChg(s);D[k]=s.docs.map(d=>({id:d.id,...d.data()}));render();BT.done(k)},bd(k))));
+    [['ann','公告'],['evt','行事曆'],['hw','作業'],['msg','留言'],['site','班級設定'],['sched','課表'],['times','上課時間']].forEach(([k,l])=>BT.task(k,l,1));
+    const goPhotos=()=>{if(!BT.isClosed())return setTimeout(goPhotos,400);unsubs.push(onSnapshot(query(collection(db,'photos'),orderBy('ts','desc'),limit(window.__lite?12:40)),s=>{D.photos=s.docs.map(d=>({id:d.id,...d.data()}));render()},()=>{}))};goPhotos();
+    ['ann','evt','hw','msg'].forEach(k=>unsubs.push(onSnapshot(k==='msg'?query(collection(db,'msg'),orderBy('ts','desc'),limit(window.__lite?80:200)):collection(db,k),s=>{if(k==='msg')msgChg(s);D[k]=s.docs.map(d=>({id:d.id,...d.data()}));render();BT.done(k)},bd(k))));
     unsubs.push(onSnapshot(doc(db,'meta','site'),s=>{const m=s.data()||{};if(m.title)D.title=m.title;if(m.tag)D.tag=m.tag;try{localStorage.setItem('cls-boot',JSON.stringify({c:m.loadClass||m.title||'',t:m.loadText||''}))}catch(x){}BT.set(m.loadClass||m.title,m.loadText);render();BT.done('site')},bd('site')));
     unsubs.push(onSnapshot(doc(db,'meta','sched'),s=>{D.sched=(s.data()||{}).cells||{};render();BT.done('sched')},bd('sched')));
     unsubs.push(onSnapshot(doc(db,'meta','times'),s=>{D.times=(s.data()||{}).t||{};render();BT.done('times')},bd('times')));
